@@ -1,0 +1,102 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/images/*.{jpg,jpeg,png,gif,ico,svg}", "/css/*", "/js/*", "/api/*", "/*.pdf", "*.pdf", "/*.html"]
+  },
+  "routes": [
+    {
+      "route": "/test-oauth.html",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0"
+      }
+    },
+    {
+      "route": "/index.html",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
+      }
+    },
+    {
+      "route": "/assets/*.js",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0"
+      }
+    },
+    {
+      "route": "/api/health",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/initPrescriptionsTable",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/googleCallback",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/microsoftCallback",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/auth/google/callback",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/auth/microsoft/callback",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/api/email/status",
+      "allowedRoles": ["anonymous"],
+      "rewrite": "/api/email-status"
+    },
+    {
+      "route": "/api/email/disconnect",
+      "allowedRoles": ["anonymous"],
+      "rewrite": "/api/email-disconnect"
+    },
+    {
+      "route": "/api/*",
+      "allowedRoles": ["authenticated"]
+    }
+  ],
+  "mimeTypes": {
+    ".json": "application/json",
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
+    ".css": "text/css",
+    ".pdf": "application/pdf",
+    ".doc": "application/msword",
+    ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ".txt": "text/plain",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".tiff": "image/tiff",
+    ".bmp": "image/bmp",
+    ".svg": "image/svg+xml",
+    ".glb": "model/gltf-binary",
+    ".gltf": "model/gltf+json",
+    ".bin": "application/octet-stream"
+  },
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https://*.supabase.co https://*.openai.azure.com https://cdn.jsdelivr.net https://unpkg.com; worker-src 'self' blob: data: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' data: https://*.supabase.co https://*.openai.azure.com https://*.blob.core.windows.net https://*.table.core.windows.net https://*.cognitiveservices.azure.com https://cdn.jsdelivr.net https://unpkg.com; font-src 'self' data:;",
+    "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
+    "Pragma": "no-cache",
+    "Expires": "0"
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html"
+    }
+  }
+}
