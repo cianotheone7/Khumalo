@@ -31,47 +31,6 @@ jobs:
       - name: Build frontend application
         run: npm run build
       
-      - name: Set up Node.js 20 for API build
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: api/package-lock.json
-      
-      - name: Build API
-        working-directory: ./api
-        run: |
-          npm ci --production
-          npm run build
-          # Remove source files after build, but keep node_modules for Oryx detection
-          find . -name "*.ts" -delete 2>/dev/null || true
-          find . -name "tsconfig.json" -delete 2>/dev/null || true
-          # Clean up node_modules - remove unnecessary files to reduce count
-          if [ -d "node_modules" ]; then
-            echo "Cleaning node_modules to reduce file count..."
-            find node_modules -name "*.md" -delete 2>/dev/null || true
-            find node_modules -name "*.map" -delete 2>/dev/null || true
-            find node_modules -name "*.test.js" -delete 2>/dev/null || true
-            find node_modules -name "*.spec.js" -delete 2>/dev/null || true
-            find node_modules -type d -name "test" -exec rm -rf {} + 2>/dev/null || true
-            find node_modules -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true
-            find node_modules -type d -name "docs" -exec rm -rf {} + 2>/dev/null || true
-            find node_modules -type d -name "examples" -exec rm -rf {} + 2>/dev/null || true
-            echo "node_modules cleaned"
-          fi
-      
-      - name: Verify API structure before deployment
-        run: |
-          echo "Verifying API folder structure..."
-          echo "API folder contents:"
-          ls -la api/ | head -10
-          echo "Checking for package.json:"
-          test -f api/package.json && echo "✓ package.json exists" || echo "✗ package.json missing"
-          echo "Checking for host.json:"
-          test -f api/host.json && echo "✓ host.json exists" || echo "✗ host.json missing"
-          echo "Checking for node_modules:"
-          test -d api/node_modules && echo "✓ node_modules exists" || echo "✗ node_modules missing"
-      
       - name: Clean up workspace - move dist to root
         run: |
           echo "Cleaning up workspace - moving dist contents to root"
@@ -80,20 +39,16 @@ jobs:
           # Move everything from dist to root
           mv dist/* . 2>/dev/null || true
           mv dist/.* . 2>/dev/null || true
-          # Remove empty dist folder and everything else (but keep api folder)
-          rm -rf dist node_modules src public .github
+          # Remove everything except dist contents and config
+          rm -rf dist node_modules src api public .github
           rm -f *.md package*.json *.lock *.ts *.js vite.config.* tsconfig.* eslint.* 2>/dev/null || true
           # Restore config to root
           mv .temp_config.json staticwebapp.config.json 2>/dev/null || true
-          echo "Workspace cleaned - dist contents moved to root, api folder kept"
-          echo "Final file count:"
+          echo "Workspace cleaned - only frontend files remain"
+          echo "File count:"
           find . -type f | wc -l
-          echo "API folder file count:"
-          find api -type f | wc -l
-          echo "Total size:"
-          du -sh . || echo "Size check unavailable"
       
-      - name: Deploy to Azure Static Web Apps
+      - name: Deploy to Azure Static Web Apps (Frontend Only)
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -101,10 +56,8 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "/"
-          api_location: "api"
           output_location: "/"
           skip_app_build: true
-          api_build_command: "npm install --production"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
