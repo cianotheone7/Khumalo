@@ -46,6 +46,19 @@ jobs:
           # Remove source files after build, but keep node_modules for Oryx detection
           find . -name "*.ts" -delete 2>/dev/null || true
           find . -name "tsconfig.json" -delete 2>/dev/null || true
+          # Clean up node_modules - remove unnecessary files to reduce count
+          if [ -d "node_modules" ]; then
+            echo "Cleaning node_modules to reduce file count..."
+            find node_modules -name "*.md" -delete 2>/dev/null || true
+            find node_modules -name "*.map" -delete 2>/dev/null || true
+            find node_modules -name "*.test.js" -delete 2>/dev/null || true
+            find node_modules -name "*.spec.js" -delete 2>/dev/null || true
+            find node_modules -type d -name "test" -exec rm -rf {} + 2>/dev/null || true
+            find node_modules -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true
+            find node_modules -type d -name "docs" -exec rm -rf {} + 2>/dev/null || true
+            find node_modules -type d -name "examples" -exec rm -rf {} + 2>/dev/null || true
+            echo "node_modules cleaned"
+          fi
       
       - name: Verify API structure before deployment
         run: |
@@ -75,8 +88,10 @@ jobs:
           echo "Workspace cleaned - dist contents moved to root, api folder kept"
           echo "Final file count:"
           find . -type f | wc -l
-          echo "API folder structure:"
-          ls -la api/ | head -10
+          echo "API folder file count:"
+          find api -type f | wc -l
+          echo "Total size:"
+          du -sh . || echo "Size check unavailable"
       
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
