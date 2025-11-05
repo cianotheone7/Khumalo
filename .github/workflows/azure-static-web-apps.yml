@@ -57,20 +57,17 @@ jobs:
           echo "Cleaning up unnecessary files to reduce deployment size..."
           # Remove frontend node_modules (not needed in dist)
           rm -rf node_modules
-          # Remove API node_modules and keep only built files
-          rm -rf api/node_modules
-          rm -rf api/.oryx*
-          # Remove source files, keep only built JS files
-          find api -name "*.ts" -type f -delete
-          find api -name "tsconfig.json" -type f -delete
-          find api -name "package.json" -type f -delete
-          find api -name "package-lock.json" -type f -delete
-          # Remove any other unnecessary files
-          find . -type d -name ".git" -exec rm -rf {} + 2>/dev/null || true
-          find . -type f -name ".gitignore" -delete
-          find . -type f -name ".swaignore" -delete
-          find . -type f -name "*.md" -delete
-          find . -type f -name "*.log" -delete
+          # Remove API source files, keep only built JS files
+          find api -name "*.ts" -type f -delete 2>/dev/null || true
+          find api -name "tsconfig.json" -type f -delete 2>/dev/null || true
+          find api -name ".nvmrc" -type f -delete 2>/dev/null || true
+          # Remove Oryx build artifacts
+          rm -rf api/.oryx* 2>/dev/null || true
+          # Remove unnecessary root files
+          find . -maxdepth 1 -type f \( -name "*.md" -o -name "*.log" -o -name ".swaignore" -o -name ".gitignore" \) -delete 2>/dev/null || true
+          # Calculate size
+          echo "Deployment size after cleanup:"
+          du -sh . || echo "Size calculation unavailable"
           echo "Cleanup complete"
       
       - name: Deploy to Azure Static Web Apps
