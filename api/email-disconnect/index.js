@@ -7,7 +7,7 @@ module.exports = async function (context, req) {
     const provider = req.query.provider;
 
     if (!userEmail) {
-        return {
+        context.res = {
             status: 400,
             headers: {
                 'Content-Type': 'application/json'
@@ -16,6 +16,7 @@ module.exports = async function (context, req) {
                 error: 'User email is required'
             }
         };
+        return;
     }
 
     const storageAccountName = process.env.AZURE_STORAGE_ACCOUNT_NAME || 'medprac20241008';
@@ -24,7 +25,7 @@ module.exports = async function (context, req) {
 
     if (!storageAccountKey) {
         context.log('ERROR: AZURE_STORAGE_ACCOUNT_KEY not configured');
-        return {
+        context.res = {
             status: 500,
             headers: {
                 'Content-Type': 'application/json'
@@ -33,6 +34,7 @@ module.exports = async function (context, req) {
                 error: 'Storage account key not configured'
             }
         };
+        return;
     }
 
     try {
@@ -48,7 +50,7 @@ module.exports = async function (context, req) {
             try {
                 const entity = await tableClient.getEntity('user', userEmail);
                 if (entity.provider !== provider) {
-                    return {
+                    context.res = {
                         status: 400,
                         headers: {
                             'Content-Type': 'application/json'
@@ -57,10 +59,11 @@ module.exports = async function (context, req) {
                             error: 'Provider mismatch'
                         }
                     };
+                    return;
                 }
             } catch (getError) {
                 if (getError.statusCode === 404) {
-                    return {
+                    context.res = {
                         status: 404,
                         headers: {
                             'Content-Type': 'application/json'
@@ -69,6 +72,7 @@ module.exports = async function (context, req) {
                             error: 'Email connection not found'
                         }
                     };
+                    return;
                 }
                 throw getError;
             }
@@ -78,7 +82,7 @@ module.exports = async function (context, req) {
         await tableClient.deleteEntity('user', userEmail);
         context.log(`✅ Disconnected email for user: ${userEmail}`);
 
-        return {
+        context.res = {
             status: 200,
             headers: {
                 'Content-Type': 'application/json'
@@ -88,10 +92,12 @@ module.exports = async function (context, req) {
                 message: 'Email disconnected successfully'
             }
         };
+        return;
     } catch (error) {
         if (error.statusCode === 404) {
             // Entity doesn't exist - treat as success
-            return {
+            context.log(`Email connection not found for ${userEmail} (already disconnected)`);
+            context.res = {
                 status: 200,
                 headers: {
                     'Content-Type': 'application/json'
@@ -101,17 +107,21 @@ module.exports = async function (context, req) {
                     message: 'Email connection not found (already disconnected)'
                 }
             };
+            return;
         }
 
         context.log(`Error disconnecting email: ${error.message}`);
-        return {
+        context.log(`Error stack: ${error.stack}`);
+        context.res = {
             status: 500,
             headers: {
                 'Content-Type': 'application/json'
             },
             body: {
-                error: 'Failed to disconnect email connection'
+                error: 'Failed to disconnect email connection',
+                details: error.message
             }
         };
+        return;
     }
 };

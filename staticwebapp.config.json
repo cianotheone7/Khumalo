@@ -56,9 +56,17 @@
       "rewrite": "/api/email-status"
     },
     {
+      "route": "/api/email-status",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/api/email/disconnect",
       "allowedRoles": ["anonymous"],
       "rewrite": "/api/email-disconnect"
+    },
+    {
+      "route": "/api/send-prescription-email",
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/api/*",

@@ -1,0 +1,23 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "",
+    
+    "GOOGLE_CLIENT_ID": "24585891665-l82obachf8r8hopul5jl4d6srdl34v4p.apps.googleusercontent.com",
+    "GOOGLE_CLIENT_SECRET": "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",
+    
+    "MICROSOFT_CLIENT_ID": "b26e2f7f-feda-40be-b837-de9ceb7c0573",
+    "MICROSOFT_CLIENT_SECRET": "your_microsoft_client_secret_here",
+    "MICROSOFT_TENANT_ID": "common",
+    
+    "AZURE_STORAGE_ACCOUNT_NAME": "medprac20241008",
+    "AZURE_STORAGE_ACCOUNT_KEY": "your_storage_account_key_here",
+    "AZURE_STATIC_WEB_APP_URL": "medical-practice-app-v2.azurestaticapps.net"
+  },
+  "Host": {
+    "CORS": "*",
+    "CORSCredentials": false
+  }
+}
+

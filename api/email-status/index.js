@@ -6,7 +6,7 @@ module.exports = async function (context, req) {
     const userEmail = req.query.user;
 
     if (!userEmail) {
-        return {
+        context.res = {
             status: 400,
             headers: {
                 'Content-Type': 'application/json'
@@ -16,6 +16,7 @@ module.exports = async function (context, req) {
                 connected: false
             }
         };
+        return;
     }
 
     const storageAccountName = process.env.AZURE_STORAGE_ACCOUNT_NAME || 'medprac20241008';
@@ -24,7 +25,7 @@ module.exports = async function (context, req) {
 
     if (!storageAccountKey) {
         context.log('ERROR: AZURE_STORAGE_ACCOUNT_KEY not configured');
-        return {
+        context.res = {
             status: 500,
             headers: {
                 'Content-Type': 'application/json'
@@ -34,6 +35,7 @@ module.exports = async function (context, req) {
                 connected: false
             }
         };
+        return;
     }
 
     try {
@@ -47,7 +49,8 @@ module.exports = async function (context, req) {
         try {
             const entity = await tableClient.getEntity('user', userEmail);
             
-            return {
+            context.log(`✅ Email connection found for ${userEmail}: ${entity.provider} - ${entity.email}`);
+            context.res = {
                 status: 200,
                 headers: {
                     'Content-Type': 'application/json'
@@ -59,10 +62,12 @@ module.exports = async function (context, req) {
                     connectedAt: entity.connectedAt
                 }
             };
+            return;
         } catch (getError) {
             if (getError.statusCode === 404) {
                 // No connection found
-                return {
+                context.log(`ℹ️ No email connection found for ${userEmail}`);
+                context.res = {
                     status: 200,
                     headers: {
                         'Content-Type': 'application/json'
@@ -71,12 +76,13 @@ module.exports = async function (context, req) {
                         connected: false
                     }
                 };
+                return;
             }
             throw getError;
         }
     } catch (error) {
         context.log(`Error checking email status: ${error.message}`);
-        return {
+        context.res = {
             status: 500,
             headers: {
                 'Content-Type': 'application/json'

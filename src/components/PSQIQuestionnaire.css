@@ -1,0 +1,470 @@
+.psqi-questionnaire {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #ebf1fb;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.psqi-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.psqi-header h2 {
+  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.psqi-instructions {
+  color: #6c757d;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.mandatory-notice {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #856404;
+  font-size: 0.95rem;
+}
+
+.psqi-progress {
+  margin-bottom: 2rem;
+}
+
+.step-indicator {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.step-indicator::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 40px;
+  right: 40px;
+  height: 2px;
+  background: #e9ecef;
+  z-index: 1;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-height: 130px;
+  width: 140px;
+  justify-content: center;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e9ecef;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+  background: #674580;
+  color: white;
+  transform: scale(1.1);
+}
+
+.step.completed .step-number {
+  background: #9c8cff;
+  color: white;
+}
+
+.step.completed .step-label {
+  color: #9c8cff;
+  font-weight: 600;
+}
+
+.step-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-align: center;
+  font-weight: 500;
+  max-width: 120px;
+  line-height: 1.3;
+  margin-top: 0.5rem;
+}
+
+.step.active .step-label {
+  color: #674580;
+  font-weight: 600;
+}
+
+.psqi-content {
+  margin-bottom: 2rem;
+  min-height: 400px;
+}
+
+.psqi-step h3 {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.psqi-step p {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #2c3e50 !important; /* Changed to darker black for better visibility */
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  background: #ffffff;
+  color: #2c3e50;
+}
+
+.form-group textarea::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-group input[type="time"],
+.form-group input[type="date"] {
+  max-width: 200px;
+}
+
+.form-group input[type="number"] {
+  max-width: 150px;
+}
+
+.sleep-problems {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.problem-item {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.problem-item label {
+  font-weight: 600;
+  color: #2c3e50 !important; /* Changed to darker black for better visibility */
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.problem-item textarea {
+  background: #ffffff;
+  color: #2c3e50;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  width: 100%;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.3s ease;
+}
+
+.problem-item textarea::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+.problem-item textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.frequency-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.radio-option:hover {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.radio-option input[type="radio"] {
+  margin-right: 0.75rem;
+  width: auto;
+  margin-bottom: 0;
+}
+
+.radio-option input[type="radio"]:checked + span {
+  color: #007bff;
+  font-weight: 600;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+  border-color: #007bff;
+  background: #e3f2fd;
+}
+
+.psqi-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e9ecef;
+}
+
+.action-right {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #6c757d;
+  border: 2px solid #6c757d;
+}
+
+.btn-outline:hover {
+  background: #6c757d;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .psqi-questionnaire {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  .psqi-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .psqi-instructions {
+    font-size: 0.9rem;
+  }
+
+  .step-indicator {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .step-indicator::before {
+    display: none;
+  }
+
+  .step {
+    flex-direction: row;
+    width: 100%;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    min-height: 80px;
+    justify-content: flex-start;
+  }
+
+  .step-number {
+    margin-right: 1rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .step-label {
+    text-align: left;
+    max-width: none;
+    flex: 1;
+  }
+
+  .psqi-step h3 {
+    font-size: 1.25rem;
+  }
+
+  .frequency-options {
+    grid-template-columns: 1fr;
+  }
+
+  .radio-option {
+    padding: 1rem;
+  }
+
+  .psqi-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .action-right {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .btn {
+    flex: 1;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .psqi-questionnaire {
+    padding: 0.75rem;
+    margin: 0.25rem;
+  }
+
+  .psqi-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .psqi-instructions {
+    font-size: 0.85rem;
+  }
+
+  .mandatory-notice {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .step {
+    padding: 0.5rem;
+  }
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
+  .step-label {
+    font-size: 0.75rem;
+  }
+
+  .psqi-step h3 {
+    font-size: 1.1rem;
+  }
+
+  .form-group input,
+  .form-group textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .problem-item {
+    padding: 1rem;
+  }
+
+  .radio-option {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}

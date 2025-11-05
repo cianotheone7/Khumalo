@@ -1,0 +1,9 @@
+{
+  "appLocation": ".",
+  "outputLocation": "dist",
+  "apiLocation": "api",
+  "apiLanguage": "node",
+  "apiVersion": "16"
+}
+
+
