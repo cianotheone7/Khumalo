@@ -47,6 +47,18 @@ jobs:
           find . -name "*.ts" -delete 2>/dev/null || true
           find . -name "tsconfig.json" -delete 2>/dev/null || true
       
+      - name: Verify API structure before deployment
+        run: |
+          echo "Verifying API folder structure..."
+          echo "API folder contents:"
+          ls -la api/ | head -10
+          echo "Checking for package.json:"
+          test -f api/package.json && echo "✓ package.json exists" || echo "✗ package.json missing"
+          echo "Checking for host.json:"
+          test -f api/host.json && echo "✓ host.json exists" || echo "✗ host.json missing"
+          echo "Checking for node_modules:"
+          test -d api/node_modules && echo "✓ node_modules exists" || echo "✗ node_modules missing"
+      
       - name: Clean up workspace - move dist to root
         run: |
           echo "Cleaning up workspace - moving dist contents to root"
@@ -61,8 +73,10 @@ jobs:
           # Restore config to root
           mv .temp_config.json staticwebapp.config.json 2>/dev/null || true
           echo "Workspace cleaned - dist contents moved to root, api folder kept"
-          echo "File count:"
+          echo "Final file count:"
           find . -type f | wc -l
+          echo "API folder structure:"
+          ls -la api/ | head -10
       
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
@@ -75,6 +89,7 @@ jobs:
           api_location: "api"
           output_location: "/"
           skip_app_build: true
+          api_build_command: "npm install --production"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
