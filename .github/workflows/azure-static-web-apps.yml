@@ -54,20 +54,52 @@ jobs:
       
       - name: Clean up before deployment
         run: |
-          echo "Cleaning up unnecessary files to reduce deployment size..."
+          echo "Cleaning up unnecessary files to reduce deployment size and file count..."
           # Remove frontend node_modules (not needed in dist)
           rm -rf node_modules
+          
           # Remove API source files, keep only built JS files
           find api -name "*.ts" -type f -delete 2>/dev/null || true
           find api -name "tsconfig.json" -type f -delete 2>/dev/null || true
           find api -name ".nvmrc" -type f -delete 2>/dev/null || true
+          
+          # Aggressively clean API node_modules - remove unnecessary files
+          if [ -d "api/node_modules" ]; then
+            echo "Cleaning API node_modules..."
+            # Remove test files, docs, and source maps
+            find api/node_modules -name "*.test.js" -delete 2>/dev/null || true
+            find api/node_modules -name "*.spec.js" -delete 2>/dev/null || true
+            find api/node_modules -name "*.map" -delete 2>/dev/null || true
+            find api/node_modules -name "README*" -delete 2>/dev/null || true
+            find api/node_modules -name "CHANGELOG*" -delete 2>/dev/null || true
+            find api/node_modules -name "LICENSE*" -delete 2>/dev/null || true
+            find api/node_modules -name "*.md" -delete 2>/dev/null || true
+            find api/node_modules -type d -name "test" -exec rm -rf {} + 2>/dev/null || true
+            find api/node_modules -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true
+            find api/node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true
+            find api/node_modules -type d -name "docs" -exec rm -rf {} + 2>/dev/null || true
+            find api/node_modules -type d -name "doc" -exec rm -rf {} + 2>/dev/null || true
+            find api/node_modules -type d -name "examples" -exec rm -rf {} + 2>/dev/null || true
+            find api/node_modules -type d -name "example" -exec rm -rf {} + 2>/dev/null || true
+            echo "API node_modules cleaned"
+          fi
+          
           # Remove Oryx build artifacts
           rm -rf api/.oryx* 2>/dev/null || true
-          # Remove unnecessary root files
+          
+          # Remove unnecessary root files and folders
           find . -maxdepth 1 -type f \( -name "*.md" -o -name "*.log" -o -name ".swaignore" -o -name ".gitignore" \) -delete 2>/dev/null || true
-          # Calculate size
-          echo "Deployment size after cleanup:"
+          rm -rf .github 2>/dev/null || true
+          rm -rf src 2>/dev/null || true
+          rm -rf public 2>/dev/null || true
+          
+          # Count files and calculate size
+          echo "---"
+          echo "File count:"
+          find . -type f | wc -l
+          echo "Deployment size:"
           du -sh . || echo "Size calculation unavailable"
+          echo "---"
           echo "Cleanup complete"
       
       - name: Deploy to Azure Static Web Apps
