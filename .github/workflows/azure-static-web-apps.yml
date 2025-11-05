@@ -31,6 +31,11 @@ jobs:
       - name: Build frontend application
         run: npm run build
       
+      - name: Remove API folder to prevent Oryx from building it
+        run: |
+          echo "Removing api folder - will deploy API separately"
+          rm -rf api
+      
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
