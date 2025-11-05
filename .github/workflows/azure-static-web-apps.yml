@@ -34,17 +34,16 @@ jobs:
       - name: Clean up workspace - move dist to root
         run: |
           echo "Cleaning up workspace - moving dist contents to root"
-          # Move dist contents to root and keep config
-          mv staticwebapp.config.json dist/ 2>/dev/null || true
+          # Save config first
+          mv staticwebapp.config.json .temp_config.json 2>/dev/null || true
           # Move everything from dist to root
           mv dist/* . 2>/dev/null || true
           mv dist/.* . 2>/dev/null || true
           # Remove empty dist folder and everything else
-          rm -rf dist
-          rm -rf node_modules src api public .github
-          rm -f *.md *.json *.lock *.ts *.js 2>/dev/null || true
+          rm -rf dist node_modules src api public .github
+          rm -f *.md package*.json *.lock *.ts *.js vite.config.* tsconfig.* eslint.* 2>/dev/null || true
           # Restore config to root
-          mv staticwebapp.config.json . 2>/dev/null || true
+          mv .temp_config.json staticwebapp.config.json 2>/dev/null || true
           echo "Workspace cleaned - dist contents moved to root"
           echo "File count:"
           find . -type f | wc -l
