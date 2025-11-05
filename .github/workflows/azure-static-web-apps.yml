@@ -36,17 +36,27 @@ jobs:
           echo "Cleaning up workspace - moving dist contents to root"
           # Save config first
           mv staticwebapp.config.json .temp_config.json 2>/dev/null || true
+          # FORCE REMOVE API FOLDER FIRST
+          rm -rf api
           # Move everything from dist to root
           mv dist/* . 2>/dev/null || true
           mv dist/.* . 2>/dev/null || true
           # Remove everything except dist contents and config
-          rm -rf dist node_modules src api public .github
+          rm -rf dist node_modules src public .github
           rm -f *.md package*.json *.lock *.ts *.js vite.config.* tsconfig.* eslint.* 2>/dev/null || true
           # Restore config to root
           mv .temp_config.json staticwebapp.config.json 2>/dev/null || true
+          # VERIFY API IS GONE
+          if [ -d "api" ]; then
+            echo "ERROR: API folder still exists!"
+            exit 1
+          fi
+          echo "✓ API folder removed"
           echo "Workspace cleaned - only frontend files remain"
           echo "File count:"
           find . -type f | wc -l
+          echo "Contents:"
+          ls -la
       
       - name: Deploy to Azure Static Web Apps (Frontend Only)
         id: builddeploy
