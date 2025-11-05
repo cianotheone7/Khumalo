@@ -31,6 +31,28 @@ jobs:
       - name: Build frontend application
         run: npm run build
       
+      - name: Set up Node.js 20 for API build
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: api/package-lock.json
+      
+      - name: Build API
+        working-directory: ./api
+        run: |
+          npm ci
+          npm run build
+      
+      - name: Clean up API - keep only built files and package.json
+        run: |
+          echo "Cleaning up API - removing source files and node_modules"
+          # Remove API source files and node_modules, keep only built JS and package.json
+          find api -name "*.ts" -delete 2>/dev/null || true
+          find api -name "tsconfig.json" -delete 2>/dev/null || true
+          rm -rf api/node_modules
+          echo "API cleaned - only built files and package.json remain"
+      
       - name: Clean up workspace - move dist to root
         run: |
           echo "Cleaning up workspace - moving dist contents to root"
@@ -39,12 +61,12 @@ jobs:
           # Move everything from dist to root
           mv dist/* . 2>/dev/null || true
           mv dist/.* . 2>/dev/null || true
-          # Remove empty dist folder and everything else
-          rm -rf dist node_modules src api public .github
+          # Remove empty dist folder and everything else (but keep api folder)
+          rm -rf dist node_modules src public .github
           rm -f *.md package*.json *.lock *.ts *.js vite.config.* tsconfig.* eslint.* 2>/dev/null || true
           # Restore config to root
           mv .temp_config.json staticwebapp.config.json 2>/dev/null || true
-          echo "Workspace cleaned - dist contents moved to root"
+          echo "Workspace cleaned - dist contents moved to root, api folder kept"
           echo "File count:"
           find . -type f | wc -l
       
@@ -56,8 +78,10 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "/"
+          api_location: "api"
           output_location: "/"
           skip_app_build: true
+          skip_api_build: true
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
