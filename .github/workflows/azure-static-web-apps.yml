@@ -41,19 +41,11 @@ jobs:
       - name: Build API
         working-directory: ./api
         run: |
-          npm ci
+          npm ci --production
           npm run build
-      
-      - name: Clean up API - keep only built files and package.json
-        run: |
-          echo "Cleaning up API - removing source files and node_modules"
-          # Remove API source files and node_modules, keep only built JS, package.json, host.json, and function.json files
-          find api -name "*.ts" -delete 2>/dev/null || true
-          find api -name "tsconfig.json" -delete 2>/dev/null || true
-          rm -rf api/node_modules
-          # Ensure package.json and host.json are present for Oryx detection
-          echo "API cleaned - keeping built JS files, package.json, host.json, and function.json files"
-          ls -la api/ | head -20
+          # Remove source files after build, but keep node_modules for Oryx detection
+          find . -name "*.ts" -delete 2>/dev/null || true
+          find . -name "tsconfig.json" -delete 2>/dev/null || true
       
       - name: Clean up workspace - move dist to root
         run: |
