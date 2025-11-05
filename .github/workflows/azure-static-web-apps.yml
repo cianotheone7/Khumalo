@@ -31,19 +31,21 @@ jobs:
       - name: Build frontend application
         run: npm run build
       
-      - name: Clean up workspace - keep only dist and config
+      - name: Clean up workspace - move dist to root
         run: |
-          echo "Cleaning up workspace - keeping only dist and staticwebapp.config.json"
-          # Keep dist and staticwebapp.config.json, remove everything else
-          mkdir -p .temp_deploy
-          mv dist .temp_deploy/
-          mv staticwebapp.config.json .temp_deploy/ 2>/dev/null || true
-          # Remove everything
-          rm -rf *
-          # Restore only what we need
-          mv .temp_deploy/* .
-          rm -rf .temp_deploy
-          echo "Workspace cleaned - only dist and config remain"
+          echo "Cleaning up workspace - moving dist contents to root"
+          # Move dist contents to root and keep config
+          mv staticwebapp.config.json dist/ 2>/dev/null || true
+          # Move everything from dist to root
+          mv dist/* . 2>/dev/null || true
+          mv dist/.* . 2>/dev/null || true
+          # Remove empty dist folder and everything else
+          rm -rf dist
+          rm -rf node_modules src api public .github
+          rm -f *.md *.json *.lock *.ts *.js 2>/dev/null || true
+          # Restore config to root
+          mv staticwebapp.config.json . 2>/dev/null || true
+          echo "Workspace cleaned - dist contents moved to root"
           echo "File count:"
           find . -type f | wc -l
       
@@ -55,7 +57,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           app_location: "/"
-          output_location: "dist"
+          output_location: "/"
           skip_app_build: true
 
   close_pull_request_job:
