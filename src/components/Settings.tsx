@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { getApiUrl } from '../config/api-config';
 import './Settings.css';
 import {
   loadUserProfile,
@@ -308,7 +309,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser }) => {
     console.log(`🔍 Checking email status for: ${userEmail}`);
 
     try {
-      const url = `/api/email-status?user=${encodeURIComponent(userEmail)}`;
+      const url = getApiUrl(`/api/email-status?user=${encodeURIComponent(userEmail)}`);
       console.log(`📡 Fetching: ${url}`);
       
       const response = await fetch(url, {
@@ -440,7 +441,7 @@ const Settings: React.FC<SettingsProps> = ({ user, onUpdateUser }) => {
     
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/email/disconnect?user=${encodeURIComponent(user.email)}&provider=${connectedProvider}`, { 
+      const response = await fetch(getApiUrl(`/api/email/disconnect?user=${encodeURIComponent(user.email)}&provider=${connectedProvider}`), { 
         method: 'POST' 
       });
       

@@ -44,7 +44,8 @@ export const createBackup = async (userId?: string): Promise<BackupResult> => {
     const recordCounts: Record<string, number> = {};
 
     // Get backup API endpoint (if deployed) or use local storage fallback
-    const backupApiUrl = import.meta.env.VITE_BACKUP_API_URL || '/api/backupTables';
+    const { getApiUrl } = await import('../config/api-config');
+    const backupApiUrl = import.meta.env.VITE_BACKUP_API_URL || getApiUrl('/api/backupTables');
 
     try {
       // Try to use backup API function

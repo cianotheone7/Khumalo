@@ -21,6 +21,7 @@ import {
   getAllCategories,
   type SAMedication
 } from '../services/southAfricanFormulary';
+import { getApiUrl } from '../config/api-config';
 import './PrescriptionManagement.css';
 
 // Virtual scrolling configuration
@@ -541,7 +542,7 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
     try {
       setSendingEmail(true);
       
-      const response = await fetch('/api/send-prescription-email', {
+      const response = await fetch(getApiUrl('/api/send-prescription-email'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
