@@ -29,6 +29,8 @@ jobs:
         run: npm ci
       
       - name: Build frontend application
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://medical-practice-api-v2.azurewebsites.net' }}
         run: npm run build
       
       - name: Clean up workspace - move dist to root
