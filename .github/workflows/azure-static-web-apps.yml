@@ -31,10 +31,21 @@ jobs:
       - name: Build frontend application
         run: npm run build
       
-      - name: Remove API folder to prevent Oryx from building it
+      - name: Clean up workspace - keep only dist and config
         run: |
-          echo "Removing api folder - will deploy API separately"
-          rm -rf api
+          echo "Cleaning up workspace - keeping only dist and staticwebapp.config.json"
+          # Keep dist and staticwebapp.config.json, remove everything else
+          mkdir -p .temp_deploy
+          mv dist .temp_deploy/
+          mv staticwebapp.config.json .temp_deploy/ 2>/dev/null || true
+          # Remove everything
+          rm -rf *
+          # Restore only what we need
+          mv .temp_deploy/* .
+          rm -rf .temp_deploy
+          echo "Workspace cleaned - only dist and config remain"
+          echo "File count:"
+          find . -type f | wc -l
       
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
