@@ -58,18 +58,13 @@ jobs:
           # Remove frontend node_modules (not needed in dist)
           rm -rf node_modules
           
-          # Remove API node_modules completely
+          # Remove API node_modules - Oryx will install them, but we'll clean up after
           rm -rf api/node_modules
           
           # Remove API source files, keep only built JS files
           find api -name "*.ts" -type f -delete 2>/dev/null || true
           find api -name "tsconfig.json" -type f -delete 2>/dev/null || true
           find api -name ".nvmrc" -type f -delete 2>/dev/null || true
-          
-          # CRITICAL: Remove package.json to prevent Oryx from installing node_modules
-          # We've already built the API, so Oryx just needs to package the built files
-          echo "Removing api/package.json to prevent Oryx from installing dependencies"
-          rm -f api/package.json api/package-lock.json
           
           # Remove Oryx build artifacts
           rm -rf api/.oryx* 2>/dev/null || true
@@ -87,7 +82,7 @@ jobs:
           echo "Deployment size:"
           du -sh . || echo "Size calculation unavailable"
           echo "---"
-          echo "Cleanup complete"
+          echo "Cleanup complete - package.json kept for Azure Functions"
       
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
