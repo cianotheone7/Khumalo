@@ -2,6 +2,9 @@
   "name": "cortexha-api",
   "version": "1.0.0",
   "description": "Azure Functions API for Cortexha Medical Practice",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "start": "func start",
     "build": "tsc"

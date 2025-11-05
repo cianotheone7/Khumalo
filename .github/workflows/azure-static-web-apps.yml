@@ -34,12 +34,18 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
       
-      - name: Install API dependencies
-        working-directory: ./api
-        run: npm ci
-      
       - name: Build application
         run: npm run build
+      
+      - name: Clean up before deployment
+        run: |
+          echo "Cleaning up unnecessary files to reduce deployment size..."
+          # Remove frontend node_modules (not needed in dist)
+          rm -rf node_modules
+          # Remove API node_modules (Oryx will build it)
+          rm -rf api/node_modules
+          # Remove any build artifacts
+          find . -type d -name ".oryx*" -exec rm -rf {} + 2>/dev/null || true
       
       - name: Deploy to Azure Static Web Apps
         id: builddeploy
@@ -51,7 +57,8 @@ jobs:
           app_location: "/" # App source code path
           api_location: "api" # Api source code path - optional
           output_location: "dist" # Built app content directory
-          skip_app_build: true # We already built it above
+          skip_app_build: true # We already built the frontend above
+          # Oryx will build the API using Node version from api/.nvmrc
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

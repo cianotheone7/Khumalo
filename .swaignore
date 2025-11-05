@@ -1,0 +1,27 @@
+# Node modules
+**/node_modules/
+
+# Build artifacts
+**/.oryx_prod_node_modules/
+**/.oryx_all_node_modules/
+**/dist/
+**/.vscode/
+**/.idea/
+
+# Logs
+**/*.log
+**/logs/
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+# TypeScript build output
+**/*.tsbuildinfo
+api/**/*.js.map
+
