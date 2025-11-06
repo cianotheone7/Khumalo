@@ -7,6 +7,15 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+/* Ensure all text elements have dark color */
+.psqi-questionnaire label,
+.psqi-questionnaire p,
+.psqi-questionnaire h2,
+.psqi-questionnaire h3,
+.psqi-questionnaire span:not(.btn *) {
+  color: #2c3e50 !important;
+}
+
 .psqi-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -146,7 +155,9 @@
   margin-bottom: 1.5rem;
 }
 
-.form-group label {
+.psqi-questionnaire .form-group label,
+.psqi-step .form-group label,
+.psqi-questionnaire label {
   display: block;
   font-weight: 600;
   color: #2c3e50 !important; /* Changed to darker black for better visibility */
@@ -200,7 +211,8 @@
   border: 1px solid #e9ecef;
 }
 
-.problem-item label {
+.psqi-questionnaire .problem-item label,
+.psqi-step .problem-item label {
   font-weight: 600;
   color: #2c3e50 !important; /* Changed to darker black for better visibility */
   margin-bottom: 1rem;
