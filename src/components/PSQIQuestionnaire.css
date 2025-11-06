@@ -134,7 +134,7 @@
 }
 
 .psqi-step p {
-  color: #2c3e50;
+  color: #2c3e50 !important;
   font-size: 1.1rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
@@ -247,6 +247,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
+  color: #2c3e50 !important; /* Ensure text is dark and visible */
 }
 
 .radio-option:hover {
@@ -260,14 +261,22 @@
   margin-bottom: 0;
 }
 
+.radio-option span {
+  color: #2c3e50 !important; /* Ensure span text is dark */
+}
+
 .radio-option input[type="radio"]:checked + span {
-  color: #007bff;
+  color: #007bff !important;
   font-weight: 600;
 }
 
 .radio-option:has(input[type="radio"]:checked) {
   border-color: #007bff;
   background: #e3f2fd;
+}
+
+.radio-option:has(input[type="radio"]:checked) span {
+  color: #007bff !important;
 }
 
 .psqi-actions {
