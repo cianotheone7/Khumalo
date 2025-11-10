@@ -3148,12 +3148,21 @@ Note: This is a basic summary. For detailed analysis, please review the individu
 
             {/* Edit Patient Modal */}
             {showEditPatient && (
-              <div className="modal edit-patient-modal">
-                <div className="modal-content edit-patient-modal-content">
-                  <h3>Edit Patient 📝</h3>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Full Name *</label>
+              <>
+                <style dangerouslySetInnerHTML={{__html: `
+                  .edit-patient-modal .form-group label,
+                  .edit-patient-modal-content .form-group label,
+                  .edit-patient-modal .edit-patient-modal-content .form-group label {
+                    color: #2c3e50 !important;
+                    font-weight: 600 !important;
+                  }
+                `}} />
+                <div className="modal edit-patient-modal">
+                  <div className="modal-content edit-patient-modal-content">
+                    <h3>Edit Patient 📝</h3>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label style={{ color: '#2c3e50', fontWeight: 600 }}>Full Name *</label>
                       <input 
                         type="text" 
                         value={newPatient.name}
