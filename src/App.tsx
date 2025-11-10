@@ -3153,7 +3153,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <h3>Edit Patient 📝</h3>
                   <div className="form-row">
                     <div className="form-group">
-                      <label style={{ color: '#2c3e50' }}>Full Name *</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Full Name *</label>
                       <input 
                         type="text" 
                         value={newPatient.name}
@@ -3162,7 +3162,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>Medical Record Number *</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Medical Record Number *</label>
                       <input 
                         type="text" 
                         value={newPatient.medicalRecordNumber}
@@ -3173,7 +3173,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Email Address</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Email Address</label>
                       <input 
                         type="email" 
                         value={newPatient.email}
@@ -3182,7 +3182,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>Phone Number</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Phone Number</label>
                       <input 
                         type="tel" 
                         value={newPatient.phone}
@@ -3196,7 +3196,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <h4 style={{ marginTop: '20px', marginBottom: '10px', color: '#2c5282' }}>Address Information</h4>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Home/Unit Number or Estate</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Home/Unit Number or Estate</label>
                       <input 
                         type="text" 
                         value={newPatient.homeNumber || ''}
@@ -3205,7 +3205,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>Street Address</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Street Address</label>
                       <input 
                         type="text" 
                         value={newPatient.streetAddress || ''}
@@ -3216,7 +3216,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Suburb</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Suburb</label>
                       <input 
                         type="text" 
                         value={newPatient.suburb || ''}
@@ -3225,7 +3225,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>City</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>City</label>
                       <input 
                         type="text" 
                         value={newPatient.city || ''}
@@ -3234,7 +3234,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>Province</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Province</label>
                       <input 
                         type="text" 
                         value={newPatient.province || ''}
@@ -3245,7 +3245,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Postal Code</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Postal Code</label>
                       <input 
                         type="text" 
                         value={newPatient.postalCode || ''}
@@ -3254,7 +3254,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>Country</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Country</label>
                       <input 
                         type="text" 
                         value={newPatient.country || ''}
@@ -3265,7 +3265,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Mobile Phone</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Mobile Phone</label>
                       <input 
                         type="tel" 
                         value={newPatient.mobilePhone}
@@ -3274,7 +3274,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>WhatsApp Phone</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>WhatsApp Phone</label>
                       <input 
                         type="tel" 
                         value={newPatient.whatsappPhone}
@@ -3285,7 +3285,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Passport/ID Number</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Passport/ID Number</label>
                       <input 
                         type="text" 
                         value={newPatient.passportId}
@@ -3294,7 +3294,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>Gender</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Gender</label>
                       <select 
                         value={newPatient.gender}
                         onChange={(e) => setNewPatient({...newPatient, gender: e.target.value})}
@@ -3308,7 +3308,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                   </div>
                   <div className="form-group">
-                    <label>Date of Birth 📅</label>
+                    <label style={{ color: '#2c3e50', fontWeight: 600 }}>Date of Birth 📅</label>
                     <DateOfBirthPicker
                       value={newPatient.dateOfBirth}
                       onChange={(date) => setNewPatient({...newPatient, dateOfBirth: date})}
@@ -3336,7 +3336,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
                   <div className="form-row">
                   <div className="form-group">
-                    <label>Medical Aid Scheme</label>
+                    <label style={{ color: '#2c3e50', fontWeight: 600 }}>Medical Aid Scheme</label>
                     <select 
                       value={newPatient.insuranceProvider}
                       onChange={(e) => setNewPatient({...newPatient, insuranceProvider: e.target.value})}
@@ -3359,7 +3359,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   {/* Other Medical Aid Field */}
                   {newPatient.insuranceProvider === 'Other' && (
                     <div className="form-group">
-                      <label>Specify Medical Aid Scheme</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Specify Medical Aid Scheme</label>
                       <input 
                         type="text" 
                         value={newPatient.customInsuranceProvider}
@@ -3372,7 +3372,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   {/* Medical Aid Number and Dependent Code */}
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Medical Aid Number</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Medical Aid Number</label>
                       <input 
                         type="text" 
                         value={newPatient.medicalAidNumber}
@@ -3381,7 +3381,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>Dependent Code</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Dependent Code</label>
                       <input 
                         type="text" 
                         value={newPatient.dependentCode}
@@ -3393,7 +3393,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
 
                   {/* Medical Information */}
                   <div className="form-group">
-                    <label>Allergies</label>
+                    <label style={{ color: '#2c3e50', fontWeight: 600 }}>Allergies</label>
                     <textarea 
                       value={newPatient.allergies}
                       onChange={(e) => setNewPatient({...newPatient, allergies: e.target.value})}
@@ -3403,7 +3403,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
 
                   <div className="form-group">
-                    <label>Diagnosed Chronic Conditions</label>
+                    <label style={{ color: '#2c3e50', fontWeight: 600 }}>Diagnosed Chronic Conditions</label>
                     <textarea 
                       value={newPatient.chronicConditions}
                       onChange={(e) => setNewPatient({...newPatient, chronicConditions: e.target.value})}
@@ -3414,7 +3414,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
 
                   {/* Patient Status */}
                   <div className="form-group">
-                    <label>Patient Status</label>
+                    <label style={{ color: '#2c3e50', fontWeight: 600 }}>Patient Status</label>
                     <select 
                       value={newPatient.status}
                       onChange={(e) => setNewPatient({...newPatient, status: e.target.value as 'Living' | 'Deceased' | 'Unknown', deceasedDate: e.target.value === 'Deceased' ? new Date().toISOString().split('T')[0] : ''})}
@@ -3427,7 +3427,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
 
                   {newPatient.status === 'Deceased' && (
                     <div className="form-group">
-                      <label>Date of Death</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Date of Death</label>
                       <input
                         type="date"
                         value={newPatient.deceasedDate || ''}
