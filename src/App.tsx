@@ -635,6 +635,22 @@ function Dashboard() {
 
   const editPatient = (patient: Patient) => {
     setEditingPatient(patient);
+    
+    // Parse emergencyContact string into name and phone
+    let emergencyContactName = '';
+    let emergencyContactPhone = '';
+    if (patient.emergencyContact) {
+      // Format is typically "Name (Phone)" or just "Name" or just "Phone"
+      const match = patient.emergencyContact.match(/^(.+?)\s*\(([^)]+)\)$/);
+      if (match) {
+        emergencyContactName = match[1].trim();
+        emergencyContactPhone = match[2].trim();
+      } else {
+        // If no parentheses, assume it's just the name
+        emergencyContactName = patient.emergencyContact.trim();
+      }
+    }
+    
     setNewPatient({
       name: patient.name,
       email: patient.email,
@@ -646,6 +662,8 @@ function Dashboard() {
       dateOfBirth: patient.dateOfBirth,
       medicalRecordNumber: patient.medicalRecordNumber,
       emergencyContact: patient.emergencyContact,
+      emergencyContactName: emergencyContactName,
+      emergencyContactPhone: emergencyContactPhone,
       insuranceProvider: patient.insuranceProvider,
       customInsuranceProvider: '',
       medicalAidNumber: patient.medicalAidNumber,
@@ -670,6 +688,11 @@ function Dashboard() {
     if (editingPatient && newPatient.name) {
       setIsUpdatingPatient(true);
       try {
+        // Combine emergencyContactName and emergencyContactPhone into emergencyContact
+        const emergencyContact = newPatient.emergencyContactName && newPatient.emergencyContactPhone 
+          ? `${newPatient.emergencyContactName} (${newPatient.emergencyContactPhone})`
+          : newPatient.emergencyContactName || newPatient.emergencyContactPhone || '';
+        
         const updatedPatientData = {
           name: newPatient.name,
           email: newPatient.email,
@@ -680,7 +703,7 @@ function Dashboard() {
           gender: newPatient.gender,
           dateOfBirth: newPatient.dateOfBirth,
           medicalRecordNumber: newPatient.medicalRecordNumber,
-          emergencyContact: newPatient.emergencyContact,
+          emergencyContact: emergencyContact,
           insuranceProvider: newPatient.insuranceProvider === 'Other' ? newPatient.customInsuranceProvider : newPatient.insuranceProvider,
           medicalAidNumber: newPatient.medicalAidNumber,
           dependentCode: newPatient.dependentCode,
@@ -3130,7 +3153,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <h3>Edit Patient 📝</h3>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Full Name *</label>
+                      <label style={{ color: '#2c3e50' }}>Full Name *</label>
                       <input 
                         type="text" 
                         value={newPatient.name}
@@ -3293,7 +3316,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
                   <div className="form-row">
                     <div className="form-group">
-                      <label>Emergency Contact Name</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Emergency Contact Name</label>
                       <input 
                         type="text" 
                         value={newPatient.emergencyContactName || ''}
@@ -3302,7 +3325,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       />
                     </div>
                     <div className="form-group">
-                      <label>Emergency Contact Phone</label>
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Emergency Contact Phone</label>
                       <input 
                         type="tel" 
                         value={newPatient.emergencyContactPhone || ''}
