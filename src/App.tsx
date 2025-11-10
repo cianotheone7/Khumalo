@@ -3148,8 +3148,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
 
             {/* Edit Patient Modal */}
             {showEditPatient && (
-              <div className="modal">
-                <div className="modal-content">
+              <div className="modal edit-patient-modal">
+                <div className="modal-content edit-patient-modal-content">
                   <h3>Edit Patient 📝</h3>
                   <div className="form-row">
                     <div className="form-group">

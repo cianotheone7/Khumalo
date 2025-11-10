@@ -1393,7 +1393,10 @@ div.modal div.modal-content .form-group label {
 
 /* Even more specific for edit patient modal */
 .modal .form-group label[style],
-.modal-content .form-group label[style] {
+.modal-content .form-group label[style],
+.edit-patient-modal .form-group label,
+.edit-patient-modal-content .form-group label,
+.edit-patient-modal .edit-patient-modal-content .form-group label {
   color: #2c3e50 !important;
   font-weight: 600 !important;
 }
