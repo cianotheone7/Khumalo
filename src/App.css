@@ -1382,6 +1382,13 @@ body {
   font-size: 0.9rem;
 }
 
+/* Force dark labels in modal - override any white color rules */
+.modal .form-group label,
+.modal-content .form-group label {
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+}
+
 .form-group label.section-header {
   font-size: 1.1rem;
   font-weight: 700;
