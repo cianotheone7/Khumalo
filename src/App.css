@@ -3435,3 +3435,16 @@ div.modal div.modal-content .form-group label {
   gap: 1rem;
   flex-wrap: wrap;
 }
+
+/* CRITICAL: Force dark labels in edit patient modal - placed at end for maximum priority */
+.edit-patient-modal .form-group label,
+.edit-patient-modal-content .form-group label,
+.edit-patient-modal .edit-patient-modal-content .form-group label,
+.edit-patient-modal .edit-patient-modal-content .form-group label[style],
+.edit-patient-modal .form-group label[style],
+.edit-patient-modal-content .form-group label[style] {
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
