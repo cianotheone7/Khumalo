@@ -3464,11 +3464,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </button>
                   </div>
                 </div>
-              </div>
+            </>
             )}
-
-          </div>
-        )}
 
         {/* Edit Profile Modal - Available from any view */}
             {showEditProfile && (
