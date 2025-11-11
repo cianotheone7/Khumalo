@@ -2401,7 +2401,6 @@ Note: This is a basic summary. For detailed analysis, please review the individu
         )}
 
         {currentView === 'patients' && (
-          <>
           <div className="patients-simple">
             {/* Simple Header */}
             <div className="patients-header">
@@ -3146,13 +3145,14 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </button>
                   </div>
                 </div>
-          )}
+              </div>
+            )}
 
             {/* Edit Patient Modal */}
             {showEditPatient && (
-                <div className="modal edit-patient-modal">
-                  <div className="modal-content edit-patient-modal-content">
-                    <h3>Edit Patient 📝</h3>
+              <div className="modal edit-patient-modal">
+                <div className="modal-content edit-patient-modal-content">
+                  <h3>Edit Patient 📝</h3>
                     <div className="form-row">
                       <div className="form-group">
                         <label>Full Name *</label>
@@ -3456,11 +3456,9 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   </div>
                 </div>
               </div>
-          )}
+            )}
 
-        </div>
-
-      {/* Edit Profile Modal - Available from any view */}
+            {/* Edit Profile Modal - Available from any view */}
             {showEditProfile && (
               <div className="modal">
                 <div className="modal-content">
@@ -3834,8 +3832,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
               </div>
             </div>
           </div>
-          </>
-
+        )}
+        </div>
         )}
 
         {currentView === 'appointments' && (
@@ -3866,8 +3864,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
         )}
 
       </main>
-      </div>
-
+      </div> {/* Close app-content */}
+      
       {/* Professional Confirmation Modal */}
       {showConfirmModal && (
         <div className="modal-overlay">
