@@ -212,7 +212,7 @@ interface Document {
   fileSize: number;
   uploadedAt: string;
   description: string;
-  documentType: 'Lab Results' | 'Imaging' | 'Pathology' | 'Consultation' | 'Other';
+  documentType: 'Lab Results' | 'Imaging' | 'Pathology' | 'Consultation' | 'Prescription' | 'Invoice' | 'Other';
 }
 
 interface AISummary {
@@ -2746,7 +2746,9 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                                 {document.documentType === 'Lab Results' ? '🧪' :
                                  document.documentType === 'Imaging' ? '📷' :
                                  document.documentType === 'Pathology' ? '🔬' :
-                                 document.documentType === 'Consultation' ? '📝' : '📄'}
+                                 document.documentType === 'Consultation' ? '📝' :
+                                 document.documentType === 'Prescription' ? '💊' :
+                                 document.documentType === 'Invoice' ? '📋' : '📄'}
                               </div>
                               <div className="document-details">
                                 <h4>{document.fileName}</h4>
@@ -3660,6 +3662,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                       <option value="Pathology">🔬 Pathology Report</option>
                       <option value="Consultation">📝 Consultation Notes</option>
                       <option value="Prescription">💊 Prescription</option>
+                      <option value="Invoice">📋 Invoice</option>
                       <option value="Other">📄 Other</option>
                     </select>
                   </div>
