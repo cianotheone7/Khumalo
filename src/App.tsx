@@ -238,7 +238,7 @@ const initializeApp = async () => {
 // Main Dashboard Component
 function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
-  const [currentView, setCurrentView] = useState<'dashboard' | 'patients' | 'appointments' | 'prescriptions' | 'activities'>('dashboard');
+  const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [showAddPatient, setShowAddPatient] = useState(false);
   const [showEditPatient, setShowEditPatient] = useState(false);
@@ -709,7 +709,7 @@ function Dashboard() {
           dependentCode: newPatient.dependentCode,
           allergies: newPatient.allergies,
           chronicConditions: newPatient.chronicConditions,
-          status: newPatient.status,
+          status: newPatient.status as 'Living' | 'Deceased' | 'Unknown',
           deceasedDate: newPatient.status === 'Deceased' ? newPatient.deceasedDate : undefined,
           // Address fields
           homeNumber: newPatient.homeNumber,
@@ -2401,6 +2401,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
         )}
 
         {currentView === 'patients' && (
+          <>
           <div className="patients-simple">
             {/* Simple Header */}
             <div className="patients-header">
@@ -3145,28 +3146,18 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
+          )}
 
             {/* Edit Patient Modal */}
             {showEditPatient && (
-              <>
-                <style dangerouslySetInnerHTML={{__html: `
-                  .edit-patient-modal .form-group label,
-                  .edit-patient-modal-content .form-group label,
-                  .edit-patient-modal .edit-patient-modal-content .form-group label {
-                    color: #2c3e50 !important;
-                    font-weight: 600 !important;
-                  }
-                `}} />
                 <div className="modal edit-patient-modal">
                   <div className="modal-content edit-patient-modal-content">
                     <h3>Edit Patient 📝</h3>
                     <div className="form-row">
                       <div className="form-group">
-                        <label style={{ color: '#2c3e50', fontWeight: 600 }}>Full Name *</label>
-                      <input 
-                        type="text" 
+                        <label>Full Name *</label>
+                      <input
+                        type="text"
                         value={newPatient.name}
                         onChange={(e) => setNewPatient({...newPatient, name: e.target.value})}
                         placeholder="Dr. John Smith"
@@ -3174,8 +3165,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Medical Record Number *</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.medicalRecordNumber}
                         onChange={(e) => setNewPatient({...newPatient, medicalRecordNumber: e.target.value})}
                         placeholder="MR-001"
@@ -3185,8 +3176,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <div className="form-row">
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Email Address</label>
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         value={newPatient.email}
                         onChange={(e) => setNewPatient({...newPatient, email: e.target.value})}
                         placeholder="patient@email.com"
@@ -3194,22 +3185,22 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Phone Number</label>
-                      <input 
-                        type="tel" 
+                      <input
+                        type="tel"
                         value={newPatient.phone}
                         onChange={(e) => setNewPatient({...newPatient, phone: e.target.value})}
                         placeholder="(555) 123-4567"
                       />
                     </div>
                   </div>
-                  
+
                   {/* Address Section */}
                   <h4 style={{ marginTop: '20px', marginBottom: '10px', color: '#2c5282' }}>Address Information</h4>
                   <div className="form-row">
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Home/Unit Number or Estate</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.homeNumber || ''}
                         onChange={(e) => setNewPatient({...newPatient, homeNumber: e.target.value})}
                         placeholder="Unit 5, Greenside Estate"
@@ -3217,8 +3208,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Street Address</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.streetAddress || ''}
                         onChange={(e) => setNewPatient({...newPatient, streetAddress: e.target.value})}
                         placeholder="123 Main Street"
@@ -3228,8 +3219,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <div className="form-row">
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Suburb</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.suburb || ''}
                         onChange={(e) => setNewPatient({...newPatient, suburb: e.target.value})}
                         placeholder="Sandton"
@@ -3237,8 +3228,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>City</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.city || ''}
                         onChange={(e) => setNewPatient({...newPatient, city: e.target.value})}
                         placeholder="Johannesburg"
@@ -3246,8 +3237,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Province</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.province || ''}
                         onChange={(e) => setNewPatient({...newPatient, province: e.target.value})}
                         placeholder="Gauteng"
@@ -3257,8 +3248,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <div className="form-row">
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Postal Code</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.postalCode || ''}
                         onChange={(e) => setNewPatient({...newPatient, postalCode: e.target.value})}
                         placeholder="2000"
@@ -3266,8 +3257,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Country</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.country || ''}
                         onChange={(e) => setNewPatient({...newPatient, country: e.target.value})}
                         placeholder="South Africa"
@@ -3277,8 +3268,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <div className="form-row">
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Mobile Phone</label>
-                      <input 
-                        type="tel" 
+                      <input
+                        type="tel"
                         value={newPatient.mobilePhone}
                         onChange={(e) => setNewPatient({...newPatient, mobilePhone: e.target.value})}
                         placeholder="+1 (555) 123-4567"
@@ -3286,8 +3277,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>WhatsApp Phone</label>
-                      <input 
-                        type="tel" 
+                      <input
+                        type="tel"
                         value={newPatient.whatsappPhone}
                         onChange={(e) => setNewPatient({...newPatient, whatsappPhone: e.target.value})}
                         placeholder="+1 (555) 123-4567"
@@ -3297,8 +3288,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <div className="form-row">
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Passport/ID Number</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.passportId}
                         onChange={(e) => setNewPatient({...newPatient, passportId: e.target.value})}
                         placeholder="A123456789"
@@ -3306,7 +3297,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Gender</label>
-                      <select 
+                      <select
                         value={newPatient.gender}
                         onChange={(e) => setNewPatient({...newPatient, gender: e.target.value})}
                       >
@@ -3328,8 +3319,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <div className="form-row">
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Emergency Contact Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.emergencyContactName || ''}
                         onChange={(e) => setNewPatient({...newPatient, emergencyContactName: e.target.value})}
                         placeholder="Jane Smith"
@@ -3337,8 +3328,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Emergency Contact Phone</label>
-                      <input 
-                        type="tel" 
+                      <input
+                        type="tel"
                         value={newPatient.emergencyContactPhone || ''}
                         onChange={(e) => setNewPatient({...newPatient, emergencyContactPhone: e.target.value})}
                         placeholder="(555) 987-6543"
@@ -3348,7 +3339,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <div className="form-row">
                   <div className="form-group">
                     <label style={{ color: '#2c3e50', fontWeight: 600 }}>Medical Aid Scheme</label>
-                    <select 
+                    <select
                       value={newPatient.insuranceProvider}
                       onChange={(e) => setNewPatient({...newPatient, insuranceProvider: e.target.value})}
                     >
@@ -3371,8 +3362,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   {newPatient.insuranceProvider === 'Other' && (
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Specify Medical Aid Scheme</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.customInsuranceProvider}
                         onChange={(e) => setNewPatient({...newPatient, customInsuranceProvider: e.target.value})}
                         placeholder="Enter medical aid scheme name"
@@ -3384,8 +3375,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   <div className="form-row">
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Medical Aid Number</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.medicalAidNumber}
                         onChange={(e) => setNewPatient({...newPatient, medicalAidNumber: e.target.value})}
                         placeholder="Medical aid membership number"
@@ -3393,8 +3384,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </div>
                     <div className="form-group">
                       <label style={{ color: '#2c3e50', fontWeight: 600 }}>Dependent Code</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={newPatient.dependentCode}
                         onChange={(e) => setNewPatient({...newPatient, dependentCode: e.target.value})}
                         placeholder="Dependent code (if applicable)"
@@ -3405,7 +3396,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   {/* Medical Information */}
                   <div className="form-group">
                     <label style={{ color: '#2c3e50', fontWeight: 600 }}>Allergies</label>
-                    <textarea 
+                    <textarea
                       value={newPatient.allergies}
                       onChange={(e) => setNewPatient({...newPatient, allergies: e.target.value})}
                       placeholder="List any known allergies (e.g., Penicillin, Shellfish, Latex)"
@@ -3415,7 +3406,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
 
                   <div className="form-group">
                     <label style={{ color: '#2c3e50', fontWeight: 600 }}>Diagnosed Chronic Conditions</label>
-                    <textarea 
+                    <textarea
                       value={newPatient.chronicConditions}
                       onChange={(e) => setNewPatient({...newPatient, chronicConditions: e.target.value})}
                       placeholder="List any chronic conditions (e.g., Diabetes Type 2, Hypertension, Asthma)"
@@ -3426,7 +3417,7 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                   {/* Patient Status */}
                   <div className="form-group">
                     <label style={{ color: '#2c3e50', fontWeight: 600 }}>Patient Status</label>
-                    <select 
+                    <select
                       value={newPatient.status}
                       onChange={(e) => setNewPatient({...newPatient, status: e.target.value as 'Living' | 'Deceased' | 'Unknown', deceasedDate: e.target.value === 'Deceased' ? new Date().toISOString().split('T')[0] : ''})}
                     >
@@ -3454,20 +3445,22 @@ Note: This is a basic summary. For detailed analysis, please review the individu
                     </button>
                     <button className="btn btn-primary" onClick={handleUpdatePatient} disabled={isUpdatingPatient}>
                       {isUpdatingPatient ? (
-                        <>
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
                           <div className="loading-spinner" style={{ width: '16px', height: '16px', marginRight: '8px' }}></div>
                           Updating...
-                        </>
+                        </span>
                       ) : (
                         'Update Patient'
                       )}
                     </button>
                   </div>
                 </div>
-            </>
-            )}
+              </div>
+          )}
 
-        {/* Edit Profile Modal - Available from any view */}
+        </div>
+
+      {/* Edit Profile Modal - Available from any view */}
             {showEditProfile && (
               <div className="modal">
                 <div className="modal-content">
@@ -3841,6 +3834,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
               </div>
             </div>
           </div>
+          </>
+
         )}
 
         {currentView === 'appointments' && (
