@@ -765,11 +765,12 @@ function Dashboard() {
           // Reset form and close modal
           setNewPatient({
     name: '', email: '', phone: '', mobilePhone: '', whatsappPhone: '', passportId: '', gender: '', dateOfBirth: '', medicalRecordNumber: '',
-    emergencyContact: '', insuranceProvider: '', customInsuranceProvider: '',
+    emergencyContact: '', emergencyContactName: '', emergencyContactPhone: '',
+    insuranceProvider: '', customInsuranceProvider: '',
     medicalAidNumber: '', dependentCode: '', allergies: '', chronicConditions: '',
     status: 'Unknown', deceasedDate: '',
     // Address fields
-    homeNumber: '', streetAddress: '', city: '', province: '', postalCode: '', country: ''
+    homeNumber: '', streetAddress: '', suburb: '', city: '', province: '', postalCode: '', country: ''
           });
           setEditingPatient(null);
           setShowEditPatient(false);
