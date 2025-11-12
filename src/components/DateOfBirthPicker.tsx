@@ -18,8 +18,15 @@ export function DateOfBirthPicker({
   id,
   name 
 }: DateOfBirthPickerProps) {
-  // Parse the date string to a Date object
-  const selectedDate = value ? new Date(value) : null;
+  // Parse the date string to a Date object - safely handle invalid dates
+  let selectedDate: Date | null = null;
+  if (value && value.trim()) {
+    const parsedDate = new Date(value);
+    // Check if the date is valid
+    if (!isNaN(parsedDate.getTime())) {
+      selectedDate = parsedDate;
+    }
+  }
 
   // Handle date change
   const handleChange = (date: Date | null) => {

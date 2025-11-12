@@ -668,6 +668,16 @@ function Dashboard() {
       }
     }
     
+    // Validate and sanitize dateOfBirth - prevent "Invalid Date" errors
+    let dateOfBirth = patient.dateOfBirth || '';
+    if (dateOfBirth) {
+      const testDate = new Date(dateOfBirth);
+      if (isNaN(testDate.getTime())) {
+        console.warn(`⚠️ Patient ${patient.name} has invalid dateOfBirth: "${dateOfBirth}". Clearing it.`);
+        dateOfBirth = '';
+      }
+    }
+    
     setNewPatient({
       name: patient.name,
       email: patient.email,
@@ -676,7 +686,7 @@ function Dashboard() {
       whatsappPhone: patient.whatsappPhone || '',
       passportId: patient.passportId || '',
       gender: patient.gender || '',
-      dateOfBirth: patient.dateOfBirth,
+      dateOfBirth: dateOfBirth,
       medicalRecordNumber: patient.medicalRecordNumber,
       emergencyContact: patient.emergencyContact,
       emergencyContactName: emergencyContactName,
