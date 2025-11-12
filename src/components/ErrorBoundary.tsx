@@ -84,16 +84,18 @@ class ErrorBoundary extends Component<Props, State> {
               We're sorry, but something unexpected happened. The error has been logged and we'll look into it.
             </p>
             
-            {import.meta.env.DEV && this.state.error && (
+            {/* Always allow users to view basic error details so we can debug issues seen in production.
+                Details are collapsed by default to avoid exposing stack traces unless explicitly requested. */}
+            {this.state.error && (
               <details className="error-details">
-                <summary>Error Details (Development Only)</summary>
+                <summary>Error Details</summary>
                 <div className="error-stack">
                   <h3>Error Message:</h3>
                   <pre>{this.state.error.message}</pre>
-                  
+
                   <h3>Stack Trace:</h3>
                   <pre>{this.state.error.stack}</pre>
-                  
+
                   {this.state.errorInfo && (
                     <>
                       <h3>Component Stack:</h3>

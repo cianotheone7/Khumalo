@@ -151,6 +151,23 @@ const updateUserProfile = async (email: string, profileData: { name?: string; ro
     return null;
   }
 };
+
+// Helper to update deceased status (used by UI) - wraps updatePatient service
+const updatePatientDeceasedStatus = async (patientId: string, deceased: boolean, deceasedDate?: string) => {
+  try {
+    const updateData: any = {
+      status: deceased ? 'Deceased' : 'Living'
+    };
+    if (deceased) updateData.deceasedDate = deceasedDate || new Date().toISOString();
+    else updateData.deceasedDate = '';
+
+    const updated = await updatePatient(patientId, updateData);
+    return updated;
+  } catch (error) {
+    console.error('❌ Error in updatePatientDeceasedStatus:', error);
+    return null;
+  }
+};
 import './App.css';
 
 // Simple localStorage helpers to replace old SDK functions
