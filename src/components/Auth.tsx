@@ -141,16 +141,6 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           <p className="security-notice">
             🔒 HIPAA Compliant • Secure Data Storage • Encrypted Communications
           </p>
-          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
-            <p style={{ margin: 0, fontSize: '13px', color: '#0369a1', fontWeight: 500 }}>
-              🎭 <strong>Demo Mode Available</strong>
-            </p>
-            <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#0c4a6e' }}>
-              Email: <code style={{ backgroundColor: '#e0f2fe', padding: '2px 6px', borderRadius: '4px' }}>demo@cortexha.com</code><br />
-              Password: <code style={{ backgroundColor: '#e0f2fe', padding: '2px 6px', borderRadius: '4px' }}>demo123</code><br />
-              <span style={{ fontSize: '11px', fontStyle: 'italic' }}>Uses anonymized data only - safe for public demonstrations</span>
-            </p>
-          </div>
         </div>
       </div>
     </div>
