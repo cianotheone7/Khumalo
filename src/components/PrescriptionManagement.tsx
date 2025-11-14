@@ -225,6 +225,12 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
   }, [resetForm]);
 
   const handleEdit = useCallback((prescription: Prescription) => {
+    // Check if in demo mode
+    if (isDemoMode() || isCurrentUserDemo()) {
+      alert('🎭 Demo Mode: Editing prescriptions is disabled in demo mode.\n\nThis feature is available in the full version with real data access.');
+      return;
+    }
+    
     setEditingPrescription(prescription);
     setSelectedPatientId(prescription.patientId);
     // Try to find patient name from cache or set from prescription
@@ -325,6 +331,12 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
   }, [selectedPatientId, medications, patientsCache, user, diagnosis, notes, editingPrescription, loadPrescriptions, handleBack]);
 
   const handleDelete = useCallback(async (prescriptionId: string) => {
+    // Check if in demo mode
+    if (isDemoMode() || isCurrentUserDemo()) {
+      alert('🎭 Demo Mode: Deleting prescriptions is disabled in demo mode.\n\nThis feature is available in the full version with real data access.');
+      return;
+    }
+    
     if (!window.confirm('Are you sure you want to delete this prescription?')) {
       return;
     }
@@ -655,7 +667,14 @@ ${prescription.doctorName}`);
       <div className="prescription-header">
         <h2>Prescription Management</h2>
         {currentView === 'list' && (
-          <button onClick={handleCreateNew} className="btn-primary" disabled={loading}>
+          <button onClick={() => {
+            if (isDemoMode() || isCurrentUserDemo()) {
+              alert('🎭 Demo Mode: Creating prescriptions is disabled in demo mode.\n\nThis feature is available in the full version with real data access.');
+              return;
+            }
+            setCurrentView('create');
+            resetForm();
+          }} className="btn-primary" disabled={loading}>
             ➕ New Prescription
           </button>
         )}
@@ -740,7 +759,19 @@ ${prescription.doctorName}`);
                         <td className="actions-cell">
                           <div className="action-buttons-container">
                             <button
-                              onClick={() => handleEdit(prescription)}
+                              onClick={() => {
+                                if (isDemoMode() || isCurrentUserDemo()) {
+                                  alert('🎭 Demo Mode: Editing prescriptions is disabled in demo mode.\n\nThis feature is available in the full version with real data access.');
+                                  return;
+                                }
+                                setEditingPrescription(prescription);
+                                setSelectedPatientId(prescription.patientId);
+                                setSelectedPatientName(prescription.patientName);
+                                setDiagnosis(prescription.diagnosis || '');
+                                setNotes(prescription.notes || '');
+                                setMedications(prescription.medications);
+                                setCurrentView('edit');
+                              }}
                               className="action-btn action-btn-edit"
                               title="Edit"
                             >
