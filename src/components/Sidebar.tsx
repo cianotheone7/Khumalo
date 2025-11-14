@@ -82,35 +82,33 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, onSymptomC
           </div>
           <h1>Cortexha</h1>
         </div>
-        {/* Mode Indicator */}
-        <div style={{
-          margin: '10px 15px',
-          padding: '10px 14px',
-          background: (isDemoMode() || isCurrentUserDemo()) 
-            ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-            : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-          borderRadius: '8px',
-          fontSize: '11px',
-          color: '#ffffff',
-          fontWeight: 600,
-          textAlign: 'center',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          letterSpacing: '0.5px'
-        }}>
-          <div style={{ fontSize: '12px', marginBottom: '4px' }}>
-            {(isDemoMode() || isCurrentUserDemo()) ? '🎭 DEMO MODE' : '🚀 LIVE MODE'}
-          </div>
-          <div style={{ 
-            fontSize: '9px', 
-            fontWeight: 400, 
-            opacity: 0.95,
-            letterSpacing: '0.3px'
+        {/* Demo Mode Indicator - Only show in demo mode */}
+        {(isDemoMode() || isCurrentUserDemo()) && (
+          <div style={{
+            margin: '10px 15px',
+            padding: '10px 14px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '8px',
+            fontSize: '11px',
+            color: '#ffffff',
+            fontWeight: 600,
+            textAlign: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            letterSpacing: '0.5px'
           }}>
-            {(isDemoMode() || isCurrentUserDemo()) 
-              ? 'Anonymized Data Only' 
-              : 'Real-Time Production Data'}
+            <div style={{ fontSize: '12px', marginBottom: '4px' }}>
+              🎭 DEMO MODE
+            </div>
+            <div style={{ 
+              fontSize: '9px', 
+              fontWeight: 400, 
+              opacity: 0.95,
+              letterSpacing: '0.3px'
+            }}>
+              Anonymized Data Only
+            </div>
           </div>
-        </div>
+        )}
       </div>
       
       <nav className="sidebar-nav">
