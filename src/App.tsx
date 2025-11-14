@@ -13,16 +13,10 @@ import PrescriptionManagement from './components/PrescriptionManagement';
 import { DateOfBirthPicker } from './components/DateOfBirthPicker';
 import { generateSummaryWithProgress } from './services/azureOpenAIService';
 import { 
-  createAISummary,
-  getAISummaries,
-  createDocument,
-  getDocuments,
-  getAllDocuments,
   permanentDeleteDocument as deleteDocumentFromTable
 } from './services/azureTableRestService';
 import { generateMedicalSummary } from './services/azureOpenAIService';
 import { 
-  getRecentActivities, 
   getActivityIcon, 
   getActivityColor,
   logPatientAdded,
@@ -36,6 +30,8 @@ import {
   logDocumentDeleted,
   type Activity
 } from './services/activityService';
+import { isCurrentUserDemo, isDemoMode } from './services/demoDataService';
+// Use data service router that handles demo mode
 import { 
   createPatient, 
   getPatients, 
@@ -44,7 +40,15 @@ import {
   updatePatient,
   deletePatient as deletePatientFromAzure,
   searchPatients
-} from './services/azurePatientRestService';
+} from './services/dataService';
+import {
+  createAISummary,
+  getAISummaries,
+  createDocument,
+  getDocuments,
+  getAllDocuments,
+  getRecentActivities
+} from './services/dataService';
 // Inline user service functions to bypass bundling issues
 // Using environment variables for better security
 const AZURE_STORAGE_ACCOUNT_NAME = import.meta.env.VITE_AZURE_STORAGE_ACCOUNT_NAME || 'medprac20241008';
@@ -1944,7 +1948,11 @@ Note: This is a basic summary. For detailed analysis, please review the individu
     
     // Default message
     setWhatsappMessage(
-      `Hello ${selectedPatient.name},\n\nPlease find your medical document attached: ${document.fileName}\n\nFrom ${user?.name || 'your medical practice'}`
+      `Hello ${selectedPatient.name},
+
+Please find your medical document attached: ${document.fileName}
+
+From ${user?.name || 'your medical practice'}`
     );
     
     setShowWhatsAppModal(true);

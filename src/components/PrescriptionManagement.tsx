@@ -1,15 +1,13 @@
 // Redesigned Prescription Management - Fast & Optimized with PDF Overlay
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { getPatients, type Patient } from '../services/azurePatientRestService';
+import { type Patient } from '../services/azurePatientRestService';
+import { getPatients } from '../services/dataService'; // Use demo-aware service
 import { 
-  getPrescriptions, 
-  createPrescription, 
-  updatePrescription, 
-  deletePrescription,
   type Prescription,
   type PrescriptionMedication 
 } from '../services/azurePrescriptionService';
+import { getPrescriptions, createPrescription, updatePrescription, deletePrescription } from '../services/dataService'; // Use demo-aware service
 import { 
   downloadPrescriptionPDF, 
   viewPrescriptionPDF 
@@ -22,6 +20,7 @@ import {
   type SAMedication
 } from '../services/southAfricanFormulary';
 import { getApiUrl } from '../config/api-config';
+import { isCurrentUserDemo, isDemoMode } from '../services/demoDataService';
 import './PrescriptionManagement.css';
 
 // Virtual scrolling configuration
@@ -451,7 +450,12 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
 
   const handleSendEmail = useCallback((prescription: Prescription) => {
     setEmailPrescription(prescription);
-    setEmailMessage(`Dear ${prescription.patientName},\n\nPlease find attached your prescription.\n\nBest regards,\n${prescription.doctorName}`);
+    setEmailMessage(`Dear ${prescription.patientName},
+
+Please find attached your prescription.
+
+Best regards,
+${prescription.doctorName}`);
     // Pre-fill with patient email if available
     setRecipientEmail(prescription.patientEmail || '');
     setShowEmailModal(true);
@@ -459,6 +463,13 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
 
   const handleSendEmailConfirm = useCallback(async () => {
     if (!emailPrescription) return;
+    
+    // Check if in demo mode
+    if (isDemoMode() || isCurrentUserDemo()) {
+      alert('🎭 Demo Mode: Email sending is disabled in demo mode.\n\nThis feature is available in the full version with real data access.');
+      setShowEmailModal(false);
+      return;
+    }
     
     // Get user email from prop, auth context, or storage
     let userEmail = null;

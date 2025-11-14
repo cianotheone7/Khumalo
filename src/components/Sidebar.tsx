@@ -1,6 +1,7 @@
 import React from 'react';
 import './Sidebar.css';
 import brainLogo from '/brain-logo.svg';
+import { isCurrentUserDemo, isDemoMode } from '../services/demoDataService';
 
 interface SidebarProps {
   currentView: string;
@@ -81,6 +82,25 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, onSymptomC
           </div>
           <h1>Cortexha</h1>
         </div>
+        {/* Demo Mode Indicator */}
+        {(isDemoMode() || isCurrentUserDemo()) && (
+          <div style={{
+            margin: '10px 15px',
+            padding: '8px 12px',
+            backgroundColor: '#fef3c7',
+            border: '1px solid #fcd34d',
+            borderRadius: '6px',
+            fontSize: '11px',
+            color: '#92400e',
+            fontWeight: 600,
+            textAlign: 'center'
+          }}>
+            🎭 DEMO MODE
+            <div style={{ fontSize: '10px', fontWeight: 400, marginTop: '2px' }}>
+              Anonymized Data Only
+            </div>
+          </div>
+        )}
       </div>
       
       <nav className="sidebar-nav">

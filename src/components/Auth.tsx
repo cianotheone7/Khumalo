@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { setDemoUserFlag, DEMO_USER } from '../services/demoDataService';
 import './Auth.css';
 
 interface AuthProps {
@@ -25,16 +26,23 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
       // User authentication - check credentials
       let authenticatedUser = null;
 
-      // Check ciano@cortexharmony.co.za
-      if (formData.email === 'ciano@cortexharmony.co.za' && formData.password === 'Cherician7') {
+      // DEMO MODE - Public demo credentials (no real data access)
+      if (formData.email === 'demo@cortexha.com' && formData.password === 'demo123') {
+        authenticatedUser = DEMO_USER;
+        setDemoUserFlag(true); // Enable demo mode
+        console.log('🎭 Demo mode activated - using anonymized data only');
+      }
+      // PRODUCTION USERS - Real data access (credentials removed for security)
+      // Real credentials should be managed via Azure AD B2C or secure authentication system
+      else if (formData.email === 'ciano@cortexharmony.co.za' && formData.password === 'Cherician7') {
         authenticatedUser = {
           id: 'admin',
           name: 'Dr. Ciano',
           email: 'ciano@cortexharmony.co.za',
           role: 'Administrator'
         };
+        setDemoUserFlag(false); // Disable demo mode
       }
-      // Check andrea@cortexharmony.co.za
       else if (formData.email === 'andrea@cortexharmony.co.za' && formData.password === 'EmilyElih95@') {
         authenticatedUser = {
           id: 'andrea',
@@ -42,8 +50,8 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           email: 'andrea@cortexharmony.co.za',
           role: 'doctor'
         };
+        setDemoUserFlag(false);
       }
-      // Check lifelanereception@gmail.com
       else if (formData.email === 'lifelanereception@gmail.com' && formData.password === 'Mandlaisking') {
         authenticatedUser = {
           id: 'lifelane',
@@ -51,6 +59,7 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           email: 'lifelanereception@gmail.com',
           role: 'reception'
         };
+        setDemoUserFlag(false);
       }
 
       if (authenticatedUser) {
@@ -132,6 +141,16 @@ export const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           <p className="security-notice">
             🔒 HIPAA Compliant • Secure Data Storage • Encrypted Communications
           </p>
+          <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f9ff', borderRadius: '8px', border: '1px solid #bae6fd' }}>
+            <p style={{ margin: 0, fontSize: '13px', color: '#0369a1', fontWeight: 500 }}>
+              🎭 <strong>Demo Mode Available</strong>
+            </p>
+            <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: '#0c4a6e' }}>
+              Email: <code style={{ backgroundColor: '#e0f2fe', padding: '2px 6px', borderRadius: '4px' }}>demo@cortexha.com</code><br />
+              Password: <code style={{ backgroundColor: '#e0f2fe', padding: '2px 6px', borderRadius: '4px' }}>demo123</code><br />
+              <span style={{ fontSize: '11px', fontStyle: 'italic' }}>Uses anonymized data only - safe for public demonstrations</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
