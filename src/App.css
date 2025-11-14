@@ -2075,53 +2075,49 @@ div.modal div.modal-content .form-group label {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   margin-top: auto;
-  padding: 1rem 1.5rem;
-  background: white;
-  border-top: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  background: rgba(26, 11, 46, 0.03);
+  border-top: 1px solid rgba(109, 40, 217, 0.1);
   position: sticky;
   bottom: 0;
 }
 
 .pagination-btn {
-  padding: 0.5rem 1.2rem;
-  background: #2c5aa0;
+  padding: 0.4rem 1rem;
+  background: #6d28d9;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
-  min-width: 100px;
+  min-width: 90px;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: #1e3f73;
-  transform: translateY(-1px);
-}
-
-.pagination-btn:active:not(:disabled) {
-  transform: translateY(0);
+  background: #5b21b6;
 }
 
 .pagination-btn:disabled {
-  background: #e5e7eb;
-  color: #9ca3af;
+  background: transparent;
+  color: #d1d5db;
   cursor: not-allowed;
-  transform: none;
+  border: 1px solid #e5e7eb;
 }
 
 .pagination-info {
-  font-weight: 600;
-  color: #374151;
-  font-size: 0.875rem;
-  min-width: 140px;
+  font-weight: 500;
+  color: #6d28d9;
+  font-size: 0.8rem;
+  min-width: 120px;
   text-align: center;
-  padding: 0.5rem 1rem;
-  background: #f3f4f6;
+  padding: 0.4rem 0.8rem;
+  background: rgba(109, 40, 217, 0.05);
   border-radius: 6px;
+  border: 1px solid rgba(109, 40, 217, 0.15);
 }
 
 .patient-list-actions .btn {
