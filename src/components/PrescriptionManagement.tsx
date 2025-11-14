@@ -437,6 +437,12 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
 
   // Fast PDF actions
   const handleViewPDF = useCallback(async (prescription: Prescription) => {
+    // Check if in demo mode
+    if (isDemoMode() || isCurrentUserDemo()) {
+      alert('🎭 Demo Mode: Viewing PDFs is disabled in demo mode.\n\nThis feature is available in the full version with real data access.');
+      return;
+    }
+    
     try {
       setLoading(true);
       await viewPrescriptionPDF(prescription);
@@ -449,6 +455,12 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
   }, []);
 
   const handleDownloadPDF = useCallback(async (prescription: Prescription) => {
+    // Check if in demo mode
+    if (isDemoMode() || isCurrentUserDemo()) {
+      alert('🎭 Demo Mode: Downloading PDFs is disabled in demo mode.\n\nThis feature is available in the full version with real data access.');
+      return;
+    }
+    
     try {
       setLoading(true);
       await downloadPrescriptionPDF(prescription);
