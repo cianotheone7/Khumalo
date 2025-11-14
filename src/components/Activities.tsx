@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getRecentActivities, getActivityIcon, getActivityColor, type Activity } from '../services/activityService';
+import { getActivityIcon, getActivityColor, type Activity } from '../services/activityService';
+import { getRecentActivities } from '../services/dataService';
 import './Activities.css';
 
 export function Activities() {
