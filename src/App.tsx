@@ -1155,47 +1155,65 @@ the advanced document processing module needs to be functioning properly.`;
                 
                 let allText = '';
                 const { createWorker } = await import('tesseract.js');
-                const worker = await createWorker('eng');
-                console.log('✅ Tesseract worker created for PDF OCR');
                 
-                // Process each page
-                for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 5); pageNum++) {
-                  console.log(`🔍 Processing page ${pageNum}/${Math.min(pdf.numPages, 5)}...`);
-                  
-                  // Update progress
-                  const pageProgress = Math.round((pageNum / Math.min(pdf.numPages, 5)) * 100);
-                  setAiProgress(pageProgress);
-                  setAiStatus(`Processing PDF page ${pageNum} of ${Math.min(pdf.numPages, 5)}...`);
-                  
-                  const page = await pdf.getPage(pageNum);
-                  const viewport = page.getViewport({ scale: 2.0 });
-                  
-                  // Create canvas
-                  const canvas = document.createElement('canvas');
-                  const context = canvas.getContext('2d')!;
-                  canvas.width = viewport.width;
-                  canvas.height = viewport.height;
-                  
-                  // Render PDF page to canvas
-                  await page.render({ 
-                    canvasContext: context, 
-                    viewport: viewport,
-                    canvas: canvas 
-                  }).promise;
-                  
-                  // Convert canvas to blob
-                  const blob = await new Promise<Blob>((resolve) => {
-                    canvas.toBlob((blob) => resolve(blob!), 'image/png');
-                  });
-                  
-                  // OCR the image
-                  const { data: { text } } = await worker.recognize(blob);
-                  allText += `\n--- Page ${pageNum} ---\n${text}\n`;
-                  
-                  console.log(`✅ Page ${pageNum} OCR completed (${text.length} chars)`);
+                // Limit to first 3 pages for speed
+                const pagesToProcess = Math.min(pdf.numPages, 3);
+                
+                // Process pages in parallel for much faster processing
+                const pagePromises = [];
+                for (let pageNum = 1; pageNum <= pagesToProcess; pageNum++) {
+                  pagePromises.push(
+                    (async (num) => {
+                      console.log(`🔍 Starting page ${num}/${pagesToProcess}...`);
+                      
+                      const page = await pdf.getPage(num);
+                      // Reduced scale from 2.0 to 1.5 for faster processing
+                      const viewport = page.getViewport({ scale: 1.5 });
+                      
+                      // Create canvas
+                      const canvas = document.createElement('canvas');
+                      const context = canvas.getContext('2d')!;
+                      canvas.width = viewport.width;
+                      canvas.height = viewport.height;
+                      
+                      // Render PDF page to canvas
+                      await page.render({ 
+                        canvasContext: context, 
+                        viewport: viewport,
+                        canvas: canvas 
+                      }).promise;
+                      
+                      // Convert canvas to blob
+                      const blob = await new Promise<Blob>((resolve) => {
+                        canvas.toBlob((blob) => resolve(blob!), 'image/png');
+                      });
+                      
+                      // OCR the image with own worker per page
+                      const worker = await createWorker('eng');
+                      const { data: { text } } = await worker.recognize(blob);
+                      await worker.terminate();
+                      
+                      console.log(`✅ Page ${num} completed (${text.length} chars)`);
+                      return { pageNum: num, text };
+                    })(pageNum)
+                  );
                 }
                 
-                await worker.terminate();
+                // Update progress as pages complete
+                let completed = 0;
+                const results = await Promise.all(
+                  pagePromises.map(p => p.then(result => {
+                    completed++;
+                    const progress = Math.round((completed / pagesToProcess) * 100);
+                    setAiProgress(progress);
+                    setAiStatus(`Processed ${completed} of ${pagesToProcess} pages...`);
+                    return result;
+                  }))
+                );
+                
+                // Combine text in order
+                results.sort((a, b) => a.pageNum - b.pageNum);
+                allText = results.map(r => `\n--- Page ${r.pageNum} ---\n${r.text}\n`).join('');
                 
                 console.log('✅ PDF OCR completed successfully');
                 console.log('📄 Total extracted text length:', allText.length);
@@ -1206,7 +1224,7 @@ the advanced document processing module needs to be functioning properly.`;
 File: ${doc.fileName}
 Type: ${doc.contentType}
 Size: ${(doc.fileSize / 1024).toFixed(1)} KB
-Pages: ${Math.min(pdf.numPages, 5)}
+Pages: ${pagesToProcess}
 Uploaded: ${doc.uploadedAt}
 
 EXTRACTED TEXT:
@@ -1219,7 +1237,7 @@ Document Category: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Cou
   doc.fileName.toLowerCase().includes('mri') ? 'MRI Report' : 
   'Medical Document'}
 
-Processing Method: PDF.js + Tesseract OCR`;
+Processing Method: PDF.js + Tesseract OCR (Parallel)`;
                 } else {
                   throw new Error('PDF OCR returned insufficient text');
                 }
