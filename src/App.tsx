@@ -1141,16 +1141,18 @@ the advanced document processing module needs to be functioning properly.`;
               console.log('📄 Processing PDF with pdf-parse...');
               
               // Use pdf-parse for PDF text extraction
-              const { default: pdfParse } = await import('pdf-parse');
-              const arrayBuffer = await file.arrayBuffer();
-              const pdfData = await pdfParse(arrayBuffer);
-              
-              console.log('✅ PDF text extraction completed');
-              console.log('📄 PDF extracted text length:', pdfData.text.length);
-              console.log('📄 PDF text preview:', pdfData.text.substring(0, 200) + '...');
-              
-              if (pdfData.text && pdfData.text.trim().length > 10) {
-                processedText = `PDF EXTRACTED CONTENT:
+              try {
+                const pdfParse = (await import('pdf-parse')).default || (await import('pdf-parse'));
+                const arrayBuffer = await file.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                const pdfData = await pdfParse(buffer);
+                
+                console.log('✅ PDF text extraction completed');
+                console.log('📄 PDF extracted text length:', pdfData.text.length);
+                console.log('📄 PDF text preview:', pdfData.text.substring(0, 200) + '...');
+                
+                if (pdfData.text && pdfData.text.trim().length > 10) {
+                  processedText = `PDF EXTRACTED CONTENT:
 File: ${doc.fileName}
 Type: ${doc.contentType}
 Size: ${(doc.fileSize / 1024).toFixed(1)} KB
@@ -1167,8 +1169,12 @@ Document Category: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Cou
   'Medical Document'}
 
 Processing Method: PDF Direct Text Extraction`;
-              } else {
-                throw new Error('PDF extraction returned insufficient text');
+                } else {
+                  throw new Error('PDF extraction returned insufficient text');
+                }
+              } catch (pdfError) {
+                console.error('❌ PDF parsing failed:', pdfError);
+                throw new Error(`Failed to extract text from PDF ${doc.fileName}. The PDF may be scanned or image-based. Please try uploading as an image for OCR processing.`);
               }
             } else {
               // Use Tesseract.js for images - but with proper error handling
