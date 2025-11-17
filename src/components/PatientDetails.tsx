@@ -554,14 +554,23 @@ From ${user?.name || 'your medical practice'}`
               No summaries generated yet. Click "Generate Summary" to create an AI-powered summary of this patient's records.
             </div>
           ) : (
-            summaries.map((summary) => (
-              <div key={summary.rowKey} className="summary-card">
-                <div className="summary-header">
-                  <span className="summary-date">{formatDateTime(summary.createdAt)}</span>
+            summaries.map((summary) => {
+              // Remove markdown formatting for cleaner display
+              const cleanText = summary.summaryText
+                .replace(/###\s*/g, '')  // Remove ### headers
+                .replace(/\*\*/g, '')      // Remove ** bold markers
+                .replace(/\*/g, '')        // Remove * italic markers
+                .replace(/`/g, '');        // Remove ` code markers
+              
+              return (
+                <div key={summary.rowKey} className="summary-card">
+                  <div className="summary-header">
+                    <span className="summary-date">{formatDateTime(summary.createdAt)}</span>
+                  </div>
+                  <pre className="summary-text">{cleanText}</pre>
                 </div>
-                <pre className="summary-text">{summary.summaryText}</pre>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

@@ -1160,7 +1160,12 @@ the advanced document processing module needs to be functioning properly.`;
                 
                 // Process each page
                 for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 5); pageNum++) {
-                  console.log(`🔍 Processing page ${pageNum}/${pdf.numPages}...`);
+                  console.log(`🔍 Processing page ${pageNum}/${Math.min(pdf.numPages, 5)}...`);
+                  
+                  // Update progress
+                  const pageProgress = Math.round((pageNum / Math.min(pdf.numPages, 5)) * 100);
+                  setAiProgress(pageProgress);
+                  setAiStatus(`Processing PDF page ${pageNum} of ${Math.min(pdf.numPages, 5)}...`);
                   
                   const page = await pdf.getPage(pageNum);
                   const viewport = page.getViewport({ scale: 2.0 });
