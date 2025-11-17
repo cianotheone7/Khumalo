@@ -555,18 +555,22 @@ From ${user?.name || 'your medical practice'}`
             </div>
           ) : (
             summaries.map((summary) => {
-              // Remove ALL markdown formatting for clean display
-              const cleanText = summary.summaryText
-                .replace(/^##\s+/gm, '')           // Remove ## headers
-                .replace(/^###\s+/gm, '')          // Remove ### headers
-                .replace(/^####\s+/gm, '')         // Remove #### headers
-                .replace(/\*\*\*(.+?)\*\*\*/g, '$1') // Remove *** bold+italic
-                .replace(/\*\*(.+?)\*\*/g, '$1')     // Remove ** bold
-                .replace(/\*(.+?)\*/g, '$1')         // Remove * italic
-                .replace(/`(.+?)`/g, '$1')          // Remove ` code markers
-                .replace(/^\*\s+/gm, '• ')          // Convert * bullets to •
-                .replace(/^-\s+/gm, '• ')           // Convert - bullets to •
-                .replace(/\n{3,}/g, '\n\n');        // Remove excessive newlines
+              // Remove ALL markdown formatting for clean professional display
+              let cleanText = summary.summaryText
+                // Remove headers (##, ###, ####)
+                .replace(/^#{1,6}\s+(.+)$/gm, '$1')
+                // Remove bold+italic (*** or ___)
+                .replace(/[*_]{3}([^*_]+)[*_]{3}/g, '$1')
+                // Remove bold (** or __)
+                .replace(/[*_]{2}([^*_]+)[*_]{2}/g, '$1')
+                // Remove italic (* or _)
+                .replace(/[*_]([^*_]+)[*_]/g, '$1')
+                // Remove code markers (`)
+                .replace(/`([^`]+)`/g, '$1')
+                // Convert bullet points to clean bullets
+                .replace(/^[*+-]\s+/gm, '• ')
+                // Remove excessive newlines (max 2)
+                .replace(/\n{3,}/g, '\n\n');
               
               return (
                 <div key={summary.rowKey} className="summary-card">
