@@ -34,7 +34,7 @@ export const azureConfig = {
   openai: {
     endpoint: import.meta.env.VITE_AZURE_OPENAI_ENDPOINT || 'https://api.a4f.co/v1',
     apiKey: import.meta.env.VITE_AZURE_OPENAI_API_KEY || 'ddc-a4f-c56fc7b02b3d485c94d5f8024554922f',
-    deployment: import.meta.env.VITE_AZURE_OPENAI_DEPLOYMENT || 'provider-5/gpt-4o-mini',
+    deployment: import.meta.env.VITE_AZURE_OPENAI_DEPLOYMENT || 'provider-5/gpt-5-nano',
     apiVersion: import.meta.env.VITE_AZURE_OPENAI_API_VERSION || '2024-12-01-preview'
   },
   auth: {
