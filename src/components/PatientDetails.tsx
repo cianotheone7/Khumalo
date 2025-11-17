@@ -224,7 +224,11 @@ export function PatientDetails({ patient }: PatientDetailsProps) {
     
     // Default message
     setWhatsappMessage(
-      `Hello ${patient.name},\n\nPlease find your medical document attached: ${doc.fileName}\n\nFrom ${user?.name || 'your medical practice'}`
+      `Hello ${patient.name},
+
+Please find your medical document attached: ${doc.fileName}
+
+From ${user?.name || 'your medical practice'}`
     );
     
     setShowWhatsAppModal(true);
@@ -286,8 +290,11 @@ export function PatientDetails({ patient }: PatientDetailsProps) {
       });
 
       await loadSummaries();
+      alert('✅ AI Summary generated successfully!');
     } catch (error) {
       console.error('Error generating summary:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`❌ Failed to generate AI summary:\n\n${errorMessage}`);
     } finally {
       setGeneratingSummary(false);
     }

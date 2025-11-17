@@ -92,48 +92,82 @@ const callAzureOpenAI = async (prompt: string): Promise<string> => {
 
 /**
  * Generate medical summary using Azure OpenAI
+ * NO FALLBACK - Only works with real document content
  */
 export const generateMedicalSummary = async (request: AISummaryRequest): Promise<AISummaryResponse> => {
   try {
-    if (!isAzureOpenAIAvailable()) {
-      // Fallback to enhanced simulation
-      return generateEnhancedSimulation(request);
-    }
-
     const { patientName, patientAge, medicalRecordNumber, documents } = request;
     
-    // Create comprehensive prompt with FULL document content for accurate medical analysis
-    const documentContents = documents.map((doc, index) => {
-      const content = doc.processedText || 'No content extracted';
-      const fileName = doc.fileName || `Document ${index + 1}`;
-      return `\n--- DOCUMENT ${index + 1}: ${fileName} ---\n${content}\n--- END DOCUMENT ${index + 1} ---`;
-    }).join('\n');
+    // Validate that we have documents with actual content
+    const documentsWithContent = documents.filter(doc => 
+      doc.processedText && 
+      doc.processedText.trim().length > 50 &&
+      doc.processedText !== 'Content not available' &&
+      doc.processedText !== 'Document content not available' &&
+      !doc.processedText.includes('Content not analyzed')
+    );
 
-    const prompt = `MEDICAL AI ANALYSIS REQUEST
-Patient: ${patientName} (${patientAge}y, MRN: ${medicalRecordNumber})
-Total Documents: ${documents.length}
+    if (documentsWithContent.length === 0) {
+      throw new Error('No documents with readable content found. Please upload documents with text content (PDFs, text files, or images with clear text) before generating a summary.');
+    }
+
+    if (!isAzureOpenAIAvailable()) {
+      throw new Error('Azure OpenAI is not configured. AI Summary requires Azure OpenAI to analyze document content.');
+    }
+    
+    // Create comprehensive prompt with FULL document content for accurate medical analysis
+    const documentContents = documentsWithContent.map((doc, index) => {
+      return `\n--- DOCUMENT ${index + 1}: ${doc.fileName} (${doc.documentType}) ---\n${doc.processedText}\n--- END DOCUMENT ${index + 1} ---`;
+    }).join('\n\n');
+
+    const prompt = `You are a medical AI assistant. Analyze the following patient documents and provide a comprehensive medical summary.
+
+PATIENT INFORMATION:
+Name: ${patientName}
+Age: ${patientAge} years
+Medical Record Number: ${medicalRecordNumber}
+Total Documents Analyzed: ${documentsWithContent.length}
 
 DOCUMENT CONTENTS:
 ${documentContents}
 
-ANALYSIS REQUIRED:
-1) Clinical Overview (2-3 sentences)
-2) Key Medical Findings (bullet points)
-3) Critical Values/Lab Results (if any)
-4) Recommendations (actionable items)
-5) Priority Level (Low/Medium/High)
-6) Follow-up Required (Yes/No)
+PROVIDE A COMPREHENSIVE MEDICAL SUMMARY WITH:
 
-Generate a comprehensive medical summary based on the FULL document content above. Focus on clinical accuracy and actionable insights.`;
+1. CLINICAL OVERVIEW (2-3 sentences summarizing the patient's current status)
 
+2. KEY FINDINGS FROM DOCUMENTS:
+   - List all significant medical findings from the documents
+   - Include lab values, vital signs, diagnoses, procedures
+   - Highlight any abnormal or critical values
+
+3. DOCUMENT SUMMARIES:
+   For each document, provide a brief summary of its key content
+
+4. CLINICAL RECOMMENDATIONS:
+   - List 3-5 actionable recommendations based on the findings
+   - Focus on follow-up care, monitoring needs, or interventions
+
+5. PRIORITY ASSESSMENT:
+   - State if this case is Low, Medium, or High priority
+   - Explain why
+
+6. FOLLOW-UP REQUIRED:
+   - State Yes or No
+   - Explain what follow-up is needed
+
+Be specific and reference actual content from the documents. Base everything on the actual document content provided.`;
+
+    console.log('🤖 Sending request to Azure OpenAI with', documentsWithContent.length, 'documents');
     const aiResponse = await callAzureOpenAI(prompt);
     
     // Parse the AI response to extract structured data
     const summary = aiResponse;
     const recommendations = extractRecommendations(aiResponse);
-    const priority = assessPriority(aiResponse, documents);
-    const followUpRequired = assessFollowUpRequired(aiResponse, documents);
-    const confidence = calculateConfidence(documents.length, aiResponse);
+    const priority = assessPriority(aiResponse, documentsWithContent);
+    const followUpRequired = assessFollowUpRequired(aiResponse, documentsWithContent);
+    const confidence = calculateConfidence(documentsWithContent.length, aiResponse);
+
+    console.log('✅ AI Summary generated successfully');
 
     return {
       summary,
@@ -145,9 +179,9 @@ Generate a comprehensive medical summary based on the FULL document content abov
     };
 
   } catch (error) {
-    console.error('Error generating AI summary:', error);
-    // Fallback to enhanced simulation
-    return generateEnhancedSimulation(request);
+    console.error('❌ Error generating AI summary:', error);
+    // NO FALLBACK - throw the error so user knows what's wrong
+    throw error;
   }
 };
 
@@ -375,24 +409,25 @@ const calculateConfidence = (documentCount: number, response: string): number =>
 
 /**
  * Generate summary with progress tracking
+ * NO FALLBACK - Requires real document content and Azure OpenAI
  */
 export const generateSummaryWithProgress = async (
   request: AISummaryRequest,
   onProgress: (progress: number, status: string) => void
 ): Promise<AISummaryResponse> => {
-  onProgress(10, 'Initializing AI analysis...');
+  onProgress(10, 'Validating document content...');
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  onProgress(25, 'Processing patient data...');
+  onProgress(25, 'Connecting to Azure OpenAI...');
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  onProgress(50, 'Analyzing medical documents...');
+  onProgress(50, 'Reading document content...');
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  onProgress(75, 'Generating clinical summary...');
+  onProgress(75, 'Analyzing medical data with AI...');
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  onProgress(90, 'Finalizing recommendations...');
+  onProgress(90, 'Generating clinical summary...');
   await new Promise(resolve => setTimeout(resolve, 300));
   
   onProgress(100, 'Summary complete!');

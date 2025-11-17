@@ -1640,7 +1640,8 @@ Note: This is a basic summary. For detailed analysis, please review the individu
       }
     } catch (error) {
       console.error('AI Summary generation failed:', error);
-      displayNotification('Failed to generate AI summary. Please try again.', 'error');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      displayNotification(`Failed to generate AI summary: ${errorMessage}`, 'error');
     } finally {
       setIsGeneratingSummary(false);
     }
