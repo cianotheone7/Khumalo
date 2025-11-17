@@ -1136,30 +1136,33 @@ the advanced document processing module needs to be functioning properly.`;
           let processedText = '';
           
           try {
-            // Handle PDF vs Image differently
+            // For PDFs, try to use pdf.js (browser-compatible) or fall back to OCR
             if (doc.contentType === 'application/pdf') {
-              console.log('📄 Processing PDF with pdf-parse...');
+              console.log('📄 Processing PDF - attempting OCR extraction...');
               
-              // Use pdf-parse for PDF text extraction
               try {
-                const pdfParse = (await import('pdf-parse')).default || (await import('pdf-parse'));
-                const arrayBuffer = await file.arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                const pdfData = await pdfParse(buffer);
+                // Use Tesseract.js for PDFs since pdf-parse doesn't work well in browser
+                const { createWorker } = await import('tesseract.js');
+                const worker = await createWorker('eng');
+                console.log('✅ Tesseract worker created for PDF');
                 
-                console.log('✅ PDF text extraction completed');
-                console.log('📄 PDF extracted text length:', pdfData.text.length);
-                console.log('📄 PDF text preview:', pdfData.text.substring(0, 200) + '...');
+                console.log('🔍 Starting OCR processing on PDF...');
+                const { data: { text } } = await worker.recognize(file);
+                await worker.terminate();
                 
-                if (pdfData.text && pdfData.text.trim().length > 10) {
-                  processedText = `PDF EXTRACTED CONTENT:
+                console.log('✅ PDF OCR completed successfully');
+                console.log('📄 PDF OCR extracted text length:', text.length);
+                console.log('📄 PDF OCR text preview:', text.substring(0, 200) + '...');
+                
+                if (text && text.trim().length > 10) {
+                  processedText = `PDF OCR EXTRACTED CONTENT:
 File: ${doc.fileName}
 Type: ${doc.contentType}
 Size: ${(doc.fileSize / 1024).toFixed(1)} KB
 Uploaded: ${doc.uploadedAt}
 
 EXTRACTED TEXT:
-${pdfData.text}
+${text}
 
 Document Category: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Count Report' : 
   doc.fileName.toLowerCase().includes('lab') ? 'Laboratory Report' : 
@@ -1168,13 +1171,13 @@ Document Category: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Cou
   doc.fileName.toLowerCase().includes('mri') ? 'MRI Report' : 
   'Medical Document'}
 
-Processing Method: PDF Direct Text Extraction`;
+Processing Method: Tesseract.js OCR (PDF)`;
                 } else {
-                  throw new Error('PDF extraction returned insufficient text');
+                  throw new Error('PDF OCR returned insufficient text');
                 }
               } catch (pdfError) {
-                console.error('❌ PDF parsing failed:', pdfError);
-                throw new Error(`Failed to extract text from PDF ${doc.fileName}. The PDF may be scanned or image-based. Please try uploading as an image for OCR processing.`);
+                console.error('❌ PDF OCR failed:', pdfError);
+                throw new Error(`Failed to extract text from PDF ${doc.fileName}. OCR processing failed. Please ensure the PDF contains clear, readable text.`);
               }
             } else {
               // Use Tesseract.js for images - but with proper error handling
