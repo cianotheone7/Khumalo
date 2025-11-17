@@ -1136,33 +1136,71 @@ the advanced document processing module needs to be functioning properly.`;
           let processedText = '';
           
           try {
-            // For PDFs, try to use pdf.js (browser-compatible) or fall back to OCR
+            // For PDFs, convert to images using PDF.js then OCR with Tesseract
             if (doc.contentType === 'application/pdf') {
-              console.log('📄 Processing PDF - attempting OCR extraction...');
+              console.log('📄 Processing PDF - converting to images for OCR...');
               
               try {
-                // Use Tesseract.js for PDFs since pdf-parse doesn't work well in browser
+                // Use PDF.js to render PDF pages as images
+                const pdfjsLib = await import('pdfjs-dist');
+                
+                // Set worker source
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                console.log(`📄 PDF loaded: ${pdf.numPages} pages`);
+                
+                let allText = '';
                 const { createWorker } = await import('tesseract.js');
                 const worker = await createWorker('eng');
-                console.log('✅ Tesseract worker created for PDF');
+                console.log('✅ Tesseract worker created for PDF OCR');
                 
-                console.log('🔍 Starting OCR processing on PDF...');
-                const { data: { text } } = await worker.recognize(file);
+                // Process each page
+                for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 5); pageNum++) {
+                  console.log(`🔍 Processing page ${pageNum}/${pdf.numPages}...`);
+                  
+                  const page = await pdf.getPage(pageNum);
+                  const viewport = page.getViewport({ scale: 2.0 });
+                  
+                  // Create canvas
+                  const canvas = document.createElement('canvas');
+                  const context = canvas.getContext('2d')!;
+                  canvas.width = viewport.width;
+                  canvas.height = viewport.height;
+                  
+                  // Render PDF page to canvas
+                  await page.render({ canvasContext: context, viewport }).promise;
+                  
+                  // Convert canvas to blob
+                  const blob = await new Promise<Blob>((resolve) => {
+                    canvas.toBlob((blob) => resolve(blob!), 'image/png');
+                  });
+                  
+                  // OCR the image
+                  const { data: { text } } = await worker.recognize(blob);
+                  allText += `\n--- Page ${pageNum} ---\n${text}\n`;
+                  
+                  console.log(`✅ Page ${pageNum} OCR completed (${text.length} chars)`);
+                }
+                
                 await worker.terminate();
                 
                 console.log('✅ PDF OCR completed successfully');
-                console.log('📄 PDF OCR extracted text length:', text.length);
-                console.log('📄 PDF OCR text preview:', text.substring(0, 200) + '...');
+                console.log('📄 Total extracted text length:', allText.length);
+                console.log('📄 Text preview:', allText.substring(0, 200) + '...');
                 
-                if (text && text.trim().length > 10) {
+                if (allText && allText.trim().length > 10) {
                   processedText = `PDF OCR EXTRACTED CONTENT:
 File: ${doc.fileName}
 Type: ${doc.contentType}
 Size: ${(doc.fileSize / 1024).toFixed(1)} KB
+Pages: ${Math.min(pdf.numPages, 5)}
 Uploaded: ${doc.uploadedAt}
 
 EXTRACTED TEXT:
-${text}
+${allText}
 
 Document Category: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Count Report' : 
   doc.fileName.toLowerCase().includes('lab') ? 'Laboratory Report' : 
@@ -1171,13 +1209,13 @@ Document Category: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Cou
   doc.fileName.toLowerCase().includes('mri') ? 'MRI Report' : 
   'Medical Document'}
 
-Processing Method: Tesseract.js OCR (PDF)`;
+Processing Method: PDF.js + Tesseract OCR`;
                 } else {
                   throw new Error('PDF OCR returned insufficient text');
                 }
               } catch (pdfError) {
                 console.error('❌ PDF OCR failed:', pdfError);
-                throw new Error(`Failed to extract text from PDF ${doc.fileName}. OCR processing failed. Please ensure the PDF contains clear, readable text.`);
+                throw new Error(`Failed to extract text from PDF ${doc.fileName}. OCR processing failed. The PDF may be encrypted, corrupted, or contain no readable text.`);
               }
             } else {
               // Use Tesseract.js for images - but with proper error handling
