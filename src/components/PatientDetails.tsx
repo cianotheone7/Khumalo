@@ -555,12 +555,18 @@ From ${user?.name || 'your medical practice'}`
             </div>
           ) : (
             summaries.map((summary) => {
-              // Remove markdown formatting for cleaner display
+              // Remove ALL markdown formatting for clean display
               const cleanText = summary.summaryText
-                .replace(/###\s*/g, '')  // Remove ### headers
-                .replace(/\*\*/g, '')      // Remove ** bold markers
-                .replace(/\*/g, '')        // Remove * italic markers
-                .replace(/`/g, '');        // Remove ` code markers
+                .replace(/^##\s+/gm, '')           // Remove ## headers
+                .replace(/^###\s+/gm, '')          // Remove ### headers
+                .replace(/^####\s+/gm, '')         // Remove #### headers
+                .replace(/\*\*\*(.+?)\*\*\*/g, '$1') // Remove *** bold+italic
+                .replace(/\*\*(.+?)\*\*/g, '$1')     // Remove ** bold
+                .replace(/\*(.+?)\*/g, '$1')         // Remove * italic
+                .replace(/`(.+?)`/g, '$1')          // Remove ` code markers
+                .replace(/^\*\s+/gm, '• ')          // Convert * bullets to •
+                .replace(/^-\s+/gm, '• ')           // Convert - bullets to •
+                .replace(/\n{3,}/g, '\n\n');        // Remove excessive newlines
               
               return (
                 <div key={summary.rowKey} className="summary-card">

@@ -3485,21 +3485,149 @@ From ${user?.name || 'your medical practice'}`
               </div>
             )}
 
-        {/* AI Summary Modal */}
+        {/* AI Summary Modal - Futuristic Loading */}
         {showAISummary && (
           <div className="modal">
             <div className="modal-content ai-summary-modal">
-              <h3>🤖 AI Summary Generation</h3>
+              <h3 style={{ 
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontSize: '1.8rem',
+                fontWeight: '700',
+                marginBottom: '2rem'
+              }}>🤖 AI Medical Analysis</h3>
               {isGeneratingSummary ? (
-                <div className="ai-progress">
-                  <div className="progress-bar">
+                <div className="ai-progress" style={{ position: 'relative' }}>
+                  {/* Futuristic animated background */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '-20px',
+                    left: '-20px',
+                    right: '-20px',
+                    bottom: '-20px',
+                    background: 'linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1))',
+                    borderRadius: '20px',
+                    animation: 'pulse 2s ease-in-out infinite',
+                    zIndex: 0
+                  }}></div>
+                  
+                  {/* Neural network animation */}
+                  <div style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    marginBottom: '2rem'
+                  }}>
+                    <div style={{
+                      width: '100px',
+                      height: '100px',
+                      margin: '0 auto 1.5rem',
+                      position: 'relative'
+                    }}>
+                      {/* Rotating rings */}
+                      {[0, 1, 2].map((i) => (
+                        <div key={i} style={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          transform: 'translate(-50%, -50%)',
+                          width: `${60 + i * 20}px`,
+                          height: `${60 + i * 20}px`,
+                          border: '3px solid',
+                          borderColor: i === 0 ? '#667eea' : i === 1 ? '#764ba2' : '#48bb78',
+                          borderRadius: '50%',
+                          borderTopColor: 'transparent',
+                          borderRightColor: 'transparent',
+                          animation: `spin ${1.5 + i * 0.5}s linear infinite ${i === 1 ? 'reverse' : ''}`,
+                          opacity: 0.7
+                        }}></div>
+                      ))}
+                      
+                      {/* Center brain icon */}
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        fontSize: '2rem',
+                        animation: 'pulse 2s ease-in-out infinite'
+                      }}>🧠</div>
+                    </div>
+                  </div>
+                  
+                  {/* Progress bar with gradient */}
+                  <div className="progress-bar" style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    height: '12px',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    border: '2px solid rgba(102, 126, 234, 0.3)',
+                    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.2)'
+                  }}>
                     <div 
                       className="progress-fill" 
-                      style={{ width: `${aiProgress}%` }}
+                      style={{ 
+                        width: `${aiProgress}%`,
+                        height: '100%',
+                        background: 'linear-gradient(90deg, #667eea 0%, #764ba2 50%, #48bb78 100%)',
+                        backgroundSize: '200% 100%',
+                        animation: 'shimmer 2s linear infinite',
+                        transition: 'width 0.3s ease',
+                        boxShadow: '0 0 20px rgba(102, 126, 234, 0.6)'
+                      }}
                     ></div>
                   </div>
-                  <p className="progress-status">{aiStatus}</p>
-                  <p className="progress-percentage">{aiProgress}%</p>
+                  
+                  {/* Status text with glow effect */}
+                  <p className="progress-status" style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    color: '#667eea',
+                    fontWeight: '600',
+                    fontSize: '1.1rem',
+                    marginTop: '1.5rem',
+                    marginBottom: '0.5rem',
+                    textShadow: '0 0 10px rgba(102, 126, 234, 0.5)'
+                  }}>{aiStatus}</p>
+                  
+                  {/* Percentage with particles */}
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <p className="progress-percentage" style={{
+                      fontSize: '2.5rem',
+                      fontWeight: '700',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      marginTop: '0.5rem'
+                    }}>{aiProgress}%</p>
+                    
+                    {/* Floating particles */}
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '1rem' }}>
+                      {[0, 1, 2, 3, 4].map((i) => (
+                        <div key={i} style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #667eea, #764ba2)',
+                          animation: `float 2s ease-in-out ${i * 0.2}s infinite`,
+                          boxShadow: '0 0 10px rgba(102, 126, 234, 0.6)'
+                        }}></div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <style>{`
+                    @keyframes shimmer {
+                      0% { background-position: 200% 0; }
+                      100% { background-position: -200% 0; }
+                    }
+                    @keyframes float {
+                      0%, 100% { transform: translateY(0px); }
+                      50% { transform: translateY(-15px); }
+                    }
+                  `}</style>
                 </div>
               ) : (
                 <div className="ai-complete">
