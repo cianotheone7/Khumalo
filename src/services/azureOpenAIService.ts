@@ -123,11 +123,8 @@ export const generateMedicalSummary = async (request: AISummaryRequest): Promise
     const documentContents = documentsWithContent.map((doc, index) => {
       const truncatedText = doc.processedText!.substring(0, 1000);
       const wasTruncated = doc.processedText!.length > 1000;
-      return `
---- DOCUMENT ${index + 1}: ${doc.fileName} (${doc.documentType}) ---
-${truncatedText}${wasTruncated ? '
-[... truncated for brevity ...]' : ''}
---- END DOCUMENT ${index + 1} ---`;
+      const truncationSuffix = wasTruncated ? '\n[... truncated for brevity ...]' : '';
+      return `\n--- DOCUMENT ${index + 1}: ${doc.fileName} (${doc.documentType}) ---\n${truncatedText}${truncationSuffix}\n--- END DOCUMENT ${index + 1} ---`;
     }).join('\n\n');
 
     const prompt = `You are a medical AI assistant. Analyze the following patient documents and provide a comprehensive medical summary.
