@@ -32,9 +32,9 @@ export const azureConfig = {
     sasToken: import.meta.env.VITE_AZURE_STORAGE_SAS_TOKEN || 'se=2026-10-30T17%3A46%3A40Z&sp=rwdxylacupfti&spr=https&sv=2022-11-02&ss=tqbf&srt=sco&sig=KqDI2JIEBhuwZy9EiZP9CaUNGJCp/rj5HAhmwr1fGMU%3D'
   },
   openai: {
-    endpoint: import.meta.env.VITE_AZURE_OPENAI_ENDPOINT || 'https://cianoai.openai.azure.com',
-    apiKey: import.meta.env.VITE_AZURE_OPENAI_API_KEY || '',
-    deployment: import.meta.env.VITE_AZURE_OPENAI_DEPLOYMENT || 'gpt-5-mini',
+    endpoint: import.meta.env.VITE_AZURE_OPENAI_ENDPOINT || 'https://api.a4f.co/v1',
+    apiKey: import.meta.env.VITE_AZURE_OPENAI_API_KEY || 'ddc-a4f-c56fc7b02b3d485c94d5f8024554922f',
+    deployment: import.meta.env.VITE_AZURE_OPENAI_DEPLOYMENT || 'provider-5/gpt-4o-mini',
     apiVersion: import.meta.env.VITE_AZURE_OPENAI_API_VERSION || '2024-12-01-preview'
   },
   auth: {

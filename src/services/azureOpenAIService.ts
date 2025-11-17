@@ -44,21 +44,23 @@ export const isAzureOpenAIAvailable = (): boolean => {
 };
 
 /**
- * Call Azure OpenAI API
+ * Call A4F OpenAI-compatible API
  */
 const callAzureOpenAI = async (prompt: string): Promise<string> => {
   if (!isAzureOpenAIAvailable()) {
-    throw new Error('Azure OpenAI not configured');
+    throw new Error('A4F API not configured');
   }
 
-  const url = `${AZURE_OPENAI_ENDPOINT}/openai/deployments/${AZURE_OPENAI_DEPLOYMENT}/chat/completions?api-version=${AZURE_OPENAI_API_VERSION}`;
+  // A4F uses standard OpenAI format: /chat/completions
+  const url = `${AZURE_OPENAI_ENDPOINT}/chat/completions`;
   
   const headers = {
     'Content-Type': 'application/json',
-    'api-key': AZURE_OPENAI_API_KEY,
+    'Authorization': `Bearer ${AZURE_OPENAI_API_KEY}`,
   };
 
   const body = {
+    model: AZURE_OPENAI_DEPLOYMENT, // e.g., 'provider-5/gpt-4o-mini'
     messages: [
       { 
         role: 'system', 
@@ -66,11 +68,12 @@ const callAzureOpenAI = async (prompt: string): Promise<string> => {
       },
       { role: 'user', content: prompt },
     ],
-    max_completion_tokens: 2000, // Increased for comprehensive medical summaries
-    // Removed temperature, top_p, and penalties as gpt-5-mini doesn't support them
+    max_tokens: 2000,
+    temperature: 0.7
   };
 
   try {
+    console.log('🤖 Sending prompt to A4F API...');
     const response = await fetch(url, {
       method: 'POST',
       headers: headers,
@@ -79,13 +82,13 @@ const callAzureOpenAI = async (prompt: string): Promise<string> => {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      throw new Error(`Azure OpenAI API error: ${response.status} - ${errorBody}`);
+      throw new Error(`A4F API error: ${response.status} - ${errorBody}`);
     }
 
     const data = await response.json();
     return data.choices[0].message.content;
   } catch (error) {
-    console.error('Error calling Azure OpenAI:', error);
+    console.error('Error calling A4F API:', error);
     throw error;
   }
 };
@@ -112,7 +115,7 @@ export const generateMedicalSummary = async (request: AISummaryRequest): Promise
     }
 
     if (!isAzureOpenAIAvailable()) {
-      throw new Error('Azure OpenAI is not configured. AI Summary requires Azure OpenAI to analyze document content.');
+      throw new Error('A4F API is not configured. AI Summary requires A4F API key to analyze document content.');
     }
     
     // Create comprehensive prompt with FULL document content for accurate medical analysis
@@ -157,7 +160,7 @@ PROVIDE A COMPREHENSIVE MEDICAL SUMMARY WITH:
 
 Be specific and reference actual content from the documents. Base everything on the actual document content provided.`;
 
-    console.log('🤖 Sending request to Azure OpenAI with', documentsWithContent.length, 'documents');
+    console.log('🤖 Sending request to A4F with', documentsWithContent.length, 'documents');
     const aiResponse = await callAzureOpenAI(prompt);
     
     // Parse the AI response to extract structured data
