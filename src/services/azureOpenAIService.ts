@@ -118,9 +118,16 @@ export const generateMedicalSummary = async (request: AISummaryRequest): Promise
       throw new Error('A4F API is not configured. AI Summary requires A4F API key to analyze document content.');
     }
     
-    // Create comprehensive prompt with FULL document content for accurate medical analysis
+    // Create prompt with truncated document content to avoid API limits
+    // Limit each document to first 1000 characters for faster processing
     const documentContents = documentsWithContent.map((doc, index) => {
-      return `\n--- DOCUMENT ${index + 1}: ${doc.fileName} (${doc.documentType}) ---\n${doc.processedText}\n--- END DOCUMENT ${index + 1} ---`;
+      const truncatedText = doc.processedText!.substring(0, 1000);
+      const wasTruncated = doc.processedText!.length > 1000;
+      return `
+--- DOCUMENT ${index + 1}: ${doc.fileName} (${doc.documentType}) ---
+${truncatedText}${wasTruncated ? '
+[... truncated for brevity ...]' : ''}
+--- END DOCUMENT ${index + 1} ---`;
     }).join('\n\n');
 
     const prompt = `You are a medical AI assistant. Analyze the following patient documents and provide a comprehensive medical summary.
