@@ -1210,48 +1210,13 @@ Processing Method: Tesseract.js OCR (Working)`;
                   throw new Error('OCR returned insufficient text');
                 }
               } catch (tesseractError) {
-                console.log('⚠️ Tesseract failed, using fallback content...');
-                processedText = `Medical Document Analysis
-File: ${doc.fileName}
-Type: ${doc.contentType}
-Size: ${(doc.fileSize / 1024).toFixed(1)} KB
-Uploaded: ${doc.uploadedAt}
-
-Document Category: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Count Report' : 
-  doc.fileName.toLowerCase().includes('lab') ? 'Laboratory Report' : 
-  doc.fileName.toLowerCase().includes('xray') ? 'X-Ray Report' : 
-  doc.fileName.toLowerCase().includes('ct') ? 'CT Scan Report' : 
-  doc.fileName.toLowerCase().includes('mri') ? 'MRI Report' : 
-  doc.fileName.toLowerCase().includes('screenshot') ? 'Screenshot/Image Report' :
-  'Medical Document'}
-
-Processing Method: Fallback (OCR failed)
-
-Note: OCR processing failed. For better analysis, please ensure the document is clear and readable.`;
+                console.error('❌ Tesseract OCR failed:', tesseractError);
+                throw new Error(`Failed to extract text from image ${doc.fileName}. OCR processing failed. Please upload a clearer image or a text-based PDF.`);
               }
             }
           } catch (ocrError) {
-            console.error('❌ OCR failed:', ocrError);
-            console.log('🔄 Falling back to basic content generation...');
-            
-            // Fallback content
-            processedText = `Medical Document Analysis
-File: ${doc.fileName}
-Type: ${doc.contentType}
-Size: ${(doc.fileSize / 1024).toFixed(1)} KB
-Uploaded: ${doc.uploadedAt}
-
-Document Category: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Count Report' : 
-  doc.fileName.toLowerCase().includes('lab') ? 'Laboratory Report' : 
-  doc.fileName.toLowerCase().includes('xray') ? 'X-Ray Report' : 
-  doc.fileName.toLowerCase().includes('ct') ? 'CT Scan Report' : 
-  doc.fileName.toLowerCase().includes('mri') ? 'MRI Report' : 
-  doc.fileName.toLowerCase().includes('screenshot') ? 'Screenshot/Image Report' :
-  'Medical Document'}
-
-Processing Method: Fallback (OCR failed)
-
-Note: OCR processing failed. For better analysis, please ensure the document is clear and readable.`;
+            console.error('❌ Document processing failed:', ocrError);
+            throw new Error(`Failed to process ${doc.fileName}: ${ocrError instanceof Error ? ocrError.message : 'Unknown error'}`);
           }
 
           console.log(`✅ Simple processing completed for: ${doc.fileName}`);
@@ -1268,40 +1233,8 @@ Note: OCR processing failed. For better analysis, please ensure the document is 
           });
         } catch (docError) {
           console.error(`❌ Failed to process document ${doc.fileName}:`, docError);
-          
-          // Create fallback content for failed documents
-          const fallbackText = `Document: ${doc.fileName}
-File Size: ${(doc.fileSize / 1024).toFixed(1)} KB
-Type: ${doc.contentType}
-Upload Date: ${doc.uploadedAt}
-
-Document processing encountered an error but the file was uploaded successfully. This commonly occurs with:
-- Scanned documents (image-based PDFs)
-- Complex medical document layouts
-- Low resolution images
-- Password-protected files
-
-For better analysis, please:
-1. Upload a clear, high-resolution image
-2. Use a text-searchable PDF
-3. Copy and paste the key values manually
-
-Document appears to be: ${doc.fileName.toLowerCase().includes('cbc') ? 'CBC/Blood Count Report' : 
-  doc.fileName.toLowerCase().includes('lab') ? 'Laboratory Report' : 
-  doc.fileName.toLowerCase().includes('xray') ? 'X-Ray Report' : 
-  doc.fileName.toLowerCase().includes('ct') ? 'CT Scan Report' : 
-  doc.fileName.toLowerCase().includes('mri') ? 'MRI Report' : 
-  'Medical Document'}`;
-          
-          documentsWithContent.push({
-            fileName: doc.fileName,
-            description: doc.description,
-            uploadedAt: doc.uploadedAt,
-            documentType: doc.documentType,
-            processedText: fallbackText,
-            fileSize: doc.fileSize || 0,
-            contentType: doc.contentType || 'unknown'
-          });
+          // NO FALLBACK - throw the error so user knows what went wrong
+          throw docError;
         }
       }
 
