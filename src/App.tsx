@@ -1505,36 +1505,8 @@ Note: This summary was generated from extracted document content. Please review 
         console.log('✅ AI summary created successfully:', response);
       } catch (aiError) {
         console.error('❌ AI service failed:', aiError);
-        
-        // Create fallback summary
-        response = {
-          summary: `Medical Summary for ${patient.name} (MRN: ${patient.medicalRecordNumber})
-
-Clinical Overview:
-Patient ${patient.name} has ${documentsWithContent.length} medical documents on file. Document processing was completed successfully.
-
-Key Findings:
-- ${documentsWithContent.length} documents processed
-- Document types: ${documentsWithContent.map(doc => doc.contentType).join(', ')}
-- All documents successfully uploaded and analyzed
-
-Recommendations:
-1. Review all uploaded documents
-2. Schedule follow-up appointment
-3. Consider additional testing if needed
-
-Priority Level: Medium
-Follow-up Required: Yes
-
-Note: This is a basic summary. For detailed analysis, please review the individual documents.`,
-          recommendations: ['Review documents', 'Schedule follow-up'],
-          followUpRequired: true,
-          priority: 'Medium',
-          generatedAt: new Date().toISOString(),
-          confidence: 0.5
-        };
-        
-        console.log('✅ Fallback summary created:', response);
+        // NO FALLBACK - throw the error
+        throw aiError;
       }
 
       const summaryData = {
