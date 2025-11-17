@@ -1144,8 +1144,9 @@ the advanced document processing module needs to be functioning properly.`;
                 // Use PDF.js to render PDF pages as images
                 const pdfjsLib = await import('pdfjs-dist');
                 
-                // Set worker source
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                // Use the bundled worker from pdfjs-dist package
+                const workerSrc = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
+                pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc.default;
                 
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -1171,7 +1172,11 @@ the advanced document processing module needs to be functioning properly.`;
                   canvas.height = viewport.height;
                   
                   // Render PDF page to canvas
-                  await page.render({ canvasContext: context, viewport }).promise;
+                  await page.render({ 
+                    canvasContext: context, 
+                    viewport: viewport,
+                    canvas: canvas 
+                  }).promise;
                   
                   // Convert canvas to blob
                   const blob = await new Promise<Blob>((resolve) => {
