@@ -97,7 +97,7 @@
     "X-Frame-Options": "DENY",
     "X-XSS-Protection": "1; mode=block",
     "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https://*.supabase.co https://*.openai.azure.com https://cdn.jsdelivr.net https://unpkg.com; worker-src 'self' blob: data: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' data: https://*.supabase.co https://*.openai.azure.com https://*.blob.core.windows.net https://*.table.core.windows.net https://*.cognitiveservices.azure.com https://cdn.jsdelivr.net https://unpkg.com https://medical-practice-api-v2.azurewebsites.net https://api.cortexha.com; font-src 'self' data:;",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: https://*.supabase.co https://*.openai.azure.com https://cdn.jsdelivr.net https://unpkg.com; worker-src 'self' blob: data: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' data: https://*.supabase.co https://*.openai.azure.com https://api.a4f.co https://*.blob.core.windows.net https://*.table.core.windows.net https://*.cognitiveservices.azure.com https://cdn.jsdelivr.net https://unpkg.com https://medical-practice-api-v2.azurewebsites.net https://api.cortexha.com; font-src 'self' data:;",
     "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
     "Pragma": "no-cache",
     "Expires": "0"
