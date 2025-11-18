@@ -16,6 +16,13 @@ interface PSQIData {
   enthusiasmProblem: string;
   overallSleepQuality: string;
   otherReasons: string;
+  // New post-meal questions
+  postPrandialBloating: string;
+  postPrandialLooseStools: string;
+  postPrandialFatigue: string;
+  // New caffeine questions
+  caffeineEffect: string;
+  lateCaffeineEffect: string;
 }
 
 interface PSQIQuestionnaireProps {
@@ -42,7 +49,14 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
     troubleStayingAwake: 'not',
     enthusiasmProblem: 'none',
     overallSleepQuality: 'fairlyGood',
-    otherReasons: ''
+    otherReasons: '',
+    // New post-meal questions (0-3 severity scale)
+    postPrandialBloating: '0',
+    postPrandialLooseStools: '0',
+    postPrandialFatigue: '0',
+    // New caffeine questions
+    caffeineEffect: 'little',
+    lateCaffeineEffect: 'no',
   });
 
   const sleepProblemOptions = [
@@ -78,11 +92,30 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
     { value: 'veryBad', label: 'Very bad' }
   ];
 
+  const severityOptions = [
+    { value: '0', label: '0 - Not at all' },
+    { value: '1', label: '1 - Mild' },
+    { value: '2', label: '2 - Moderate' },
+    { value: '3', label: '3 - Severe' }
+  ];
+
+  const caffeineEffectOptions = [
+    { value: 'anxiety', label: 'Small amounts of caffeine trigger anxiety, palpitations, or insomnia' },
+    { value: 'alert', label: 'Caffeine makes you alert without palpitations or anxiety' },
+    { value: 'little', label: 'Caffeine has little/no effect on you' }
+  ];
+
+  const lateCaffeineOptions = [
+    { value: 'yes', label: 'Late caffeine delays your sleep' },
+    { value: 'no', label: 'Late caffeine does not delay your sleep' }
+  ];
+
   const steps = [
     'Sleep Timing',
     'Sleep Problems',
     'Sleep Medication & Alertness',
-    'Overall Assessment'
+    'Overall Assessment',
+    'Post-Meal & Caffeine Effects'
   ];
 
   const handleInputChange = (field: keyof PSQIData, value: string) => {
@@ -121,6 +154,10 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
         return formData.sleepMedication !== '' && formData.troubleStayingAwake !== '';
       case 3:
         return formData.enthusiasmProblem !== '' && formData.overallSleepQuality !== '';
+      case 4:
+        return formData.postPrandialBloating !== '' && formData.postPrandialLooseStools !== '' && 
+               formData.postPrandialFatigue !== '' && formData.caffeineEffect !== '' && 
+               formData.lateCaffeineEffect !== '';
       default:
         return false;
     }
@@ -293,6 +330,104 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
                       value={option.value}
                       checked={formData.overallSleepQuality === option.value}
                       onChange={(e) => handleInputChange('overallSleepQuality', e.target.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div className="psqi-step">
+            <h3>Post-Meal & Caffeine Effects (Past Month)</h3>
+            <p className="section-description">Please rate the severity of these symptoms after meals:</p>
+            
+            <div className="form-group">
+              <label>Post-prandial bloating *</label>
+              <div className="frequency-options">
+                {severityOptions.map((option) => (
+                  <label key={option.value} className="radio-option">
+                    <input
+                      type="radio"
+                      name="postPrandialBloating"
+                      value={option.value}
+                      checked={formData.postPrandialBloating === option.value}
+                      onChange={(e) => handleInputChange('postPrandialBloating', e.target.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Post-prandial loose stools or urgency *</label>
+              <div className="frequency-options">
+                {severityOptions.map((option) => (
+                  <label key={option.value} className="radio-option">
+                    <input
+                      type="radio"
+                      name="postPrandialLooseStools"
+                      value={option.value}
+                      checked={formData.postPrandialLooseStools === option.value}
+                      onChange={(e) => handleInputChange('postPrandialLooseStools', e.target.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Post-prandial fatigue or sleepiness *</label>
+              <div className="frequency-options">
+                {severityOptions.map((option) => (
+                  <label key={option.value} className="radio-option">
+                    <input
+                      type="radio"
+                      name="postPrandialFatigue"
+                      value={option.value}
+                      checked={formData.postPrandialFatigue === option.value}
+                      onChange={(e) => handleInputChange('postPrandialFatigue', e.target.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>How does caffeine affect you? *</label>
+              <div className="frequency-options">
+                {caffeineEffectOptions.map((option) => (
+                  <label key={option.value} className="radio-option">
+                    <input
+                      type="radio"
+                      name="caffeineEffect"
+                      value={option.value}
+                      checked={formData.caffeineEffect === option.value}
+                      onChange={(e) => handleInputChange('caffeineEffect', e.target.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            
+            <div className="form-group">
+              <label>Does late caffeine affect your sleep? *</label>
+              <div className="frequency-options">
+                {lateCaffeineOptions.map((option) => (
+                  <label key={option.value} className="radio-option">
+                    <input
+                      type="radio"
+                      name="lateCaffeineEffect"
+                      value={option.value}
+                      checked={formData.lateCaffeineEffect === option.value}
+                      onChange={(e) => handleInputChange('lateCaffeineEffect', e.target.value)}
                     />
                     <span>{option.label}</span>
                   </label>
