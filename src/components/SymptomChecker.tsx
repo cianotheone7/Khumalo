@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './SymptomChecker.css';
 import { logSymptomChecker } from '../services/activityService';
-import PSQIQuestionnaire from './PSQIQuestionnaire';
+import FatigueFactoryProgram from './FatigueFactoryProgram';
 import Body from '@mjcdev/react-body-highlighter';
 import { getPatients } from '../services/azurePatientRestService';
 import { uploadDocument } from '../services/azureBlobService';
@@ -1334,7 +1334,7 @@ const SymptomChecker: React.FC = () => {
 
       {currentStep === 'psqi' && (
         <div className="psqi-container">
-          <PSQIQuestionnaire 
+          <FatigueFactoryProgram 
             onComplete={handlePSQIComplete}
             isMandatory={true}
           />

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './PSQIQuestionnaire.css';
+import './FatigueFactoryProgram.css';
 
 interface PSQIData {
   name: string;
@@ -445,7 +445,7 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
   return (
     <div className="psqi-questionnaire">
       <div className="psqi-header">
-        <h2>Pittsburgh Sleep Quality Index (PSQI)</h2>
+        <h2>The Fatigue Factory program</h2>
         <p className="psqi-instructions">
           The following questions relate to your usual sleep habits during the <strong>past month only</strong>. 
           Your answers should indicate the most accurate reply for the <strong>majority</strong> of days and nights in the past month. 
