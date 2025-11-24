@@ -3098,42 +3098,63 @@ From ${user?.name || 'your medical practice'}`
 
                   <div className="form-group">
                     <label>Diagnosed Chronic Conditions</label>
-                    <select
-                      multiple
-                      value={newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean) : []}
-                      onChange={(e) => {
-                        const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
-                        setNewPatient({...newPatient, chronicConditions: selectedOptions.join(', ')});
-                      }}
-                      style={{
-                        minHeight: '120px',
-                        padding: '8px',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#000'
-                      }}
-                    >
-                      <option value="Diabetes Type 1" style={{ color: '#000' }}>Diabetes Type 1</option>
-                      <option value="Diabetes Type 2" style={{ color: '#000' }}>Diabetes Type 2</option>
-                      <option value="Hypertension" style={{ color: '#000' }}>Hypertension</option>
-                      <option value="Asthma" style={{ color: '#000' }}>Asthma</option>
-                      <option value="COPD" style={{ color: '#000' }}>COPD</option>
-                      <option value="Heart Disease" style={{ color: '#000' }}>Heart Disease</option>
-                      <option value="Chronic Kidney Disease" style={{ color: '#000' }}>Chronic Kidney Disease</option>
-                      <option value="Arthritis" style={{ color: '#000' }}>Arthritis</option>
-                      <option value="Epilepsy" style={{ color: '#000' }}>Epilepsy</option>
-                      <option value="HIV/AIDS" style={{ color: '#000' }}>HIV/AIDS</option>
-                      <option value="Cancer" style={{ color: '#000' }}>Cancer</option>
-                      <option value="Depression" style={{ color: '#000' }}>Depression</option>
-                      <option value="Anxiety Disorder" style={{ color: '#000' }}>Anxiety Disorder</option>
-                      <option value="Bipolar Disorder" style={{ color: '#000' }}>Bipolar Disorder</option>
-                      <option value="Schizophrenia" style={{ color: '#000' }}>Schizophrenia</option>
-                      <option value="Thyroid Disorder" style={{ color: '#000' }}>Thyroid Disorder</option>
-                      <option value="Obesity" style={{ color: '#000' }}>Obesity</option>
-                      <option value="High Cholesterol" style={{ color: '#000' }}>High Cholesterol</option>
-                    </select>
-                    <small style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginTop: '5px', display: 'block' }}>Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+                    <div style={{
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '12px',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      maxHeight: '200px',
+                      overflowY: 'auto'
+                    }}>
+                      {[
+                        'Diabetes Type 1', 'Diabetes Type 2', 'Hypertension', 'Asthma', 'COPD',
+                        'Heart Disease', 'Chronic Kidney Disease', 'Arthritis', 'Epilepsy',
+                        'HIV/AIDS', 'Cancer', 'Depression', 'Anxiety Disorder', 'Bipolar Disorder',
+                        'Schizophrenia', 'Thyroid Disorder', 'Obesity', 'High Cholesterol'
+                      ].map(condition => {
+                        const selectedConditions = newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean) : [];
+                        const isSelected = selectedConditions.includes(condition);
+                        return (
+                          <label key={condition} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '8px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            borderRadius: '6px',
+                            background: isSelected ? 'rgba(78, 205, 196, 0.2)' : 'transparent',
+                            transition: 'all 0.2s ease',
+                            border: isSelected ? '1px solid #4ecdc4' : '1px solid transparent'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = isSelected ? 'rgba(78, 205, 196, 0.3)' : 'rgba(255, 255, 255, 0.05)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = isSelected ? 'rgba(78, 205, 196, 0.2)' : 'transparent'}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                let newConditions;
+                                if (e.target.checked) {
+                                  newConditions = [...selectedConditions, condition];
+                                } else {
+                                  newConditions = selectedConditions.filter(c => c !== condition);
+                                }
+                                setNewPatient({...newPatient, chronicConditions: newConditions.join(', ')});
+                              }}
+                              style={{
+                                marginRight: '10px',
+                                width: '18px',
+                                height: '18px',
+                                cursor: 'pointer',
+                                accentColor: '#4ecdc4'
+                              }}
+                            />
+                            <span style={{ color: '#000', fontWeight: isSelected ? '600' : '400' }}>{condition}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    <small style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginTop: '5px', display: 'block' }}>Click to select multiple conditions</small>
                   </div>
 
                   {/* Address Section */}
@@ -3505,42 +3526,63 @@ From ${user?.name || 'your medical practice'}`
 
                   <div className="form-group">
                     <label style={{ color: '#2c3e50', fontWeight: 600 }}>Diagnosed Chronic Conditions</label>
-                    <select
-                      multiple
-                      value={newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean) : []}
-                      onChange={(e) => {
-                        const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
-                        setNewPatient({...newPatient, chronicConditions: selectedOptions.join(', ')});
-                      }}
-                      style={{
-                        minHeight: '120px',
-                        padding: '8px',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#000'
-                      }}
-                    >
-                      <option value="Diabetes Type 1" style={{ color: '#000' }}>Diabetes Type 1</option>
-                      <option value="Diabetes Type 2" style={{ color: '#000' }}>Diabetes Type 2</option>
-                      <option value="Hypertension" style={{ color: '#000' }}>Hypertension</option>
-                      <option value="Asthma" style={{ color: '#000' }}>Asthma</option>
-                      <option value="COPD" style={{ color: '#000' }}>COPD</option>
-                      <option value="Heart Disease" style={{ color: '#000' }}>Heart Disease</option>
-                      <option value="Chronic Kidney Disease" style={{ color: '#000' }}>Chronic Kidney Disease</option>
-                      <option value="Arthritis" style={{ color: '#000' }}>Arthritis</option>
-                      <option value="Epilepsy" style={{ color: '#000' }}>Epilepsy</option>
-                      <option value="HIV/AIDS" style={{ color: '#000' }}>HIV/AIDS</option>
-                      <option value="Cancer" style={{ color: '#000' }}>Cancer</option>
-                      <option value="Depression" style={{ color: '#000' }}>Depression</option>
-                      <option value="Anxiety Disorder" style={{ color: '#000' }}>Anxiety Disorder</option>
-                      <option value="Bipolar Disorder" style={{ color: '#000' }}>Bipolar Disorder</option>
-                      <option value="Schizophrenia" style={{ color: '#000' }}>Schizophrenia</option>
-                      <option value="Thyroid Disorder" style={{ color: '#000' }}>Thyroid Disorder</option>
-                      <option value="Obesity" style={{ color: '#000' }}>Obesity</option>
-                      <option value="High Cholesterol" style={{ color: '#000' }}>High Cholesterol</option>
-                    </select>
-                    <small style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginTop: '5px', display: 'block' }}>Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+                    <div style={{
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      padding: '12px',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      maxHeight: '200px',
+                      overflowY: 'auto'
+                    }}>
+                      {[
+                        'Diabetes Type 1', 'Diabetes Type 2', 'Hypertension', 'Asthma', 'COPD',
+                        'Heart Disease', 'Chronic Kidney Disease', 'Arthritis', 'Epilepsy',
+                        'HIV/AIDS', 'Cancer', 'Depression', 'Anxiety Disorder', 'Bipolar Disorder',
+                        'Schizophrenia', 'Thyroid Disorder', 'Obesity', 'High Cholesterol'
+                      ].map(condition => {
+                        const selectedConditions = newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean) : [];
+                        const isSelected = selectedConditions.includes(condition);
+                        return (
+                          <label key={condition} style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '8px',
+                            marginBottom: '4px',
+                            cursor: 'pointer',
+                            borderRadius: '6px',
+                            background: isSelected ? 'rgba(78, 205, 196, 0.2)' : 'transparent',
+                            transition: 'all 0.2s ease',
+                            border: isSelected ? '1px solid #4ecdc4' : '1px solid transparent'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = isSelected ? 'rgba(78, 205, 196, 0.3)' : 'rgba(255, 255, 255, 0.05)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = isSelected ? 'rgba(78, 205, 196, 0.2)' : 'transparent'}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                let newConditions;
+                                if (e.target.checked) {
+                                  newConditions = [...selectedConditions, condition];
+                                } else {
+                                  newConditions = selectedConditions.filter(c => c !== condition);
+                                }
+                                setNewPatient({...newPatient, chronicConditions: newConditions.join(', ')});
+                              }}
+                              style={{
+                                marginRight: '10px',
+                                width: '18px',
+                                height: '18px',
+                                cursor: 'pointer',
+                                accentColor: '#4ecdc4'
+                              }}
+                            />
+                            <span style={{ color: '#000', fontWeight: isSelected ? '600' : '400' }}>{condition}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    <small style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginTop: '5px', display: 'block' }}>Click to select multiple conditions</small>
                   </div>
 
                   {/* Patient Status */}
