@@ -211,6 +211,7 @@ interface Patient {
   whatsappPhone?: string;
   passportId?: string;
   gender?: string;
+  race?: string;
   dateOfBirth: string;
   medicalRecordNumber: string;
   emergencyContact: string;
@@ -314,6 +315,7 @@ function Dashboard() {
     whatsappPhone: '',
     passportId: '',
     gender: '',
+    race: '',
     dateOfBirth: '',
     medicalRecordNumber: '',
     emergencyContact: '',
@@ -691,6 +693,7 @@ function Dashboard() {
       whatsappPhone: patient.whatsappPhone || '',
       passportId: patient.passportId || '',
       gender: patient.gender || '',
+      race: patient.race || '',
       dateOfBirth: dateOfBirth,
       medicalRecordNumber: patient.medicalRecordNumber,
       emergencyContact: patient.emergencyContact,
@@ -779,7 +782,7 @@ function Dashboard() {
           
           // Reset form and close modal
           setNewPatient({
-    name: '', email: '', phone: '', mobilePhone: '', whatsappPhone: '', passportId: '', gender: '', dateOfBirth: '', medicalRecordNumber: '',
+    name: '', email: '', phone: '', mobilePhone: '', whatsappPhone: '', passportId: '', gender: '', race: '', dateOfBirth: '', medicalRecordNumber: '',
     emergencyContact: '', emergencyContactName: '', emergencyContactPhone: '',
     insuranceProvider: '', customInsuranceProvider: '',
     medicalAidNumber: '', dependentCode: '', allergies: '', chronicConditions: '',
@@ -899,7 +902,7 @@ function Dashboard() {
         }
 
         setNewPatient({
-    name: '', email: '', phone: '', mobilePhone: '', whatsappPhone: '', passportId: '', gender: '', dateOfBirth: '', medicalRecordNumber: '',
+    name: '', email: '', phone: '', mobilePhone: '', whatsappPhone: '', passportId: '', gender: '', race: '', dateOfBirth: '', medicalRecordNumber: '',
     emergencyContact: '', emergencyContactName: '', emergencyContactPhone: '', 
     insuranceProvider: '', customInsuranceProvider: '',
     medicalAidNumber: '', dependentCode: '', allergies: '', chronicConditions: '',
@@ -2968,6 +2971,23 @@ From ${user?.name || 'your medical practice'}`
                       </select>
                     </div>
                   </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label>Race/Ethnicity</label>
+                      <select 
+                        value={newPatient.race || ''}
+                        onChange={(e) => setNewPatient({...newPatient, race: e.target.value})}
+                      >
+                        <option value="">Select Race/Ethnicity</option>
+                        <option value="Black African">Black African</option>
+                        <option value="Coloured">Coloured</option>
+                        <option value="Indian/Asian">Indian/Asian</option>
+                        <option value="White">White</option>
+                        <option value="Other">Other</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                      </select>
+                    </div>
+                  </div>
                   <div className="form-group">
                     <label>Date of Birth 📅</label>
                     <DateOfBirthPicker
@@ -3343,6 +3363,23 @@ From ${user?.name || 'your medical practice'}`
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label style={{ color: '#2c3e50', fontWeight: 600 }}>Race/Ethnicity</label>
+                      <select
+                        value={newPatient.race || ''}
+                        onChange={(e) => setNewPatient({...newPatient, race: e.target.value})}
+                      >
+                        <option value="">Select Race/Ethnicity</option>
+                        <option value="Black African">Black African</option>
+                        <option value="Coloured">Coloured</option>
+                        <option value="Indian/Asian">Indian/Asian</option>
+                        <option value="White">White</option>
                         <option value="Other">Other</option>
                         <option value="Prefer not to say">Prefer not to say</option>
                       </select>
