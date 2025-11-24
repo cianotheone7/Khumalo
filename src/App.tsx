@@ -971,34 +971,46 @@ function Dashboard() {
       setIsUploadingDocument(true);
       
       try {
-        // Get the file from the file input
+        // Get ALL files from the file input
         const fileInput = window.document.querySelector('input[type="file"]') as HTMLInputElement;
-        const file = fileInput?.files?.[0];
+        const files = fileInput?.files;
         
-        const fileName = file ? file.name : newDocument.fileName;
-        const fileSize = file ? file.size : Math.floor(Math.random() * 1000000) + 100000;
-        const contentType = file ? file.type : 'application/octet-stream';
-        let processedText = '';
+        if (!files || files.length === 0) {
+          displayNotification('Please select at least one file to upload.', 'error');
+          setIsUploadingDocument(false);
+          return;
+        }
 
-        // Process document content if file is provided
-        if (file) {
-          // Use simple document processing (no complex module loading)
+        const filesToUpload = Array.from(files);
+        console.log(`📦 Uploading ${filesToUpload.length} file(s)...`);
+
+        // Process all files
+        for (let i = 0; i < filesToUpload.length; i++) {
+          const file = filesToUpload[i];
+          console.log(`📄 Processing file ${i + 1}/${filesToUpload.length}: ${file.name}`);
+
+          const fileName = file.name;
+          const fileSize = file.size;
+          const contentType = file.type;
+          let processedText = '';
+
+          // Use simple document processing
           console.log('🔄 Using simple document processing for upload...');
           
-          const fileName = file.name.toLowerCase();
+          const fileNameLower = file.name.toLowerCase();
           processedText = `Medical Document Analysis
 File: ${file.name}
 Type: ${file.type}
 Size: ${(file.size / 1024).toFixed(1)} KB
 Uploaded: ${new Date().toLocaleString()}
 
-Document Category: ${fileName.includes('cbc') ? 'CBC/Blood Count Report' : 
-  fileName.includes('lab') ? 'Laboratory Report' : 
-  fileName.includes('xray') ? 'X-Ray Report' : 
-  fileName.includes('ct') ? 'CT Scan Report' : 
-  fileName.includes('mri') ? 'MRI Report' : 
-  fileName.includes('screenshot') ? 'Screenshot/Image Report' :
-  'Medical Document'}
+Document Category: ${fileNameLower.includes('cbc') ? 'CBC/Blood Count Report' : 
+            fileNameLower.includes('lab') ? 'Laboratory Report' : 
+            fileNameLower.includes('xray') ? 'X-Ray Report' : 
+            fileNameLower.includes('ct') ? 'CT Scan Report' : 
+            fileNameLower.includes('mri') ? 'MRI Report' : 
+            fileNameLower.includes('screenshot') ? 'Screenshot/Image Report' :
+            'Medical Document'}
 
 Processing Method: Simple Analysis (Advanced OCR temporarily unavailable)
 
@@ -1015,13 +1027,9 @@ the advanced document processing module needs to be functioning properly.`;
             fileName: file.name,
             textLength: processedText.length
           });
-        } else {
-          processedText = newDocument.description || 'Document content not available';
-        }
 
-        // Upload file to Azure Blob Storage first
-        let blobUrl = '';
-        if (file) {
+          // Upload file to Azure Blob Storage
+          let blobUrl = '';
           const { uploadDocument } = await import('./services/azureBlobService');
           const uploadResult = await uploadDocument(file, {
             fileName: fileName,
@@ -1038,48 +1046,44 @@ the advanced document processing module needs to be functioning properly.`;
           
           blobUrl = uploadResult.url || '';
           console.log('File uploaded successfully to Azure Blob Storage:', blobUrl);
-        } else {
-          // For documents without files, create a placeholder URL with SAS token
-          const BLOB_SAS_TOKEN = '?se=2030-10-21T20%3A49%3A23Z&sp=rwdlacup&sv=2022-11-02&ss=b&srt=sco&sig=jU1EOpixz4skvqAyuWJt2ItEX1Qys4fmG/oyRIgvg9I%3D';
-          blobUrl = `https://medprac20241008.blob.core.windows.net/patient-documents/${selectedPatient.medicalRecordNumber}/${Date.now()}-${fileName}${BLOB_SAS_TOKEN}`;
-        }
 
-        const documentData = {
-          patientId: selectedPatient.medicalRecordNumber,
-          fileName: fileName,
-          fileSize: fileSize,
-          description: newDocument.description,
-          documentType: newDocument.documentType,
-          blobUrl: blobUrl,
-          contentType: contentType,
-          processedText: processedText // Store the extracted text content
-        };
+          const documentData = {
+            patientId: selectedPatient.medicalRecordNumber,
+            fileName: fileName,
+            fileSize: fileSize,
+            description: newDocument.description,
+            documentType: newDocument.documentType,
+            blobUrl: blobUrl,
+            contentType: contentType,
+            processedText: processedText
+          };
 
-        // Always save to Azure - no local storage for medical data
-        if (!isAzureAvailable()) {
-          throw new Error('Azure storage not available. Cannot save document securely.');
+          // Save to Azure
+          if (!isAzureAvailable()) {
+            throw new Error('Azure storage not available. Cannot save document securely.');
+          }
+          
+          const document = await createDocument(documentData);
+          
+          // Log activity
+          if (user) {
+            await logDocumentUploaded(
+              selectedPatient.medicalRecordNumber || selectedPatient.id,
+              selectedPatient.name,
+              user.id || user.email,
+              user.name || user.email,
+              document.rowKey || 'unknown'
+            );
+          }
         }
         
-        const document = await createDocument(documentData);
-        
-        // Log activity
-        if (user) {
-          await logDocumentUploaded(
-            selectedPatient.medicalRecordNumber || selectedPatient.id,
-            selectedPatient.name,
-            user.id || user.email,
-            user.name || user.email,
-            document.rowKey || 'unknown'
-          );
-          refreshActivities();
-        }
-        
-        // Refresh the documents list to get the latest data from Azure
+        // Refresh after all files uploaded
+        await refreshActivities();
         await refreshDocumentsList();
 
         setNewDocument({ fileName: '', description: '', documentType: 'Other' });
         setShowAddDocument(false);
-        displayNotification('Document added and processed successfully!');
+        displayNotification(`${filesToUpload.length} document(s) uploaded successfully!`);
       } catch (error) {
         console.error('Failed to add document:', error);
         displayNotification('Failed to add document. Please try again.', 'error');
@@ -3423,22 +3427,40 @@ From ${user?.name || 'your medical practice'}`
                   )}
                   <h3>📤 Add Document for {selectedPatient.name}</h3>
                   <div className="form-group">
-                    <label>Upload File *</label>
+                    <label>Upload Files * (Multiple files supported)</label>
                     <input 
                       type="file" 
                       id="fileUpload"
+                      multiple
                       onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          const file = e.target.files[0];
-                          setNewDocument({...newDocument, fileName: file.name});
+                        if (e.target.files && e.target.files.length > 0) {
+                          const files = Array.from(e.target.files);
+                          const firstFile = files[0];
+                          setNewDocument({...newDocument, fileName: firstFile.name});
                         }
                       }}
                       accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
                       className="file-input"
                     />
                     <label htmlFor="fileUpload" className="file-upload-label">
-                      📁 Choose File or Drag & Drop
+                      📁 Choose Files (Hold Ctrl/Cmd for multiple)
                     </label>
+                    {(() => {
+                      const fileInput = window.document.querySelector('input[type="file"]') as HTMLInputElement;
+                      const files = fileInput?.files;
+                      return files && files.length > 0 ? (
+                        <div style={{ marginTop: '10px', padding: '10px', background: 'rgba(78, 205, 196, 0.1)', borderRadius: '8px', border: '1px solid rgba(78, 205, 196, 0.3)' }}>
+                          <div style={{ fontWeight: '600', color: '#4ecdc4', marginBottom: '8px' }}>✓ {files.length} file{files.length !== 1 ? 's' : ''} selected</div>
+                          <div style={{ maxHeight: '150px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                            {Array.from(files).map((file, i) => (
+                              <div key={i} style={{ fontSize: '0.9em', color: 'rgba(255,255,255,0.8)', padding: '5px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
+                                📄 {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                   <div className="form-group">
                     <label>Document Name *</label>
@@ -3478,7 +3500,11 @@ From ${user?.name || 'your medical practice'}`
                       Cancel
                     </button>
                     <button className="btn btn-primary" onClick={() => addDocument()} disabled={isUploadingDocument}>
-                      {isUploadingDocument ? '⏳ Uploading...' : '📤 Upload Document'}
+                      {isUploadingDocument ? '⏳ Uploading...' : (() => {
+                        const fileInput = window.document.querySelector('input[type="file"]') as HTMLInputElement;
+                        const count = fileInput?.files?.length || 0;
+                        return count > 1 ? `📤 Upload ${count} Documents` : '📤 Upload Document';
+                      })()}
                     </button>
                   </div>
                 </div>
