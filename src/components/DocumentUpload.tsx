@@ -16,6 +16,7 @@ export function DocumentUpload({ patientId, onClose, onDocumentUploaded }: Docum
   const { user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [description, setDescription] = useState('');
+  const [documentCategory, setDocumentCategory] = useState('Other');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ completed: 0, total: 0 });
@@ -26,6 +27,21 @@ export function DocumentUpload({ patientId, onClose, onDocumentUploaded }: Docum
   const [captureMode, setCaptureMode] = useState<'file' | 'camera'>('file');
   const [uploadComplete, setUploadComplete] = useState<boolean>(false);
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
+
+  // Document categories for medical practice
+  const documentCategories = [
+    'Lab Results',
+    'Radiology/Imaging',
+    'Prescription',
+    'Consultation Notes',
+    'Referral Letter',
+    'Medical Certificate',
+    'Insurance Documents',
+    'Consent Forms',
+    'Medical History',
+    'Discharge Summary',
+    'Other'
+  ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log('🟢 FILES SELECTED:', e.target.files?.length || 0);
@@ -107,7 +123,7 @@ export function DocumentUpload({ patientId, onClose, onDocumentUploaded }: Docum
           patientId: patientId,
           fileName: file.name,
           blobUrl: result.url || '',
-          documentType: 'Other', // Default document type
+          documentType: documentCategory, // Use selected category
           contentType: file.type,
           fileSize: file.size,
           description: description || '',
@@ -418,7 +434,7 @@ export function DocumentUpload({ patientId, onClose, onDocumentUploaded }: Docum
           </div>
         )}
         <div className="modal-header">
-          <h2>Upload Document v2.1</h2>
+          <h2>📄 Bulk Document Upload</h2>
           <button onClick={onClose} className="close-button" disabled={loading}>×</button>
         </div>
 
@@ -428,6 +444,32 @@ export function DocumentUpload({ patientId, onClose, onDocumentUploaded }: Docum
               {error}
             </div>
           )}
+
+          <div className="form-group">
+            <label htmlFor="category">Document Category *</label>
+            <select
+              id="category"
+              value={documentCategory}
+              onChange={(e) => setDocumentCategory(e.target.value)}
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '8px',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                background: 'rgba(255, 255, 255, 0.05)',
+                color: '#fff',
+                fontSize: '1rem',
+                marginBottom: '1rem'
+              }}
+            >
+              {documentCategories.map((category) => (
+                <option key={category} value={category} style={{ background: '#1e293b', color: '#fff' }}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <div className="form-group">
             <label>Upload Method *</label>
@@ -454,8 +496,8 @@ export function DocumentUpload({ patientId, onClose, onDocumentUploaded }: Docum
 
             {captureMode === 'file' ? (
               <div>
-                <label htmlFor="files" style={{ fontWeight: 'normal', fontSize: '0.9em', color: '#666' }}>
-                  Select files from your device (multiple files supported)
+                <label htmlFor="files" style={{ fontWeight: 'normal', fontSize: '0.9em', color: 'rgba(255, 255, 255, 0.8)' }}>
+                  📎 Select multiple files from your device
                 </label>
                 <input
                   id="files"
@@ -465,7 +507,11 @@ export function DocumentUpload({ patientId, onClose, onDocumentUploaded }: Docum
                   required
                   disabled={loading}
                   accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.tiff,.bmp"
+                  style={{ marginTop: '0.5rem' }}
                 />
+                <small style={{ display: 'block', marginTop: '8px', color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85em' }}>
+                  💡 Tip: Hold Ctrl/Cmd to select multiple files at once. All files will be uploaded to the same category.
+                </small>
               </div>
             ) : (
               <div>
@@ -488,14 +534,59 @@ export function DocumentUpload({ patientId, onClose, onDocumentUploaded }: Docum
             )}
 
             {files.length > 0 && (
-              <div className="files-info" style={{ marginTop: '15px' }}>
-                <div className="files-count">{files.length} file(s) selected</div>
-                <div className="files-list">
+              <div className="files-info" style={{ 
+                marginTop: '15px',
+                background: 'rgba(78, 205, 196, 0.1)',
+                border: '1px solid rgba(78, 205, 196, 0.3)',
+                borderRadius: '8px',
+                padding: '1rem'
+              }}>
+                <div style={{ 
+                  fontSize: '1rem', 
+                  fontWeight: '600', 
+                  color: '#4ecdc4',
+                  marginBottom: '0.75rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  ✓ {files.length} file{files.length !== 1 ? 's' : ''} selected
+                </div>
+                <div style={{ 
+                  maxHeight: '200px', 
+                  overflowY: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem'
+                }}>
                   {files.map((file, index) => (
-                    <div key={index} className="file-item">
-                      {file.name} ({(file.size / 1024).toFixed(1)} KB)
+                    <div key={index} style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      fontSize: '0.9rem',
+                      color: 'rgba(255, 255, 255, 0.9)'
+                    }}>
+                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        📄 {file.name}
+                      </span>
+                      <span style={{ color: 'rgba(255, 255, 255, 0.6)', marginLeft: '1rem', whiteSpace: 'nowrap' }}>
+                        {(file.size / 1024).toFixed(1)} KB
+                      </span>
                     </div>
                   ))}
+                </div>
+                <div style={{ 
+                  marginTop: '0.75rem', 
+                  paddingTop: '0.75rem', 
+                  borderTop: '1px solid rgba(78, 205, 196, 0.2)',
+                  fontSize: '0.85rem',
+                  color: 'rgba(255, 255, 255, 0.7)'
+                }}>
+                  Category: <strong style={{ color: '#4ecdc4' }}>{documentCategory}</strong>
                 </div>
               </div>
             )}
