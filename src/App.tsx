@@ -975,7 +975,11 @@ function Dashboard() {
         return;
       }
 
-      // Convert image to base64
+      const age = patient.dateOfBirth ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear() : 'Unknown';
+      const height = patient.height || 'Not specified';
+
+      // Convert image to base64 for vision model
+      console.log('🔍 Converting image to base64 for vision analysis...');
       const base64Image = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
@@ -986,34 +990,7 @@ function Dashboard() {
         reader.readAsDataURL(file);
       });
 
-      const age = patient.dateOfBirth ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear() : 'Unknown';
-      const height = patient.height || 'Not specified';
-
-      // Use A4F API directly (it doesn't support vision, so we'll extract text from image first)
-      // For now, create a text-based prompt describing what we need
-      const prompt = `Analyze a body composition scan for a patient. Patient details: Age ${age}, Height ${height}.
-
-This is a body composition analysis image. Based on typical body composition reports, provide a comprehensive health summary including:
-
-1. Expected body composition metrics to look for:
-   - Weight, Body Fat %, BMI
-   - Skeletal Muscle %, Muscle Mass
-   - Protein %, BMR (Basal Metabolic Rate)
-   - Fat-free Body Weight, Subcutaneous Fat %
-   - Visceral Fat, Body Water %, Bone Mass
-   - Metabolic Age
-
-2. Health assessment framework based on age ${age}:
-   - What are healthy ranges for each metric at this age?
-   - What are concerning values?
-
-3. General recommendations for body composition improvement
-
-4. Importance of tracking these metrics over time
-
-Provide a detailed, professional medical summary suitable for sharing with the patient about body composition analysis.`;
-
-      // Call A4F API
+      // Use vision model to analyze the image directly
       const { azureConfig } = await import('./config/azure-config');
       const url = `${azureConfig.openai.endpoint}/chat/completions`;
       
@@ -1024,25 +1001,73 @@ Provide a detailed, professional medical summary suitable for sharing with the p
           'Authorization': `Bearer ${azureConfig.openai.apiKey}`,
         },
         body: JSON.stringify({
-          model: azureConfig.openai.deployment,
+          model: 'provider-2/llama-3.2-11b-vision-instruct', // Vision-capable model
           messages: [
             { 
               role: 'system', 
-              content: 'You are a medical professional providing body composition analysis and health recommendations.'
+              content: 'You are a medical professional providing detailed body composition analysis. Extract all visible metrics from the image and provide comprehensive health recommendations.'
             },
-            { role: 'user', content: prompt }
+            { 
+              role: 'user', 
+              content: [
+                {
+                  type: 'text',
+                  text: `Analyze this body composition scan for a patient.
+
+Patient Details:
+- Age: ${age} years
+- Height: ${height}
+
+Provide a comprehensive health summary including:
+
+1. BODY COMPOSITION METRICS:
+   - Extract and list ALL visible metrics from the image (weight, body fat %, BMI, skeletal muscle %, muscle mass, protein %, BMR, fat-free body weight, subcutaneous fat %, visceral fat, body water %, bone mass, metabolic age, etc.)
+   - Clearly state each metric name and its exact value
+
+2. HEALTH ASSESSMENT FOR AGE ${age}:
+   - Evaluate each metric against healthy ranges for this age
+   - Identify any concerning values
+   - Overall health status
+
+3. RISK FACTORS:
+   - Any potential health concerns based on the measurements
+   - Areas requiring immediate attention
+
+4. RECOMMENDATIONS:
+   - Specific actions to improve body composition
+   - Dietary suggestions
+   - Exercise recommendations (types and frequency)
+   - Monitoring frequency
+
+5. IMPORTANCE OF TRACKING:
+   - Why these metrics matter for long-term health
+   - How to track progress over time
+
+Provide a detailed, professional medical summary suitable for sharing with the patient.`
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:image/jpeg;base64,${base64Image}`
+                  }
+                }
+              ]
+            }
           ],
-          max_tokens: 2000,
+          max_tokens: 2500,
           temperature: 0.3
         })
       });
 
       if (!response.ok) {
-        throw new Error(`A4F API error: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`A4F API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
       const summaryContent = data.choices[0].message.content.trim();
+
+      console.log('✅ Vision analysis complete');
 
       // Save summary to database
       const summaryData = {
@@ -3896,6 +3921,29 @@ From ${user?.name || 'your medical practice'}`
                   }}
                 >
                   Close
+                </button>
+                <button 
+                  className="btn btn-success"
+                  onClick={() => {
+                    const patient = patientsList.find(p => p.medicalRecordNumber === selectedSummary.patientId);
+                    if (patient) {
+                      setSelectedPatient(patient);
+                      setWhatsappPhone(patient.whatsappPhone || patient.mobilePhone || patient.phone || '');
+                      setWhatsappMessage(`Hi ${patient.name},
+
+Here is your AI-generated medical summary:
+
+${selectedSummary.summaryText}
+
+Best regards,
+Dr Hlosukwazi Khumalo`);
+                      setShowWhatsAppModal(true);
+                      setShowSummaryModal(false);
+                    }
+                  }}
+                  style={{ background: '#25D366', color: 'white' }}
+                >
+                  📱 Send via WhatsApp
                 </button>
                 <button 
                   className="btn btn-primary"
