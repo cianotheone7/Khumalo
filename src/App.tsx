@@ -981,9 +981,8 @@ function Dashboard() {
       const age = patient.dateOfBirth ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear() : 'Unknown';
       const height = patient.height || 'Not specified';
 
-      // Extract text from image using Mistral OCR
-      console.log('🔍 Extracting text from body composition image using Mistral OCR...');
-      let extractedText = '';
+      // Extract text and analyze using A4F vision model
+      console.log('🔍 Using A4F vision model to analyze body composition image...');
       
       try {
         // Convert image to base64
@@ -997,153 +996,122 @@ function Dashboard() {
           reader.readAsDataURL(file);
         });
 
-        // Call Mistral OCR API
-        const mistralResponse = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        // Use A4F vision model to analyze the image and create summary directly
+        const { azureConfig } = await import('./config/azure-config');
+        const url = `${azureConfig.openai.endpoint}/chat/completions`;
+        
+        const response = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer f2OBMcwgL9pZgIOkmo7A6qgMxgSZztcX'
+            'Authorization': `Bearer ${azureConfig.openai.apiKey}`,
           },
           body: JSON.stringify({
-            model: 'pixtral-12b-2409',
+            model: 'provider-2/gpt-4.1-nano',
             messages: [
-              {
-                role: 'user',
+              { 
+                role: 'user', 
                 content: [
                   {
                     type: 'text',
-                    text: 'Extract ALL text from this body composition scan image. Return ONLY the raw text, preserving all numbers, percentages, and labels exactly as they appear. Do not add any analysis or commentary.'
-                  },
-                  {
-                    type: 'image_url',
-                    image_url: `data:image/jpeg;base64,${base64Image}`
-                  }
-                ]
-              }
-            ]
-          })
-        });
-
-        if (!mistralResponse.ok) {
-          const errorText = await mistralResponse.text();
-          console.error('Mistral OCR error:', errorText);
-          throw new Error(`Mistral OCR failed: ${mistralResponse.status}`);
-        }
-
-        const mistralData = await mistralResponse.json();
-        extractedText = mistralData.choices[0].message.content.trim();
-        console.log('✅ Mistral OCR extraction complete');
-        console.log('Extracted text:', extractedText);
-      } catch (ocrError) {
-        console.error('Mistral OCR extraction failed:', ocrError);
-        extractedText = 'Unable to extract text from image. Please ensure the image is clear and readable.';
-      }
-
-      if (extractedText.length < 20) {
-        displayNotification('Could not extract enough data from image. Please upload a clearer image.', 'error');
-        return;
-      }
-
-      console.log('📤 Sending extracted data to AI for analysis...');
-      
-      // Send extracted text to A4F for analysis
-      const { azureConfig } = await import('./config/azure-config');
-      const url = `${azureConfig.openai.endpoint}/chat/completions`;
-      
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${azureConfig.openai.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: azureConfig.openai.deployment,
-          messages: [
-            { 
-              role: 'system', 
-              content: 'You are a medical professional analyzing body composition scans. Parse the OCR text and extract body composition metrics. Provide specific, actionable health recommendations.'
-            },
-            { 
-              role: 'user', 
-              content: `Parse this body composition scan OCR text and create a professional medical summary.
+                    text: `You are a medical professional analyzing a body composition scan image.
 
 Patient: Age ${age} years, Height ${height}
 
-Extracted OCR Text from Body Composition Scan:
-${extractedText}
-
-Your task:
-1. Parse the OCR text to extract body composition metrics
-2. Common metrics: Weight, Body Fat %, BMI, Skeletal Muscle %, Muscle Mass, Protein %, BMR, Visceral Fat, Body Water %, Bone Mass, Metabolic Age
-3. Create a professional summary
+Analyze this body composition scan image and create a comprehensive medical summary.
 
 Format your response as:
 
 ## Body Composition Analysis - Age ${age}
 
 ### Extracted Metrics
-[List each metric found with its value]
+List ALL visible metrics from the image with their exact values:
+- Weight: [value]
+- Body Fat %: [value]
+- BMI: [value]
+- Skeletal Muscle %: [value]
+- Muscle Mass: [value]
+- Protein %: [value]
+- BMR: [value]
+- Visceral Fat: [value]
+- Body Water %: [value]
+- Bone Mass: [value]
+- Metabolic Age: [value]
+- [any other visible metrics]
 
 ### Health Assessment
-[Compare metrics to healthy ranges for age ${age}]
-[Note any concerning values]
-[Overall health status]
+Compare each metric to healthy ranges for age ${age}:
+- Overall health status
+- Concerning values (if any)
+- Risk factors
 
 ### Recommendations
 **Dietary Changes:**
-[Specific dietary recommendations]
+[Specific dietary recommendations based on the metrics]
 
 **Exercise Plan:**
-[Types of exercise, frequency per week]
+[Types of exercise, frequency per week based on current composition]
 
 **Lifestyle:**
 [Other health recommendations]
 
 ### Tracking & Follow-up
-[Why tracking matters]
-[Recommended monitoring frequency]
+- Why these metrics matter for long-term health
+- Recommended monitoring frequency
 
 Provide a detailed, professional summary suitable for sharing with the patient.`
-            }
-          ],
-          max_tokens: 3000,
-          temperature: 0.3
-        })
-      });
+                  },
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:image/jpeg;base64,${base64Image}`
+                    }
+                  }
+                ]
+              }
+            ],
+            max_tokens: 3000,
+            temperature: 0.3
+          })
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('AI API error:', errorText);
-        throw new Error(`A4F API error: ${response.status} - ${errorText}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('A4F Vision API error:', errorText);
+          throw new Error(`A4F Vision API error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        const summaryContent = data.choices[0].message.content.trim();
+
+        console.log('✅ A4F vision analysis complete');
+        console.log('Summary preview:', summaryContent.substring(0, 200) + '...');
+
+        // Save summary to database
+        const summaryData = {
+          patientId: patient.medicalRecordNumber || patient.id,
+          patientName: patient.name,
+          documentIds: document.rowKey,
+          summaryText: summaryContent,
+          summaryType: 'Body Composition Analysis',
+          createdBy: user?.id || user?.email || 'system'
+        };
+
+        await createAISummary(summaryData);
+        console.log('✅ Body composition AI summary saved to database');
+        
+        // Refresh summaries list immediately
+        const { getAISummaries } = await import('./services/azureTableRestService');
+        const updatedSummaries = await getAISummaries();
+        setSummariesList(updatedSummaries);
+        console.log('✅ Summaries list refreshed');
+        
+        // Show success notification
+        displayNotification('🏋️ Body composition summary generated successfully!');
+      } catch (error) {
+        console.error('❌ Error in vision analysis:', error);
+        throw error;
       }
-
-      const data = await response.json();
-      const summaryContent = data.choices[0].message.content.trim();
-
-      console.log('✅ AI analysis complete');
-      console.log('Summary preview:', summaryContent.substring(0, 200) + '...');
-
-      // Save summary to database
-      const summaryData = {
-        patientId: patient.medicalRecordNumber || patient.id,
-        patientName: patient.name,
-        documentIds: document.rowKey,
-        summaryText: summaryContent,
-        summaryType: 'Body Composition Analysis',
-        createdBy: user?.id || user?.email || 'system'
-      };
-
-      await createAISummary(summaryData);
-      console.log('✅ Body composition AI summary saved to database');
-      
-      // Refresh summaries list immediately
-      const { getAISummaries } = await import('./services/azureTableRestService');
-      const updatedSummaries = await getAISummaries();
-      setSummariesList(updatedSummaries);
-      console.log('✅ Summaries list refreshed');
-      
-      // Show success notification
-      displayNotification('🏋️ Body composition summary generated successfully!');
     } catch (error) {
       console.error('❌ Error generating body composition summary:', error);
       displayNotification('Failed to generate body composition summary. Check console for details.', 'error');
