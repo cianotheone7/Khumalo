@@ -981,21 +981,31 @@ function Dashboard() {
       const age = patient.dateOfBirth ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear() : 'Unknown';
       const height = patient.height || 'Not specified';
 
-      // Convert image to base64 for vision model
-      console.log('🔍 Converting image to base64 for vision analysis...');
-      const base64Image = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64 = reader.result as string;
-          resolve(base64.split(',')[1]);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
-      console.log('📤 Sending to vision model for analysis...');
+      // Extract text from image using OCR
+      console.log('🔍 Extracting text from body composition image using OCR...');
+      let extractedText = '';
       
-      // Use vision model to analyze the image directly
+      try {
+        const { createWorker } = await import('tesseract.js');
+        const worker = await createWorker('eng');
+        const { data: { text } } = await worker.recognize(file);
+        await worker.terminate();
+        extractedText = text;
+        console.log('✅ OCR extraction complete');
+        console.log('Extracted text preview:', extractedText.substring(0, 300));
+      } catch (ocrError) {
+        console.error('OCR extraction failed:', ocrError);
+        extractedText = 'Unable to extract text from image. Please ensure the image is clear and readable.';
+      }
+
+      if (extractedText.length < 20) {
+        displayNotification('Could not extract enough data from image. Please upload a clearer image.', 'error');
+        return;
+      }
+
+      console.log('📤 Sending extracted data to AI for analysis...');
+      
+      // Send extracted text to A4F for analysis
       const { azureConfig } = await import('./config/azure-config');
       const url = `${azureConfig.openai.endpoint}/chat/completions`;
       
@@ -1006,81 +1016,76 @@ function Dashboard() {
           'Authorization': `Bearer ${azureConfig.openai.apiKey}`,
         },
         body: JSON.stringify({
-          model: 'provider-2/llama-3.2-11b-vision-instruct',
+          model: azureConfig.openai.deployment,
           messages: [
             { 
               role: 'system', 
-              content: 'You are a medical professional analyzing body composition scans. Extract ALL visible metrics from the image and provide specific, actionable health recommendations based on the actual data you see.'
+              content: 'You are a medical professional analyzing body composition scans. Extract ALL visible metrics from the OCR text and provide specific, actionable health recommendations based on the actual data.'
             },
             { 
               role: 'user', 
-              content: [
-                {
-                  type: 'text',
-                  text: `Analyze this body composition scan image in detail.
+              content: `Analyze this body composition scan data extracted via OCR.
 
 Patient: Age ${age} years, Height ${height}
 
+Extracted OCR Text from Body Composition Scan:
+${extractedText}
+
 INSTRUCTIONS:
-1. Carefully examine the image and extract ALL visible metrics
-2. List each metric with its EXACT value from the image
-3. Provide health assessment based on the ACTUAL values you see
+1. Parse the OCR text and extract ALL body composition metrics you can find
+2. List each metric with its exact value
+3. Provide health assessment based on the actual values
 4. Give specific recommendations
 
 Provide:
 
-**EXTRACTED METRICS** (list ALL visible values):
-- Weight: [exact value from image]
-- Body Fat %: [exact value]
-- BMI: [exact value]
-- Skeletal Muscle %: [exact value]
-- Muscle Mass: [exact value]
-- Protein %: [exact value]
-- BMR: [exact value]
-- Visceral Fat: [exact value]
-- Body Water %: [exact value]
-- Bone Mass: [exact value]
-- Metabolic Age: [exact value]
-- [any other visible metrics]
+**EXTRACTED METRICS** (parse from OCR text above):
+- Weight: [value if found]
+- Body Fat %: [value if found]
+- BMI: [value if found]
+- Skeletal Muscle %: [value if found]
+- Muscle Mass: [value if found]
+- Protein %: [value if found]
+- BMR: [value if found]
+- Visceral Fat: [value if found]
+- Body Water %: [value if found]
+- Bone Mass: [value if found]
+- Metabolic Age: [value if found]
+- [any other metrics found in the text]
 
 **HEALTH ASSESSMENT FOR AGE ${age}**:
-- Compare each metric to healthy ranges
-- Overall status
+- Compare each metric to healthy ranges for this age
+- Overall health status
 - Concerning values (if any)
 
 **RECOMMENDATIONS**:
 - Specific dietary changes
 - Exercise plan (types, frequency)
+- Lifestyle modifications
 - Monitoring schedule
 
 **TRACKING IMPORTANCE**:
 - Why these metrics matter
-- How to improve over time`
-                },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64Image}`
-                  }
-                }
-              ]
+- How to improve over time
+
+Provide a detailed, professional summary suitable for sharing with the patient.`
             }
           ],
           max_tokens: 3000,
-          temperature: 0.2
+          temperature: 0.3
         })
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Vision API error:', errorText);
-        throw new Error(`A4F Vision API error: ${response.status} - ${errorText}`);
+        console.error('AI API error:', errorText);
+        throw new Error(`A4F API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
       const summaryContent = data.choices[0].message.content.trim();
 
-      console.log('✅ Vision analysis complete');
+      console.log('✅ AI analysis complete');
       console.log('Summary preview:', summaryContent.substring(0, 200) + '...');
 
       // Save summary to database
@@ -1099,7 +1104,7 @@ Provide:
       // Refresh summaries list immediately
       const { getAISummaries } = await import('./services/azureTableRestService');
       const updatedSummaries = await getAISummaries();
-      setAiSummaries(updatedSummaries);
+      setSummariesList(updatedSummaries);
       console.log('✅ Summaries list refreshed');
       
       // Show success notification
