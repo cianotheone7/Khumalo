@@ -3088,12 +3088,168 @@ From ${user?.name || 'your medical practice'}`
 
                   <div className="form-group">
                     <label>Current Medications</label>
-                    <textarea 
-                      value={newPatient.currentMedications || ''}
-                      onChange={(e) => setNewPatient({...newPatient, currentMedications: e.target.value})}
-                      placeholder="List current medications and dosages (e.g., Metformin 500mg twice daily, Lisinopril 10mg once daily)"
-                      rows={3}
-                    />
+                    {/* Smart medication suggestions based on chronic conditions */}
+                    {(() => {
+                      const selectedConditions = newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean) : [];
+                      const medicationsByCondition = {
+                        'Hypertension': [
+                          'Amlodipine 5mg (one tablet daily)',
+                          'Amlodipine 10mg (one tablet daily)',
+                          'Enalapril 10mg (one tablet daily)',
+                          'Enalapril 20mg (one tablet twice daily)',
+                          'Losartan 50mg (one tablet daily)',
+                          'Perindopril 4mg (one tablet daily)',
+                          'Hydrochlorothiazide 12.5mg (one tablet daily)'
+                        ],
+                        'Diabetes Type 1': [
+                          'Insulin Glargine (Lantus) - as prescribed',
+                          'Insulin Aspart (NovoRapid) - as prescribed',
+                          'Insulin Lispro (Humalog) - as prescribed'
+                        ],
+                        'Diabetes Type 2': [
+                          'Metformin 500mg (one tablet twice daily)',
+                          'Metformin 850mg (one tablet twice daily)',
+                          'Metformin XR 1000mg (one tablet daily)',
+                          'Glimepiride 2mg (one tablet daily)',
+                          'Gliclazide 80mg (one tablet twice daily)',
+                          'Empagliflozin 10mg (one tablet daily)',
+                          'Sitagliptin 100mg (one tablet daily)'
+                        ],
+                        'Asthma': [
+                          'Salbutamol inhaler (2 puffs as needed)',
+                          'Budesonide inhaler 200mcg (2 puffs twice daily)',
+                          'Seretide 250 inhaler (2 puffs twice daily)',
+                          'Montelukast 10mg (one tablet at night)'
+                        ],
+                        'COPD': [
+                          'Tiotropium 18mcg inhaler (once daily)',
+                          'Salbutamol inhaler (2 puffs as needed)',
+                          'Seretide 250 inhaler (2 puffs twice daily)'
+                        ],
+                        'High Cholesterol': [
+                          'Atorvastatin 10mg (one tablet at night)',
+                          'Atorvastatin 20mg (one tablet at night)',
+                          'Simvastatin 20mg (one tablet at night)',
+                          'Rosuvastatin 10mg (one tablet at night)'
+                        ],
+                        'Heart Disease': [
+                          'Aspirin 100mg (one tablet daily)',
+                          'Clopidogrel 75mg (one tablet daily)',
+                          'Bisoprolol 2.5mg (one tablet daily)',
+                          'Carvedilol 6.25mg (one tablet twice daily)'
+                        ],
+                        'Arthritis': [
+                          'Ibuprofen 400mg (one tablet three times daily with food)',
+                          'Naproxen 500mg (one tablet twice daily with food)',
+                          'Celecoxib 200mg (one capsule daily)',
+                          'Methotrexate 10mg (once weekly)'
+                        ],
+                        'Depression': [
+                          'Fluoxetine 20mg (one capsule daily)',
+                          'Sertraline 50mg (one tablet daily)',
+                          'Citalopram 20mg (one tablet daily)',
+                          'Amitriptyline 25mg (one tablet at night)'
+                        ],
+                        'Anxiety Disorder': [
+                          'Escitalopram 10mg (one tablet daily)',
+                          'Alprazolam 0.5mg (as needed for anxiety)',
+                          'Propranolol 10mg (as needed)'
+                        ],
+                        'Epilepsy': [
+                          'Carbamazepine 200mg (one tablet twice daily)',
+                          'Sodium Valproate 500mg (one tablet twice daily)',
+                          'Lamotrigine 100mg (one tablet twice daily)'
+                        ],
+                        'Thyroid Disorder': [
+                          'Levothyroxine 50mcg (one tablet daily before breakfast)',
+                          'Levothyroxine 100mcg (one tablet daily before breakfast)',
+                          'Carbimazole 5mg (as prescribed)'
+                        ],
+                        'HIV/AIDS': [
+                          'Tenofovir/Emtricitabine/Efavirenz (TDF/FTC/EFV) - Fixed dose combination',
+                          'Dolutegravir 50mg (one tablet daily)',
+                          'Abacavir/Lamivudine (ABC/3TC) combination'
+                        ],
+                        'Chronic Kidney Disease': [
+                          'Furosemide 40mg (one tablet daily)',
+                          'Sodium Bicarbonate 500mg (as prescribed)',
+                          'Calcium Carbonate 500mg (with meals)'
+                        ]
+                      };
+                      
+                      // Get suggested medications based on selected conditions
+                      const suggestedMeds: string[] = [];
+                      selectedConditions.forEach(condition => {
+                        if (medicationsByCondition[condition as keyof typeof medicationsByCondition]) {
+                          suggestedMeds.push(...medicationsByCondition[condition as keyof typeof medicationsByCondition]);
+                        }
+                      });
+                      
+                      return (
+                        <>
+                          {suggestedMeds.length > 0 && (
+                            <div style={{
+                              border: '1px solid rgba(78, 205, 196, 0.3)',
+                              borderRadius: '8px',
+                              padding: '12px',
+                              background: 'rgba(78, 205, 196, 0.1)',
+                              maxHeight: '200px',
+                              overflowY: 'auto',
+                              marginBottom: '10px'
+                            }}>
+                              <small style={{ color: '#4ecdc4', fontWeight: '600', marginBottom: '8px', display: 'block' }}>💊 Suggested medications based on conditions:</small>
+                              {suggestedMeds.map((med, idx) => {
+                                const currentMeds = newPatient.currentMedications || '';
+                                const isSelected = currentMeds.includes(med);
+                                return (
+                                  <label key={idx} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '6px',
+                                    marginBottom: '3px',
+                                    cursor: 'pointer',
+                                    borderRadius: '4px',
+                                    background: isSelected ? 'rgba(78, 205, 196, 0.3)' : 'transparent',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.background = isSelected ? 'rgba(78, 205, 196, 0.4)' : 'rgba(255, 255, 255, 0.05)'}
+                                  onMouseLeave={(e) => e.currentTarget.style.background = isSelected ? 'rgba(78, 205, 196, 0.3)' : 'transparent'}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={(e) => {
+                                        let medsList = currentMeds ? currentMeds.split('\n').filter(m => m.trim()) : [];
+                                        if (e.target.checked) {
+                                          medsList.push(med);
+                                        } else {
+                                          medsList = medsList.filter(m => m !== med);
+                                        }
+                                        setNewPatient({...newPatient, currentMedications: medsList.join('\n')});
+                                      }}
+                                      style={{
+                                        marginRight: '8px',
+                                        width: '16px',
+                                        height: '16px',
+                                        cursor: 'pointer',
+                                        accentColor: '#4ecdc4'
+                                      }}
+                                    />
+                                    <span style={{ color: '#000', fontSize: '0.9rem', fontWeight: isSelected ? '600' : '400' }}>{med}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
+                          <textarea 
+                            value={newPatient.currentMedications || ''}
+                            onChange={(e) => setNewPatient({...newPatient, currentMedications: e.target.value})}
+                            placeholder="List current medications and dosages (e.g., Metformin 500mg twice daily, Lisinopril 10mg once daily)\nOr select from suggestions above"
+                            rows={4}
+                          />
+                        </>
+                      );
+                    })()}
                   </div>
 
                   <div className="form-group">
@@ -3516,12 +3672,168 @@ From ${user?.name || 'your medical practice'}`
 
                   <div className="form-group">
                     <label style={{ color: '#2c3e50', fontWeight: 600 }}>Current Medications</label>
-                    <textarea
-                      value={newPatient.currentMedications || ''}
-                      onChange={(e) => setNewPatient({...newPatient, currentMedications: e.target.value})}
-                      placeholder="List current medications and dosages (e.g., Metformin 500mg twice daily, Lisinopril 10mg once daily)"
-                      rows={3}
-                    />
+                    {/* Smart medication suggestions based on chronic conditions */}
+                    {(() => {
+                      const selectedConditions = newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean) : [];
+                      const medicationsByCondition = {
+                        'Hypertension': [
+                          'Amlodipine 5mg (one tablet daily)',
+                          'Amlodipine 10mg (one tablet daily)',
+                          'Enalapril 10mg (one tablet daily)',
+                          'Enalapril 20mg (one tablet twice daily)',
+                          'Losartan 50mg (one tablet daily)',
+                          'Perindopril 4mg (one tablet daily)',
+                          'Hydrochlorothiazide 12.5mg (one tablet daily)'
+                        ],
+                        'Diabetes Type 1': [
+                          'Insulin Glargine (Lantus) - as prescribed',
+                          'Insulin Aspart (NovoRapid) - as prescribed',
+                          'Insulin Lispro (Humalog) - as prescribed'
+                        ],
+                        'Diabetes Type 2': [
+                          'Metformin 500mg (one tablet twice daily)',
+                          'Metformin 850mg (one tablet twice daily)',
+                          'Metformin XR 1000mg (one tablet daily)',
+                          'Glimepiride 2mg (one tablet daily)',
+                          'Gliclazide 80mg (one tablet twice daily)',
+                          'Empagliflozin 10mg (one tablet daily)',
+                          'Sitagliptin 100mg (one tablet daily)'
+                        ],
+                        'Asthma': [
+                          'Salbutamol inhaler (2 puffs as needed)',
+                          'Budesonide inhaler 200mcg (2 puffs twice daily)',
+                          'Seretide 250 inhaler (2 puffs twice daily)',
+                          'Montelukast 10mg (one tablet at night)'
+                        ],
+                        'COPD': [
+                          'Tiotropium 18mcg inhaler (once daily)',
+                          'Salbutamol inhaler (2 puffs as needed)',
+                          'Seretide 250 inhaler (2 puffs twice daily)'
+                        ],
+                        'High Cholesterol': [
+                          'Atorvastatin 10mg (one tablet at night)',
+                          'Atorvastatin 20mg (one tablet at night)',
+                          'Simvastatin 20mg (one tablet at night)',
+                          'Rosuvastatin 10mg (one tablet at night)'
+                        ],
+                        'Heart Disease': [
+                          'Aspirin 100mg (one tablet daily)',
+                          'Clopidogrel 75mg (one tablet daily)',
+                          'Bisoprolol 2.5mg (one tablet daily)',
+                          'Carvedilol 6.25mg (one tablet twice daily)'
+                        ],
+                        'Arthritis': [
+                          'Ibuprofen 400mg (one tablet three times daily with food)',
+                          'Naproxen 500mg (one tablet twice daily with food)',
+                          'Celecoxib 200mg (one capsule daily)',
+                          'Methotrexate 10mg (once weekly)'
+                        ],
+                        'Depression': [
+                          'Fluoxetine 20mg (one capsule daily)',
+                          'Sertraline 50mg (one tablet daily)',
+                          'Citalopram 20mg (one tablet daily)',
+                          'Amitriptyline 25mg (one tablet at night)'
+                        ],
+                        'Anxiety Disorder': [
+                          'Escitalopram 10mg (one tablet daily)',
+                          'Alprazolam 0.5mg (as needed for anxiety)',
+                          'Propranolol 10mg (as needed)'
+                        ],
+                        'Epilepsy': [
+                          'Carbamazepine 200mg (one tablet twice daily)',
+                          'Sodium Valproate 500mg (one tablet twice daily)',
+                          'Lamotrigine 100mg (one tablet twice daily)'
+                        ],
+                        'Thyroid Disorder': [
+                          'Levothyroxine 50mcg (one tablet daily before breakfast)',
+                          'Levothyroxine 100mcg (one tablet daily before breakfast)',
+                          'Carbimazole 5mg (as prescribed)'
+                        ],
+                        'HIV/AIDS': [
+                          'Tenofovir/Emtricitabine/Efavirenz (TDF/FTC/EFV) - Fixed dose combination',
+                          'Dolutegravir 50mg (one tablet daily)',
+                          'Abacavir/Lamivudine (ABC/3TC) combination'
+                        ],
+                        'Chronic Kidney Disease': [
+                          'Furosemide 40mg (one tablet daily)',
+                          'Sodium Bicarbonate 500mg (as prescribed)',
+                          'Calcium Carbonate 500mg (with meals)'
+                        ]
+                      };
+                      
+                      // Get suggested medications based on selected conditions
+                      const suggestedMeds: string[] = [];
+                      selectedConditions.forEach(condition => {
+                        if (medicationsByCondition[condition as keyof typeof medicationsByCondition]) {
+                          suggestedMeds.push(...medicationsByCondition[condition as keyof typeof medicationsByCondition]);
+                        }
+                      });
+                      
+                      return (
+                        <>
+                          {suggestedMeds.length > 0 && (
+                            <div style={{
+                              border: '1px solid rgba(78, 205, 196, 0.3)',
+                              borderRadius: '8px',
+                              padding: '12px',
+                              background: 'rgba(78, 205, 196, 0.1)',
+                              maxHeight: '200px',
+                              overflowY: 'auto',
+                              marginBottom: '10px'
+                            }}>
+                              <small style={{ color: '#4ecdc4', fontWeight: '600', marginBottom: '8px', display: 'block' }}>💊 Suggested medications based on conditions:</small>
+                              {suggestedMeds.map((med, idx) => {
+                                const currentMeds = newPatient.currentMedications || '';
+                                const isSelected = currentMeds.includes(med);
+                                return (
+                                  <label key={idx} style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '6px',
+                                    marginBottom: '3px',
+                                    cursor: 'pointer',
+                                    borderRadius: '4px',
+                                    background: isSelected ? 'rgba(78, 205, 196, 0.3)' : 'transparent',
+                                    transition: 'all 0.2s ease'
+                                  }}
+                                  onMouseEnter={(e) => e.currentTarget.style.background = isSelected ? 'rgba(78, 205, 196, 0.4)' : 'rgba(255, 255, 255, 0.05)'}
+                                  onMouseLeave={(e) => e.currentTarget.style.background = isSelected ? 'rgba(78, 205, 196, 0.3)' : 'transparent'}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={(e) => {
+                                        let medsList = currentMeds ? currentMeds.split('\n').filter(m => m.trim()) : [];
+                                        if (e.target.checked) {
+                                          medsList.push(med);
+                                        } else {
+                                          medsList = medsList.filter(m => m !== med);
+                                        }
+                                        setNewPatient({...newPatient, currentMedications: medsList.join('\n')});
+                                      }}
+                                      style={{
+                                        marginRight: '8px',
+                                        width: '16px',
+                                        height: '16px',
+                                        cursor: 'pointer',
+                                        accentColor: '#4ecdc4'
+                                      }}
+                                    />
+                                    <span style={{ color: '#000', fontSize: '0.9rem', fontWeight: isSelected ? '600' : '400' }}>{med}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
+                          <textarea 
+                            value={newPatient.currentMedications || ''}
+                            onChange={(e) => setNewPatient({...newPatient, currentMedications: e.target.value})}
+                            placeholder="List current medications and dosages (e.g., Metformin 500mg twice daily, Lisinopril 10mg once daily)\nOr select from suggestions above"
+                            rows={4}
+                          />
+                        </>
+                      );
+                    })()}
                   </div>
 
                   <div className="form-group">
