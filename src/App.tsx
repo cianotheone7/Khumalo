@@ -981,29 +981,61 @@ function Dashboard() {
       const age = patient.dateOfBirth ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear() : 'Unknown';
       const height = patient.height || 'Not specified';
 
-      // Extract text from image using OCR with better preprocessing
-      console.log('🔍 Extracting text from body composition image using OCR...');
+      // Extract text from image using Mistral OCR
+      console.log('🔍 Extracting text from body composition image using Mistral OCR...');
       let extractedText = '';
       
       try {
-        const { createWorker } = await import('tesseract.js');
-        const worker = await createWorker('eng', 1, {
-          logger: m => console.log('OCR:', m)
+        // Convert image to base64
+        const base64Image = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const base64 = reader.result as string;
+            resolve(base64.split(',')[1]);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
         });
-        
-        // Set parameters for better accuracy with numbers
-        await worker.setParameters({
-          tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.%:/ ',
-          tessedit_pageseg_mode: '6', // Assume uniform block of text
+
+        // Call Mistral OCR API
+        const mistralResponse = await fetch('https://api.mistral.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer f2OBMcwgL9pZgIOkmo7A6qgMxgSZztcX'
+          },
+          body: JSON.stringify({
+            model: 'pixtral-12b-2409',
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Extract ALL text from this body composition scan image. Return ONLY the raw text, preserving all numbers, percentages, and labels exactly as they appear. Do not add any analysis or commentary.'
+                  },
+                  {
+                    type: 'image_url',
+                    image_url: `data:image/jpeg;base64,${base64Image}`
+                  }
+                ]
+              }
+            ]
+          })
         });
-        
-        const { data: { text } } = await worker.recognize(file);
-        await worker.terminate();
-        extractedText = text;
-        console.log('✅ OCR extraction complete');
+
+        if (!mistralResponse.ok) {
+          const errorText = await mistralResponse.text();
+          console.error('Mistral OCR error:', errorText);
+          throw new Error(`Mistral OCR failed: ${mistralResponse.status}`);
+        }
+
+        const mistralData = await mistralResponse.json();
+        extractedText = mistralData.choices[0].message.content.trim();
+        console.log('✅ Mistral OCR extraction complete');
         console.log('Extracted text:', extractedText);
       } catch (ocrError) {
-        console.error('OCR extraction failed:', ocrError);
+        console.error('Mistral OCR extraction failed:', ocrError);
         extractedText = 'Unable to extract text from image. Please ensure the image is clear and readable.';
       }
 
@@ -1029,7 +1061,7 @@ function Dashboard() {
           messages: [
             { 
               role: 'system', 
-              content: 'You are a medical professional analyzing body composition scans. The OCR text may contain errors - be intelligent about parsing the numbers. Look for patterns like "Weight: XX.X kg" or "Body Fat: XX.X%". Extract metrics and provide health recommendations.'
+              content: 'You are a medical professional analyzing body composition scans. Parse the OCR text and extract body composition metrics. Provide specific, actionable health recommendations.'
             },
             { 
               role: 'user', 
@@ -1037,21 +1069,20 @@ function Dashboard() {
 
 Patient: Age ${age} years, Height ${height}
 
-Raw OCR Text (may contain errors):
+Extracted OCR Text from Body Composition Scan:
 ${extractedText}
 
 Your task:
-1. Intelligently parse the OCR text to extract body composition metrics
-2. Common metrics to look for: Weight, Body Fat %, BMI, Skeletal Muscle %, Muscle Mass, Protein %, BMR, Visceral Fat, Body Water %, Bone Mass, Metabolic Age
-3. Numbers may be garbled - use context clues (e.g., body fat is typically 10-40%, not 400%)
-4. Create a professional summary
+1. Parse the OCR text to extract body composition metrics
+2. Common metrics: Weight, Body Fat %, BMI, Skeletal Muscle %, Muscle Mass, Protein %, BMR, Visceral Fat, Body Water %, Bone Mass, Metabolic Age
+3. Create a professional summary
 
 Format your response as:
 
 ## Body Composition Analysis - Age ${age}
 
 ### Extracted Metrics
-[List each metric found with its value, noting if OCR quality was poor]
+[List each metric found with its value]
 
 ### Health Assessment
 [Compare metrics to healthy ranges for age ${age}]
@@ -2830,6 +2861,25 @@ From ${user?.name || 'your medical practice'}`
                               <div className="summary-header">
                                 <h4>AI Summary - {summary.createdAt ? new Date(summary.createdAt).toLocaleDateString('en-ZA') : 'Unknown Date'}</h4>
                                 <div className="summary-header-actions">
+                                  <button 
+                                    className="btn btn-success btn-sm"
+                                    onClick={() => {
+                                      setWhatsappPhone(selectedPatient.whatsappPhone || selectedPatient.mobilePhone || selectedPatient.phone || '');
+                                      setWhatsappMessage(`Hi ${selectedPatient.name},
+
+Here is your AI-generated medical summary:
+
+${summary.summaryText || summary.summary}
+
+Best regards,
+Dr Hlosukwazi Khumalo`);
+                                      setShowWhatsAppModal(true);
+                                    }}
+                                    style={{ background: '#25D366', color: 'white', marginRight: '8px' }}
+                                    title="Send via WhatsApp"
+                                  >
+                                    📱
+                                  </button>
                                   <button 
                                       className="summary-delete-btn"
                                     onClick={() => deleteSummary(summary.rowKey)}
