@@ -355,16 +355,6 @@ From ${user?.name || 'your medical practice'}`
     }
   };
 
-  const toggleCondition = (condition: string) => {
-    setChronicConditions(prev => {
-      if (prev.includes(condition)) {
-        return prev.filter(c => c !== condition);
-      } else {
-        return [...prev, condition];
-      }
-    });
-  };
-
   const handleDocumentUploaded = async () => {
     setShowUploadModal(false);
     console.log('📄 Document uploaded, refreshing list...');
@@ -561,55 +551,44 @@ From ${user?.name || 'your medical practice'}`
             </label>
             {editingChronicConditions ? (
               <div style={{ marginTop: '10px' }}>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                  gap: '10px',
-                  marginBottom: '15px'
-                }}>
-                  {[
-                    'Diabetes Type 1',
-                    'Diabetes Type 2',
-                    'Hypertension',
-                    'Asthma',
-                    'COPD',
-                    'Heart Disease',
-                    'Chronic Kidney Disease',
-                    'Arthritis',
-                    'Epilepsy',
-                    'HIV/AIDS',
-                    'Cancer',
-                    'Depression',
-                    'Anxiety Disorder',
-                    'Bipolar Disorder',
-                    'Schizophrenia',
-                    'Thyroid Disorder',
-                    'Obesity',
-                    'High Cholesterol'
-                  ].map((condition) => (
-                    <label
-                      key={condition}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        padding: '8px 12px',
-                        background: chronicConditions.includes(condition) ? 'rgba(78, 205, 196, 0.2)' : 'rgba(255, 255, 255, 0.05)',
-                        border: chronicConditions.includes(condition) ? '2px solid #4ecdc4' : '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={chronicConditions.includes(condition)}
-                        onChange={() => toggleCondition(condition)}
-                        style={{ marginRight: '8px', cursor: 'pointer' }}
-                      />
-                      <span style={{ fontSize: '0.9rem' }}>{condition}</span>
-                    </label>
-                  ))}
-                </div>
+                <select
+                  multiple
+                  value={chronicConditions}
+                  onChange={(e) => {
+                    const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
+                    setChronicConditions(selectedOptions);
+                  }}
+                  style={{
+                    minHeight: '150px',
+                    width: '100%',
+                    padding: '8px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    color: '#fff',
+                    marginBottom: '15px'
+                  }}
+                >
+                  <option value="Diabetes Type 1">Diabetes Type 1</option>
+                  <option value="Diabetes Type 2">Diabetes Type 2</option>
+                  <option value="Hypertension">Hypertension</option>
+                  <option value="Asthma">Asthma</option>
+                  <option value="COPD">COPD</option>
+                  <option value="Heart Disease">Heart Disease</option>
+                  <option value="Chronic Kidney Disease">Chronic Kidney Disease</option>
+                  <option value="Arthritis">Arthritis</option>
+                  <option value="Epilepsy">Epilepsy</option>
+                  <option value="HIV/AIDS">HIV/AIDS</option>
+                  <option value="Cancer">Cancer</option>
+                  <option value="Depression">Depression</option>
+                  <option value="Anxiety Disorder">Anxiety Disorder</option>
+                  <option value="Bipolar Disorder">Bipolar Disorder</option>
+                  <option value="Schizophrenia">Schizophrenia</option>
+                  <option value="Thyroid Disorder">Thyroid Disorder</option>
+                  <option value="Obesity">Obesity</option>
+                  <option value="High Cholesterol">High Cholesterol</option>
+                </select>
+                <small style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginBottom: '10px', display: 'block' }}>Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button
                     onClick={saveChronicConditions}
