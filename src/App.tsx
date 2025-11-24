@@ -219,6 +219,7 @@ interface Patient {
   medicalAidNumber: string;
   dependentCode: string;
   allergies: string;
+  currentMedications?: string;
   chronicConditions: string;
   status?: 'Living' | 'Deceased' | 'Unknown';
   deceasedDate?: string;
@@ -326,6 +327,7 @@ function Dashboard() {
     medicalAidNumber: '',
     dependentCode: '',
     allergies: '',
+    currentMedications: '',
     chronicConditions: '',
     status: 'Unknown',
     deceasedDate: '',
@@ -704,6 +706,7 @@ function Dashboard() {
       medicalAidNumber: patient.medicalAidNumber,
       dependentCode: patient.dependentCode,
       allergies: patient.allergies,
+      currentMedications: patient.currentMedications || '',
       chronicConditions: patient.chronicConditions,
       status: patient.status || 'Unknown',
       deceasedDate: patient.deceasedDate || '',
@@ -785,7 +788,7 @@ function Dashboard() {
     name: '', email: '', phone: '', mobilePhone: '', whatsappPhone: '', passportId: '', gender: '', race: '', dateOfBirth: '', medicalRecordNumber: '',
     emergencyContact: '', emergencyContactName: '', emergencyContactPhone: '',
     insuranceProvider: '', customInsuranceProvider: '',
-    medicalAidNumber: '', dependentCode: '', allergies: '', chronicConditions: '',
+    medicalAidNumber: '', dependentCode: '', allergies: '', currentMedications: '', chronicConditions: '',
     status: 'Unknown', deceasedDate: '',
     // Address fields
     homeNumber: '', streetAddress: '', suburb: '', city: '', province: '', postalCode: '', country: ''
@@ -905,7 +908,7 @@ function Dashboard() {
     name: '', email: '', phone: '', mobilePhone: '', whatsappPhone: '', passportId: '', gender: '', race: '', dateOfBirth: '', medicalRecordNumber: '',
     emergencyContact: '', emergencyContactName: '', emergencyContactPhone: '', 
     insuranceProvider: '', customInsuranceProvider: '',
-    medicalAidNumber: '', dependentCode: '', allergies: '', chronicConditions: '',
+    medicalAidNumber: '', dependentCode: '', allergies: '', currentMedications: '', chronicConditions: '',
     status: 'Unknown', deceasedDate: '',
     // Address fields
     homeNumber: '', streetAddress: '', suburb: '', city: '', province: '', postalCode: '', country: ''
@@ -3084,6 +3087,16 @@ From ${user?.name || 'your medical practice'}`
                   </div>
 
                   <div className="form-group">
+                    <label>Current Medications</label>
+                    <textarea 
+                      value={newPatient.currentMedications || ''}
+                      onChange={(e) => setNewPatient({...newPatient, currentMedications: e.target.value})}
+                      placeholder="List current medications and dosages (e.g., Metformin 500mg twice daily, Lisinopril 10mg once daily)"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="form-group">
                     <label>Diagnosed Chronic Conditions</label>
                     <select
                       multiple
@@ -3476,6 +3489,16 @@ From ${user?.name || 'your medical practice'}`
                       value={newPatient.allergies}
                       onChange={(e) => setNewPatient({...newPatient, allergies: e.target.value})}
                       placeholder="List any known allergies (e.g., Penicillin, Shellfish, Latex)"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label style={{ color: '#2c3e50', fontWeight: 600 }}>Current Medications</label>
+                    <textarea
+                      value={newPatient.currentMedications || ''}
+                      onChange={(e) => setNewPatient({...newPatient, currentMedications: e.target.value})}
+                      placeholder="List current medications and dosages (e.g., Metformin 500mg twice daily, Lisinopril 10mg once daily)"
                       rows={3}
                     />
                   </div>
