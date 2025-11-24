@@ -2849,7 +2849,7 @@ From ${user?.name || 'your medical practice'}`
                                     className="btn btn-success btn-sm"
                                     onClick={() => {
                                       setWhatsappPhone(selectedPatient.whatsappPhone || selectedPatient.mobilePhone || selectedPatient.phone || '');
-                                      setWhatsappMessage(`Hi ${selectedPatient.name},\n\n${summary.summaryText || summary.summary}`);
+                                      setWhatsappMessage(summary.summaryText || summary.summary);
                                       setShowWhatsAppModal(true);
                                     }}
                                     style={{ background: '#25D366', color: 'white', marginRight: '8px' }}
@@ -4228,13 +4228,17 @@ Dr Hlosukwazi Khumalo`);
                 <option value="">Custom number...</option>
               </select>
               
-              {whatsappPhone === '' && (
+              {(whatsappPhone === '' || 
+                (!selectedPatient.whatsappPhone?.includes(whatsappPhone) && 
+                 !selectedPatient.mobilePhone?.includes(whatsappPhone) && 
+                 !selectedPatient.phone?.includes(whatsappPhone))) && (
                 <input
                   type="tel"
                   placeholder="Enter phone number with country code (e.g., +27...)"
-                  defaultValue=""
+                  value={whatsappPhone === '' ? '' : whatsappPhone}
                   onChange={(e) => setWhatsappPhone(e.target.value)}
                   autoFocus
+                  onClick={(e) => e.stopPropagation()}
                   style={{
                     width: '100%',
                     padding: '0.75rem',
