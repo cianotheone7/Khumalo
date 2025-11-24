@@ -360,6 +360,7 @@ function Dashboard() {
   const [selectedDocumentForWhatsApp, setSelectedDocumentForWhatsApp] = useState<any | null>(null);
   const [whatsappPhone, setWhatsappPhone] = useState('');
   const [whatsappMessage, setWhatsappMessage] = useState('');
+  const [isCustomWhatsAppNumber, setIsCustomWhatsAppNumber] = useState(false);
 
   // KPI data for last 30 days
   const [kpiData, setKpiData] = useState({
@@ -2850,6 +2851,7 @@ From ${user?.name || 'your medical practice'}`
                                     onClick={() => {
                                       setWhatsappPhone(selectedPatient.whatsappPhone || selectedPatient.mobilePhone || selectedPatient.phone || '');
                                       setWhatsappMessage(summary.summaryText || summary.summary);
+                                      setIsCustomWhatsAppNumber(false);
                                       setShowWhatsAppModal(true);
                                     }}
                                     style={{ background: '#25D366', color: 'white', marginRight: '8px' }}
@@ -4197,8 +4199,16 @@ Dr Hlosukwazi Khumalo`);
                 Phone Number
               </label>
               <select
-                value={whatsappPhone}
-                onChange={(e) => setWhatsappPhone(e.target.value)}
+                value={isCustomWhatsAppNumber ? 'custom' : whatsappPhone}
+                onChange={(e) => {
+                  if (e.target.value === 'custom') {
+                    setIsCustomWhatsAppNumber(true);
+                    setWhatsappPhone('');
+                  } else {
+                    setIsCustomWhatsAppNumber(false);
+                    setWhatsappPhone(e.target.value);
+                  }
+                }}
                 style={{
                   width: '100%',
                   padding: '0.75rem',
@@ -4225,17 +4235,14 @@ Dr Hlosukwazi Khumalo`);
                     Phone: {selectedPatient.phone}
                   </option>
                 )}
-                <option value="">Custom number...</option>
+                <option value="custom">Custom number...</option>
               </select>
               
-              {(whatsappPhone === '' || 
-                (!selectedPatient.whatsappPhone?.includes(whatsappPhone) && 
-                 !selectedPatient.mobilePhone?.includes(whatsappPhone) && 
-                 !selectedPatient.phone?.includes(whatsappPhone))) && (
+              {isCustomWhatsAppNumber && (
                 <input
                   type="tel"
                   placeholder="Enter phone number with country code (e.g., +27...)"
-                  value={whatsappPhone === '' ? '' : whatsappPhone}
+                  value={whatsappPhone}
                   onChange={(e) => setWhatsappPhone(e.target.value)}
                   autoFocus
                   onClick={(e) => e.stopPropagation()}
@@ -4287,6 +4294,7 @@ Dr Hlosukwazi Khumalo`);
                 onClick={() => {
                   setShowWhatsAppModal(false);
                   setSelectedDocumentForWhatsApp(null);
+                  setIsCustomWhatsAppNumber(false);
                 }}
                 style={{
                   padding: '0.75rem 1.5rem',
