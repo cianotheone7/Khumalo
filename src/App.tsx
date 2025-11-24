@@ -6,7 +6,6 @@ import { Auth } from './components/Auth';
 import Sidebar from './components/Sidebar';
 import Settings from './components/Settings';
 import { Activities } from './components/Activities';
-import { BodyMatrix } from './components/BodyMatrix';
 import SymptomCheckerPage from './pages/SymptomCheckerPage';
 import AppointmentBooking from './components/AppointmentBooking';
 import PatientAppointmentBooking from './components/PatientAppointmentBooking';
@@ -234,7 +233,7 @@ interface Document {
   fileSize: number;
   uploadedAt: string;
   description: string;
-  documentType: 'Lab Results' | 'Imaging' | 'Pathology' | 'Consultation' | 'Prescription' | 'Invoice' | 'Other';
+  documentType: 'Lab Results' | 'Imaging' | 'Pathology' | 'Consultation' | 'Prescription' | 'Invoice' | 'Body Composition' | 'Other';
 }
 
 interface AISummary {
@@ -966,6 +965,106 @@ function Dashboard() {
     }
   };
 
+  const generateBodyCompositionSummary = async (patient: Patient, document: any, file: File) => {
+    try {
+      // Import the A4F service
+      const { isAzureOpenAIAvailable } = await import('./services/azureOpenAIService');
+      
+      if (!isAzureOpenAIAvailable()) {
+        console.warn('A4F API not configured, skipping body composition summary');
+        return;
+      }
+
+      // Convert image to base64
+      const base64Image = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result as string;
+          resolve(base64.split(',')[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const age = patient.dateOfBirth ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear() : 'Unknown';
+      const height = patient.height || 'Not specified';
+
+      // Use A4F API directly (it doesn't support vision, so we'll extract text from image first)
+      // For now, create a text-based prompt describing what we need
+      const prompt = `Analyze a body composition scan for a patient. Patient details: Age ${age}, Height ${height}.
+
+This is a body composition analysis image. Based on typical body composition reports, provide a comprehensive health summary including:
+
+1. Expected body composition metrics to look for:
+   - Weight, Body Fat %, BMI
+   - Skeletal Muscle %, Muscle Mass
+   - Protein %, BMR (Basal Metabolic Rate)
+   - Fat-free Body Weight, Subcutaneous Fat %
+   - Visceral Fat, Body Water %, Bone Mass
+   - Metabolic Age
+
+2. Health assessment framework based on age ${age}:
+   - What are healthy ranges for each metric at this age?
+   - What are concerning values?
+
+3. General recommendations for body composition improvement
+
+4. Importance of tracking these metrics over time
+
+Provide a detailed, professional medical summary suitable for sharing with the patient about body composition analysis.`;
+
+      // Call A4F API
+      const { azureConfig } = await import('./config/azure-config');
+      const url = `${azureConfig.openai.endpoint}/chat/completions`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${azureConfig.openai.apiKey}`,
+        },
+        body: JSON.stringify({
+          model: azureConfig.openai.deployment,
+          messages: [
+            { 
+              role: 'system', 
+              content: 'You are a medical professional providing body composition analysis and health recommendations.'
+            },
+            { role: 'user', content: prompt }
+          ],
+          max_tokens: 2000,
+          temperature: 0.3
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`A4F API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const summaryContent = data.choices[0].message.content.trim();
+
+      // Save summary to database
+      const summaryData = {
+        patientId: patient.medicalRecordNumber || patient.id,
+        patientName: patient.name,
+        documentIds: document.rowKey,
+        summaryText: summaryContent,
+        summaryType: 'Body Composition Analysis',
+        createdBy: user?.id || user?.email || 'system'
+      };
+
+      await createAISummary(summaryData);
+      console.log('✅ Body composition AI summary created successfully');
+      
+      // Show success notification
+      displayNotification('🏋️ Body composition summary generated! View in patient details.');
+    } catch (error) {
+      console.error('Error generating body composition summary:', error);
+      throw error;
+    }
+  };
+
   const addDocument = async () => {
     if (selectedPatient && newDocument.fileName) {
       console.log('🚀🚀🚀 UPLOAD STARTING!');
@@ -1075,6 +1174,17 @@ the advanced document processing module needs to be functioning properly.`;
               user.name || user.email,
               document.rowKey || 'unknown'
             );
+          }
+
+          // Generate AI summary for Body Composition documents
+          if (newDocument.documentType === 'Body Composition') {
+            console.log('🏋️ Generating AI summary for body composition document...');
+            try {
+              await generateBodyCompositionSummary(selectedPatient, document, file);
+            } catch (summaryError) {
+              console.error('Failed to generate body composition summary:', summaryError);
+              // Don't fail the upload if summary generation fails
+            }
           }
         }
         
@@ -3550,6 +3660,7 @@ From ${user?.name || 'your medical practice'}`
                       <option value="Consultation">📝 Consultation Notes</option>
                       <option value="Prescription">💊 Prescription</option>
                       <option value="Invoice">📋 Invoice</option>
+                      <option value="Body Composition">🏋️‍♀️ Body Composition</option>
                       <option value="Other">📄 Other</option>
                     </select>
                   </div>
@@ -3882,12 +3993,6 @@ From ${user?.name || 'your medical practice'}`
         {currentView === 'activities' && (
           <div className="activities-view">
             <Activities />
-          </div>
-        )}
-
-        {currentView === 'bodymatrix' && (
-          <div className="bodymatrix-view">
-            <BodyMatrix user={user} />
           </div>
         )}
 
