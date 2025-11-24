@@ -967,11 +967,14 @@ function Dashboard() {
 
   const generateBodyCompositionSummary = async (patient: Patient, document: any, file: File) => {
     try {
+      console.log('🏋️ Starting body composition analysis...');
+      
       // Import the A4F service
       const { isAzureOpenAIAvailable } = await import('./services/azureOpenAIService');
       
       if (!isAzureOpenAIAvailable()) {
         console.warn('A4F API not configured, skipping body composition summary');
+        displayNotification('AI service not configured. Cannot generate summary.', 'error');
         return;
       }
 
@@ -990,6 +993,8 @@ function Dashboard() {
         reader.readAsDataURL(file);
       });
 
+      console.log('📤 Sending to vision model for analysis...');
+      
       // Use vision model to analyze the image directly
       const { azureConfig } = await import('./config/azure-config');
       const url = `${azureConfig.openai.endpoint}/chat/completions`;
@@ -1001,49 +1006,56 @@ function Dashboard() {
           'Authorization': `Bearer ${azureConfig.openai.apiKey}`,
         },
         body: JSON.stringify({
-          model: 'provider-2/llama-3.2-11b-vision-instruct', // Vision-capable model
+          model: 'provider-2/llama-3.2-11b-vision-instruct',
           messages: [
             { 
               role: 'system', 
-              content: 'You are a medical professional providing detailed body composition analysis. Extract all visible metrics from the image and provide comprehensive health recommendations.'
+              content: 'You are a medical professional analyzing body composition scans. Extract ALL visible metrics from the image and provide specific, actionable health recommendations based on the actual data you see.'
             },
             { 
               role: 'user', 
               content: [
                 {
                   type: 'text',
-                  text: `Analyze this body composition scan for a patient.
+                  text: `Analyze this body composition scan image in detail.
 
-Patient Details:
-- Age: ${age} years
-- Height: ${height}
+Patient: Age ${age} years, Height ${height}
 
-Provide a comprehensive health summary including:
+INSTRUCTIONS:
+1. Carefully examine the image and extract ALL visible metrics
+2. List each metric with its EXACT value from the image
+3. Provide health assessment based on the ACTUAL values you see
+4. Give specific recommendations
 
-1. BODY COMPOSITION METRICS:
-   - Extract and list ALL visible metrics from the image (weight, body fat %, BMI, skeletal muscle %, muscle mass, protein %, BMR, fat-free body weight, subcutaneous fat %, visceral fat, body water %, bone mass, metabolic age, etc.)
-   - Clearly state each metric name and its exact value
+Provide:
 
-2. HEALTH ASSESSMENT FOR AGE ${age}:
-   - Evaluate each metric against healthy ranges for this age
-   - Identify any concerning values
-   - Overall health status
+**EXTRACTED METRICS** (list ALL visible values):
+- Weight: [exact value from image]
+- Body Fat %: [exact value]
+- BMI: [exact value]
+- Skeletal Muscle %: [exact value]
+- Muscle Mass: [exact value]
+- Protein %: [exact value]
+- BMR: [exact value]
+- Visceral Fat: [exact value]
+- Body Water %: [exact value]
+- Bone Mass: [exact value]
+- Metabolic Age: [exact value]
+- [any other visible metrics]
 
-3. RISK FACTORS:
-   - Any potential health concerns based on the measurements
-   - Areas requiring immediate attention
+**HEALTH ASSESSMENT FOR AGE ${age}**:
+- Compare each metric to healthy ranges
+- Overall status
+- Concerning values (if any)
 
-4. RECOMMENDATIONS:
-   - Specific actions to improve body composition
-   - Dietary suggestions
-   - Exercise recommendations (types and frequency)
-   - Monitoring frequency
+**RECOMMENDATIONS**:
+- Specific dietary changes
+- Exercise plan (types, frequency)
+- Monitoring schedule
 
-5. IMPORTANCE OF TRACKING:
-   - Why these metrics matter for long-term health
-   - How to track progress over time
-
-Provide a detailed, professional medical summary suitable for sharing with the patient.`
+**TRACKING IMPORTANCE**:
+- Why these metrics matter
+- How to improve over time`
                 },
                 {
                   type: 'image_url',
@@ -1054,20 +1066,22 @@ Provide a detailed, professional medical summary suitable for sharing with the p
               ]
             }
           ],
-          max_tokens: 2500,
-          temperature: 0.3
+          max_tokens: 3000,
+          temperature: 0.2
         })
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`A4F API error: ${response.status} - ${errorText}`);
+        console.error('Vision API error:', errorText);
+        throw new Error(`A4F Vision API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
       const summaryContent = data.choices[0].message.content.trim();
 
       console.log('✅ Vision analysis complete');
+      console.log('Summary preview:', summaryContent.substring(0, 200) + '...');
 
       // Save summary to database
       const summaryData = {
@@ -1080,12 +1094,19 @@ Provide a detailed, professional medical summary suitable for sharing with the p
       };
 
       await createAISummary(summaryData);
-      console.log('✅ Body composition AI summary created successfully');
+      console.log('✅ Body composition AI summary saved to database');
+      
+      // Refresh summaries list immediately
+      const { getAISummaries } = await import('./services/azureTableRestService');
+      const updatedSummaries = await getAISummaries();
+      setAiSummaries(updatedSummaries);
+      console.log('✅ Summaries list refreshed');
       
       // Show success notification
-      displayNotification('🏋️ Body composition summary generated! View in patient details.');
+      displayNotification('🏋️ Body composition summary generated successfully!');
     } catch (error) {
-      console.error('Error generating body composition summary:', error);
+      console.error('❌ Error generating body composition summary:', error);
+      displayNotification('Failed to generate body composition summary. Check console for details.', 'error');
       throw error;
     }
   };
