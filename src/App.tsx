@@ -2870,12 +2870,74 @@ From ${user?.name || 'your medical practice'}`
 
                   <div className="form-group">
                     <label>Diagnosed Chronic Conditions</label>
-                    <textarea 
-                      value={newPatient.chronicConditions}
-                      onChange={(e) => setNewPatient({...newPatient, chronicConditions: e.target.value})}
-                      placeholder="List any chronic conditions (e.g., Diabetes Type 2, Hypertension, Asthma)"
-                      rows={3}
-                    />
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                      gap: '10px',
+                      marginTop: '10px',
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                      padding: '10px',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                      {[
+                        'Diabetes Type 1',
+                        'Diabetes Type 2',
+                        'Hypertension',
+                        'Asthma',
+                        'COPD',
+                        'Heart Disease',
+                        'Chronic Kidney Disease',
+                        'Arthritis',
+                        'Epilepsy',
+                        'HIV/AIDS',
+                        'Cancer',
+                        'Depression',
+                        'Anxiety Disorder',
+                        'Bipolar Disorder',
+                        'Schizophrenia',
+                        'Thyroid Disorder',
+                        'Obesity',
+                        'High Cholesterol'
+                      ].map((condition) => {
+                        const selectedConditions = newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()) : [];
+                        const isChecked = selectedConditions.includes(condition);
+                        return (
+                          <label
+                            key={condition}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '8px 12px',
+                              background: isChecked ? 'rgba(78, 205, 196, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                              border: isChecked ? '2px solid #4ecdc4' : '1px solid rgba(255, 255, 255, 0.1)',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                const currentConditions = newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean) : [];
+                                let updatedConditions;
+                                if (e.target.checked) {
+                                  updatedConditions = [...currentConditions, condition];
+                                } else {
+                                  updatedConditions = currentConditions.filter(c => c !== condition);
+                                }
+                                setNewPatient({...newPatient, chronicConditions: updatedConditions.join(', ')});
+                              }}
+                              style={{ marginRight: '8px', cursor: 'pointer' }}
+                            />
+                            <span style={{ fontSize: '0.9rem' }}>{condition}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Address Section */}
@@ -3220,12 +3282,74 @@ From ${user?.name || 'your medical practice'}`
 
                   <div className="form-group">
                     <label style={{ color: '#2c3e50', fontWeight: 600 }}>Diagnosed Chronic Conditions</label>
-                    <textarea
-                      value={newPatient.chronicConditions}
-                      onChange={(e) => setNewPatient({...newPatient, chronicConditions: e.target.value})}
-                      placeholder="List any chronic conditions (e.g., Diabetes Type 2, Hypertension, Asthma)"
-                      rows={3}
-                    />
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                      gap: '10px',
+                      marginTop: '10px',
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                      padding: '10px',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255, 255, 255, 0.1)'
+                    }}>
+                      {[
+                        'Diabetes Type 1',
+                        'Diabetes Type 2',
+                        'Hypertension',
+                        'Asthma',
+                        'COPD',
+                        'Heart Disease',
+                        'Chronic Kidney Disease',
+                        'Arthritis',
+                        'Epilepsy',
+                        'HIV/AIDS',
+                        'Cancer',
+                        'Depression',
+                        'Anxiety Disorder',
+                        'Bipolar Disorder',
+                        'Schizophrenia',
+                        'Thyroid Disorder',
+                        'Obesity',
+                        'High Cholesterol'
+                      ].map((condition) => {
+                        const selectedConditions = newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()) : [];
+                        const isChecked = selectedConditions.includes(condition);
+                        return (
+                          <label
+                            key={condition}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              padding: '8px 12px',
+                              background: isChecked ? 'rgba(78, 205, 196, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                              border: isChecked ? '2px solid #4ecdc4' : '1px solid rgba(255, 255, 255, 0.1)',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={(e) => {
+                                const currentConditions = newPatient.chronicConditions ? newPatient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean) : [];
+                                let updatedConditions;
+                                if (e.target.checked) {
+                                  updatedConditions = [...currentConditions, condition];
+                                } else {
+                                  updatedConditions = currentConditions.filter(c => c !== condition);
+                                }
+                                setNewPatient({...newPatient, chronicConditions: updatedConditions.join(', ')});
+                              }}
+                              style={{ marginRight: '8px', cursor: 'pointer' }}
+                            />
+                            <span style={{ fontSize: '0.9rem' }}>{condition}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Patient Status */}
