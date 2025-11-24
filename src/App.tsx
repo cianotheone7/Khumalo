@@ -981,18 +981,27 @@ function Dashboard() {
       const age = patient.dateOfBirth ? new Date().getFullYear() - new Date(patient.dateOfBirth).getFullYear() : 'Unknown';
       const height = patient.height || 'Not specified';
 
-      // Extract text from image using OCR
+      // Extract text from image using OCR with better preprocessing
       console.log('🔍 Extracting text from body composition image using OCR...');
       let extractedText = '';
       
       try {
         const { createWorker } = await import('tesseract.js');
-        const worker = await createWorker('eng');
+        const worker = await createWorker('eng', 1, {
+          logger: m => console.log('OCR:', m)
+        });
+        
+        // Set parameters for better accuracy with numbers
+        await worker.setParameters({
+          tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.%:/ ',
+          tessedit_pageseg_mode: '6', // Assume uniform block of text
+        });
+        
         const { data: { text } } = await worker.recognize(file);
         await worker.terminate();
         extractedText = text;
         console.log('✅ OCR extraction complete');
-        console.log('Extracted text preview:', extractedText.substring(0, 300));
+        console.log('Extracted text:', extractedText);
       } catch (ocrError) {
         console.error('OCR extraction failed:', ocrError);
         extractedText = 'Unable to extract text from image. Please ensure the image is clear and readable.';
@@ -1020,53 +1029,48 @@ function Dashboard() {
           messages: [
             { 
               role: 'system', 
-              content: 'You are a medical professional analyzing body composition scans. Extract ALL visible metrics from the OCR text and provide specific, actionable health recommendations based on the actual data.'
+              content: 'You are a medical professional analyzing body composition scans. The OCR text may contain errors - be intelligent about parsing the numbers. Look for patterns like "Weight: XX.X kg" or "Body Fat: XX.X%". Extract metrics and provide health recommendations.'
             },
             { 
               role: 'user', 
-              content: `Analyze this body composition scan data extracted via OCR.
+              content: `Parse this body composition scan OCR text and create a professional medical summary.
 
 Patient: Age ${age} years, Height ${height}
 
-Extracted OCR Text from Body Composition Scan:
+Raw OCR Text (may contain errors):
 ${extractedText}
 
-INSTRUCTIONS:
-1. Parse the OCR text and extract ALL body composition metrics you can find
-2. List each metric with its exact value
-3. Provide health assessment based on the actual values
-4. Give specific recommendations
+Your task:
+1. Intelligently parse the OCR text to extract body composition metrics
+2. Common metrics to look for: Weight, Body Fat %, BMI, Skeletal Muscle %, Muscle Mass, Protein %, BMR, Visceral Fat, Body Water %, Bone Mass, Metabolic Age
+3. Numbers may be garbled - use context clues (e.g., body fat is typically 10-40%, not 400%)
+4. Create a professional summary
 
-Provide:
+Format your response as:
 
-**EXTRACTED METRICS** (parse from OCR text above):
-- Weight: [value if found]
-- Body Fat %: [value if found]
-- BMI: [value if found]
-- Skeletal Muscle %: [value if found]
-- Muscle Mass: [value if found]
-- Protein %: [value if found]
-- BMR: [value if found]
-- Visceral Fat: [value if found]
-- Body Water %: [value if found]
-- Bone Mass: [value if found]
-- Metabolic Age: [value if found]
-- [any other metrics found in the text]
+## Body Composition Analysis - Age ${age}
 
-**HEALTH ASSESSMENT FOR AGE ${age}**:
-- Compare each metric to healthy ranges for this age
-- Overall health status
-- Concerning values (if any)
+### Extracted Metrics
+[List each metric found with its value, noting if OCR quality was poor]
 
-**RECOMMENDATIONS**:
-- Specific dietary changes
-- Exercise plan (types, frequency)
-- Lifestyle modifications
-- Monitoring schedule
+### Health Assessment
+[Compare metrics to healthy ranges for age ${age}]
+[Note any concerning values]
+[Overall health status]
 
-**TRACKING IMPORTANCE**:
-- Why these metrics matter
-- How to improve over time
+### Recommendations
+**Dietary Changes:**
+[Specific dietary recommendations]
+
+**Exercise Plan:**
+[Types of exercise, frequency per week]
+
+**Lifestyle:**
+[Other health recommendations]
+
+### Tracking & Follow-up
+[Why tracking matters]
+[Recommended monitoring frequency]
 
 Provide a detailed, professional summary suitable for sharing with the patient.`
             }
