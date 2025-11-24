@@ -1014,52 +1014,62 @@ function Dashboard() {
                 content: [
                   {
                     type: 'text',
-                    text: `You are a medical professional analyzing a body composition scan image.
+                    text: `You are a medical professional from Dr Hlosukwazi Khumalo's practice analyzing a body composition scan.
 
 Patient: Age ${age} years, Height ${height}
 
-Analyze this body composition scan image and create a comprehensive medical summary.
+Analyze this body composition scan image and create a professional medical report.
+
+IMPORTANT: 
+- Write as Dr Hlosukwazi Khumalo's practice
+- Do NOT mention AI, automation, or technology
+- Write in first-person professional medical language
+- Be warm, professional, and reassuring
 
 Format your response as:
 
-## Body Composition Analysis - Age ${age}
+Dear ${patient.name},
 
-### Extracted Metrics
-List ALL visible metrics from the image with their exact values:
+Thank you for your recent body composition assessment at our practice. Below is a comprehensive analysis of your results:
+
+**Body Composition Metrics**
+Based on your scan, here are your current measurements:
 - Weight: [value]
-- Body Fat %: [value]
+- Body Fat Percentage: [value]
 - BMI: [value]
-- Skeletal Muscle %: [value]
+- Skeletal Muscle: [value]
 - Muscle Mass: [value]
-- Protein %: [value]
-- BMR: [value]
+- Protein: [value]
+- Basal Metabolic Rate: [value] kcal/day
 - Visceral Fat: [value]
-- Body Water %: [value]
+- Body Water: [value]
 - Bone Mass: [value]
 - Metabolic Age: [value]
 - [any other visible metrics]
 
-### Health Assessment
-Compare each metric to healthy ranges for age ${age}:
-- Overall health status
-- Concerning values (if any)
-- Risk factors
+**Health Assessment**
+At ${age} years of age, [detailed assessment of metrics compared to healthy ranges, note concerning values if any, overall health status]
 
-### Recommendations
-**Dietary Changes:**
-[Specific dietary recommendations based on the metrics]
+**Recommendations for Optimal Health**
 
-**Exercise Plan:**
-[Types of exercise, frequency per week based on current composition]
+*Nutrition:*
+[Specific dietary recommendations]
 
-**Lifestyle:**
+*Exercise Program:*
+[Specific exercise recommendations with types and frequency]
+
+*Lifestyle:*
 [Other health recommendations]
 
-### Tracking & Follow-up
-- Why these metrics matter for long-term health
-- Recommended monitoring frequency
+**Moving Forward**
+[Why tracking matters and recommended monitoring frequency]
 
-Provide a detailed, professional summary suitable for sharing with the patient.`
+We're here to support you on your health journey. Please don't hesitate to contact our practice if you have any questions about these results.
+
+Warm regards,
+
+Dr Hlosukwazi Khumalo
+Dr Hlosukwazi Khumalo's Practice`
                   },
                   {
                     type: 'image_url',
@@ -4223,7 +4233,6 @@ Dr Hlosukwazi Khumalo`);
                 <input
                   type="tel"
                   placeholder="Enter phone number with country code (e.g., +27...)"
-                  value={whatsappPhone}
                   onChange={(e) => setWhatsappPhone(e.target.value)}
                   style={{
                     width: '100%',
