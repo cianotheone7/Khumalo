@@ -3453,7 +3453,7 @@ From ${user?.name || 'your medical practice'}`
                           <div style={{ fontWeight: '600', color: '#4ecdc4', marginBottom: '8px' }}>✓ {files.length} file{files.length !== 1 ? 's' : ''} selected</div>
                           <div style={{ maxHeight: '150px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                             {Array.from(files).map((file, i) => (
-                              <div key={i} style={{ fontSize: '0.9em', color: 'rgba(255,255,255,0.8)', padding: '5px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
+                              <div key={i} style={{ fontSize: '0.9em', color: '#000000', padding: '5px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
                                 📄 {file.name} ({(file.size / 1024).toFixed(1)} KB)
                               </div>
                             ))}
@@ -3462,15 +3462,21 @@ From ${user?.name || 'your medical practice'}`
                       ) : null;
                     })()}
                   </div>
-                  <div className="form-group">
-                    <label>Document Name *</label>
-                    <input 
-                      type="text" 
-                      value={newDocument.fileName}
-                      onChange={(e) => setNewDocument({...newDocument, fileName: e.target.value})}
-                      placeholder="e.g., Blood Test Results - 15 Jan 2024"
-                    />
-                  </div>
+                  {(() => {
+                    const fileInput = window.document.querySelector('input[type="file"]') as HTMLInputElement;
+                    const fileCount = fileInput?.files?.length || 0;
+                    return fileCount <= 1 ? (
+                      <div className="form-group">
+                        <label>Document Name *</label>
+                        <input 
+                          type="text" 
+                          value={newDocument.fileName}
+                          onChange={(e) => setNewDocument({...newDocument, fileName: e.target.value})}
+                          placeholder="e.g., Blood Test Results - 15 Jan 2024"
+                        />
+                      </div>
+                    ) : null;
+                  })()}
                   <div className="form-group">
                     <label>Document Type</label>
                     <select 
