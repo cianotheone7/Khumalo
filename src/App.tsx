@@ -1007,7 +1007,7 @@ function Dashboard() {
             'Authorization': `Bearer ${azureConfig.openai.apiKey}`,
           },
           body: JSON.stringify({
-            model: 'provider-2/gpt-4.1-nano',
+            model: 'provider-5/gpt-4.1-mini-2025-04-14',
             messages: [
               { 
                 role: 'user', 
@@ -4133,7 +4133,7 @@ Dr Hlosukwazi Khumalo`);
       )}
 
       {/* WhatsApp Modal */}
-      {showWhatsAppModal && selectedDocumentForWhatsApp && selectedPatient && (
+      {showWhatsAppModal && selectedPatient && (
         <div className="modal-overlay" style={{
           position: 'fixed',
           top: 0,
@@ -4174,7 +4174,7 @@ Dr Hlosukwazi Khumalo`);
                 Send via WhatsApp
               </h3>
               <p style={{ color: '#1a1a1a', margin: 0, fontSize: '0.9rem', fontWeight: '500', paddingLeft: '1rem' }}>
-                Document: {selectedDocumentForWhatsApp.fileName}
+                {selectedDocumentForWhatsApp ? `Document: ${selectedDocumentForWhatsApp.fileName}` : 'AI Summary'}
               </p>
             </div>
 
