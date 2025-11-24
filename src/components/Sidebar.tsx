@@ -30,6 +30,12 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, onSymptomC
       view: 'patients'
     },
     {
+      id: 'bodymatrix',
+      icon: '💪',
+      label: 'Body Matrix',
+      view: 'bodymatrix'
+    },
+    {
       id: 'symptom-checker',
       icon: '🩺',
       label: 'Symptom Checker',

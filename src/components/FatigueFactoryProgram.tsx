@@ -114,8 +114,8 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
     'Sleep Timing',
     'Sleep Problems',
     'Sleep Medication & Alertness',
-    'Overall Assessment',
-    'Post-Meal & Caffeine Effects'
+    'Post-Meal & Caffeine Effects',
+    'Overall Assessment'
   ];
 
   const handleInputChange = (field: keyof PSQIData, value: string) => {
@@ -149,15 +149,19 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
         return formData.bedtime !== '' && formData.fallAsleepMinutes !== '' && 
                formData.wakeTime !== '' && formData.actualSleepHours !== '';
       case 1:
-        return true; // Sleep problems are optional
+        // Make all sleep problems compulsory
+        const allProblemsAnswered = sleepProblemOptions.every(problem => 
+          formData.sleepProblems[problem.key] !== undefined && formData.sleepProblems[problem.key] !== ''
+        );
+        return allProblemsAnswered;
       case 2:
         return formData.sleepMedication !== '' && formData.troubleStayingAwake !== '';
       case 3:
-        return formData.enthusiasmProblem !== '' && formData.overallSleepQuality !== '';
-      case 4:
         return formData.postPrandialBloating !== '' && formData.postPrandialLooseStools !== '' && 
                formData.postPrandialFatigue !== '' && formData.caffeineEffect !== '' && 
                formData.lateCaffeineEffect !== '';
+      case 4:
+        return formData.enthusiasmProblem !== '' && formData.overallSleepQuality !== '';
       default:
         return false;
     }
@@ -301,47 +305,6 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
       case 3:
         return (
           <div className="psqi-step">
-            <h3>Overall Assessment (Past Month)</h3>
-            <div className="form-group">
-              <label>How much of a problem has it been for you to keep up enough enthusiasm to get things done? *</label>
-              <div className="frequency-options">
-                {problemOptions.map((option) => (
-                  <label key={option.value} className="radio-option">
-                    <input
-                      type="radio"
-                      name="enthusiasmProblem"
-                      value={option.value}
-                      checked={formData.enthusiasmProblem === option.value}
-                      onChange={(e) => handleInputChange('enthusiasmProblem', e.target.value)}
-                    />
-                    <span>{option.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            <div className="form-group">
-              <label>How would you rate your sleep quality overall? *</label>
-              <div className="frequency-options">
-                {qualityOptions.map((option) => (
-                  <label key={option.value} className="radio-option">
-                    <input
-                      type="radio"
-                      name="overallSleepQuality"
-                      value={option.value}
-                      checked={formData.overallSleepQuality === option.value}
-                      onChange={(e) => handleInputChange('overallSleepQuality', e.target.value)}
-                    />
-                    <span>{option.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="psqi-step">
             <h3>Post-Meal & Caffeine Effects (Past Month)</h3>
             <p className="section-description">Please rate the severity of these symptoms after meals:</p>
             
@@ -437,6 +400,47 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
           </div>
         );
 
+      case 4:
+        return (
+          <div className="psqi-step">
+            <h3>Overall Assessment (Past Month)</h3>
+            <div className="form-group">
+              <label>How much of a problem has it been for you to keep up enough enthusiasm to get things done? *</label>
+              <div className="frequency-options">
+                {problemOptions.map((option) => (
+                  <label key={option.value} className="radio-option">
+                    <input
+                      type="radio"
+                      name="enthusiasmProblem"
+                      value={option.value}
+                      checked={formData.enthusiasmProblem === option.value}
+                      onChange={(e) => handleInputChange('enthusiasmProblem', e.target.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="form-group">
+              <label>How would you rate your sleep quality overall? *</label>
+              <div className="frequency-options">
+                {qualityOptions.map((option) => (
+                  <label key={option.value} className="radio-option">
+                    <input
+                      type="radio"
+                      name="overallSleepQuality"
+                      value={option.value}
+                      checked={formData.overallSleepQuality === option.value}
+                      onChange={(e) => handleInputChange('overallSleepQuality', e.target.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
@@ -445,7 +449,7 @@ const PSQIQuestionnaire: React.FC<PSQIQuestionnaireProps> = ({
   return (
     <div className="psqi-questionnaire">
       <div className="psqi-header">
-        <h2>The Fatigue Factory program</h2>
+        <h2>The Fatigue Factory Program</h2>
         <p className="psqi-instructions">
           The following questions relate to your usual sleep habits during the <strong>past month only</strong>. 
           Your answers should indicate the most accurate reply for the <strong>majority</strong> of days and nights in the past month. 

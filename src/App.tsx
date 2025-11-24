@@ -6,6 +6,7 @@ import { Auth } from './components/Auth';
 import Sidebar from './components/Sidebar';
 import Settings from './components/Settings';
 import { Activities } from './components/Activities';
+import { BodyMatrix } from './components/BodyMatrix';
 import SymptomCheckerPage from './pages/SymptomCheckerPage';
 import AppointmentBooking from './components/AppointmentBooking';
 import PatientAppointmentBooking from './components/PatientAppointmentBooking';
@@ -3881,6 +3882,12 @@ From ${user?.name || 'your medical practice'}`
         {currentView === 'activities' && (
           <div className="activities-view">
             <Activities />
+          </div>
+        )}
+
+        {currentView === 'bodymatrix' && (
+          <div className="bodymatrix-view">
+            <BodyMatrix />
           </div>
         )}
 
