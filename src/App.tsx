@@ -3887,7 +3887,7 @@ From ${user?.name || 'your medical practice'}`
 
         {currentView === 'bodymatrix' && (
           <div className="bodymatrix-view">
-            <BodyMatrix />
+            <BodyMatrix user={user} />
           </div>
         )}
 

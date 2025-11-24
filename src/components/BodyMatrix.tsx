@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import Tesseract from 'tesseract.js';
 import * as XLSX from 'xlsx';
 
@@ -27,8 +26,15 @@ interface BodyMetrics {
   createdAt: string;
 }
 
-export function BodyMatrix() {
-  const { user } = useAuth();
+interface BodyMatrixProps {
+  user: {
+    id?: string;
+    email: string;
+    name: string;
+  };
+}
+
+export function BodyMatrix({ user }: BodyMatrixProps) {
   const [metrics, setMetrics] = useState<BodyMetrics[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
