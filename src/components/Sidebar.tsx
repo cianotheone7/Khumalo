@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentView, onViewChange, onSymptomC
     {
       id: 'bodymatrix',
       icon: '🏋️',
-      label: 'Body Matrix',
+      label: 'Body Composition',
       view: 'bodymatrix'
     }
   ];

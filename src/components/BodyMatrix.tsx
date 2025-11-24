@@ -7,6 +7,7 @@ interface BodyMetrics {
   partitionKey: string;
   patientId: string;
   patientName: string;
+  patientSurname: string;
   date: string;
   weight: string;
   bodyFat: string;
@@ -170,7 +171,8 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
         rowKey,
         partitionKey,
         patientId: user.id || user.email,
-        patientName: user.name || user.email,
+        patientName: extractedData.patientName || '',
+        patientSurname: extractedData.patientSurname || '',
         date: new Date().toISOString(),
         weight: extractedData.weight || '',
         bodyFat: extractedData.bodyFat || '',
@@ -286,7 +288,8 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
   const exportToExcel = () => {
     const data = metrics.map(m => ({
       'Date': new Date(m.date).toLocaleDateString(),
-      'Patient': m.patientName,
+      'Name': m.patientName,
+      'Surname': m.patientSurname,
       'Weight': m.weight,
       'Body Fat': m.bodyFat,
       'BMI': m.bmi,
@@ -304,8 +307,8 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
 
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Body Metrics');
-    XLSX.writeFile(wb, `BodyMetrics_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.utils.book_append_sheet(wb, ws, 'Body Composition');
+    XLSX.writeFile(wb, `BodyComposition_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   return (
@@ -385,7 +388,7 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
       `}</style>
 
       <div className="body-matrix-header">
-        <h2>📊 Body Matrix</h2>
+        <h2>📊 Body Composition</h2>
         <div style={{ display: 'flex', gap: '1rem' }}>
           <button className="btn btn-secondary" onClick={exportToExcel} disabled={metrics.length === 0}>
             📥 Export to Excel
@@ -426,7 +429,7 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
             <div key={metric.rowKey} className="metric-card">
               <div className="metric-card-header">
                 <div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: '600' }}>{metric.patientName}</div>
+                  <div style={{ fontSize: '1.1rem', fontWeight: '600' }}>{metric.patientName} {metric.patientSurname}</div>
                   <div style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.6)' }}>
                     {new Date(metric.date).toLocaleDateString()}
                   </div>
@@ -507,15 +510,34 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="modal">
-          <div className="modal-content" style={{ maxWidth: '600px' }}>
+          <div className="modal-content" style={{ maxWidth: '700px' }}>
             <h3>📊 Review Extracted Data</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+              <div className="form-group">
+                <label>Name *</label>
+                <input
+                  type="text"
+                  value={extractedData.patientName || ''}
+                  onChange={(e) => setExtractedData({...extractedData, patientName: e.target.value})}
+                  placeholder="Patient's name"
+                />
+              </div>
+              <div className="form-group">
+                <label>Surname *</label>
+                <input
+                  type="text"
+                  value={extractedData.patientSurname || ''}
+                  onChange={(e) => setExtractedData({...extractedData, patientSurname: e.target.value})}
+                  placeholder="Patient's surname"
+                />
+              </div>
               <div className="form-group">
                 <label>Weight</label>
                 <input
                   type="text"
                   value={extractedData.weight || ''}
                   onChange={(e) => setExtractedData({...extractedData, weight: e.target.value})}
+                  placeholder="e.g., 64.95kg"
                 />
               </div>
               <div className="form-group">
@@ -524,6 +546,7 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
                   type="text"
                   value={extractedData.bodyFat || ''}
                   onChange={(e) => setExtractedData({...extractedData, bodyFat: e.target.value})}
+                  placeholder="e.g., 24.8%"
                 />
               </div>
               <div className="form-group">
@@ -532,6 +555,7 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
                   type="text"
                   value={extractedData.bmi || ''}
                   onChange={(e) => setExtractedData({...extractedData, bmi: e.target.value})}
+                  placeholder="e.g., 24.1"
                 />
               </div>
               <div className="form-group">
@@ -617,7 +641,11 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
             </div>
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={() => setShowUploadModal(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={saveMetrics} disabled={uploading}>
+              <button 
+                className="btn btn-primary" 
+                onClick={saveMetrics} 
+                disabled={uploading || !extractedData.patientName || !extractedData.patientSurname}
+              >
                 {uploading ? 'Saving...' : '💾 Save to Database'}
               </button>
             </div>
@@ -628,9 +656,25 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
       {/* Edit Modal */}
       {editingMetric && (
         <div className="modal">
-          <div className="modal-content" style={{ maxWidth: '600px' }}>
-            <h3>✏️ Edit Metrics</h3>
+          <div className="modal-content" style={{ maxWidth: '700px' }}>
+            <h3>✏️ Edit Body Composition</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '1rem' }}>
+              <div className="form-group">
+                <label>Name</label>
+                <input
+                  type="text"
+                  value={editingMetric.patientName || ''}
+                  onChange={(e) => setEditingMetric({...editingMetric, patientName: e.target.value})}
+                />
+              </div>
+              <div className="form-group">
+                <label>Surname</label>
+                <input
+                  type="text"
+                  value={editingMetric.patientSurname || ''}
+                  onChange={(e) => setEditingMetric({...editingMetric, patientSurname: e.target.value})}
+                />
+              </div>
               {Object.entries({
                 weight: 'Weight',
                 bodyFat: 'Body Fat',
