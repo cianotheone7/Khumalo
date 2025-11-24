@@ -1025,6 +1025,7 @@ IMPORTANT:
 - Do NOT mention AI, automation, or technology
 - Write in first-person professional medical language
 - Be warm, professional, and reassuring
+- END your response with ONLY the signature shown below, do NOT add any additional closing or signature
 
 Format your response as:
 
@@ -1912,7 +1913,7 @@ From ${user?.name || 'your medical practice'}`
   };
 
   const sendViaWhatsApp = () => {
-    if (!selectedDocumentForWhatsApp || !whatsappPhone) {
+    if (!whatsappPhone) {
       alert('Please select a phone number');
       return;
     }
@@ -1922,10 +1923,15 @@ From ${user?.name || 'your medical practice'}`
     
     // Encode message
     const encodedMessage = encodeURIComponent(whatsappMessage);
-    const encodedUrl = encodeURIComponent(selectedDocumentForWhatsApp.blobUrl);
     
-    // WhatsApp Web URL with message and link to document
-    const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}%0A%0ADocument:%20${encodedUrl}`;
+    // WhatsApp Web URL with message and optionally document link
+    let whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
+    
+    // Add document link if there is one
+    if (selectedDocumentForWhatsApp) {
+      const encodedUrl = encodeURIComponent(selectedDocumentForWhatsApp.blobUrl);
+      whatsappUrl += `%0A%0ADocument:%20${encodedUrl}`;
+    }
     
     // Open WhatsApp
     window.open(whatsappUrl, '_blank');
@@ -2843,14 +2849,7 @@ From ${user?.name || 'your medical practice'}`
                                     className="btn btn-success btn-sm"
                                     onClick={() => {
                                       setWhatsappPhone(selectedPatient.whatsappPhone || selectedPatient.mobilePhone || selectedPatient.phone || '');
-                                      setWhatsappMessage(`Hi ${selectedPatient.name},
-
-Here is your AI-generated medical summary:
-
-${summary.summaryText || summary.summary}
-
-Best regards,
-Dr Hlosukwazi Khumalo`);
+                                      setWhatsappMessage(`Hi ${selectedPatient.name},\n\n${summary.summaryText || summary.summary}`);
                                       setShowWhatsAppModal(true);
                                     }}
                                     style={{ background: '#25D366', color: 'white', marginRight: '8px' }}
@@ -4233,7 +4232,9 @@ Dr Hlosukwazi Khumalo`);
                 <input
                   type="tel"
                   placeholder="Enter phone number with country code (e.g., +27...)"
+                  defaultValue=""
                   onChange={(e) => setWhatsappPhone(e.target.value)}
+                  autoFocus
                   style={{
                     width: '100%',
                     padding: '0.75rem',
