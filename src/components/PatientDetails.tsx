@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getDocuments, getAISummaries, createAISummary, permanentDeleteDocument, restoreDocument } from '../services/azureTableRestService';
 import type { Document, AISummary } from '../services/azureTableRestService';
 import type { Patient } from '../services/azurePatientRestService';
+import { updatePatient } from '../services/dataService';
 import { useAuth } from '../contexts/AuthContext';
 import { generateMedicalSummary } from '../services/azureOpenAIService';
 import { DocumentUpload } from './DocumentUpload';
@@ -49,6 +50,9 @@ export function PatientDetails({ patient }: PatientDetailsProps) {
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   const [whatsappPhone, setWhatsappPhone] = useState('');
   const [whatsappMessage, setWhatsappMessage] = useState('');
+  const [editingChronicConditions, setEditingChronicConditions] = useState(false);
+  const [chronicConditions, setChronicConditions] = useState<string[]>([]);
+  const [savingConditions, setSavingConditions] = useState(false);
 
   const loadDocuments = async (silent: boolean = false) => {
     if (!silent) {
@@ -137,6 +141,13 @@ export function PatientDetails({ patient }: PatientDetailsProps) {
   useEffect(() => {
     loadDocuments();
     loadSummaries();
+    // Initialize chronic conditions from patient data
+    if (patient.chronicConditions) {
+      const conditions = patient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean);
+      setChronicConditions(conditions);
+    } else {
+      setChronicConditions([]);
+    }
   }, [patient.rowKey]);
 
   const formatDate = (dateString: string) => {
@@ -322,6 +333,38 @@ From ${user?.name || 'your medical practice'}`
     }
   };
 
+  const saveChronicConditions = async () => {
+    setSavingConditions(true);
+    try {
+      const conditionsString = chronicConditions.join(', ');
+      const updated = await updatePatient(patient.id || patient.rowKey, {
+        chronicConditions: conditionsString
+      });
+      
+      if (updated) {
+        alert('Chronic conditions updated successfully!');
+        setEditingChronicConditions(false);
+      } else {
+        alert('Failed to update chronic conditions. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating chronic conditions:', error);
+      alert('Failed to update chronic conditions. Please try again.');
+    } finally {
+      setSavingConditions(false);
+    }
+  };
+
+  const toggleCondition = (condition: string) => {
+    setChronicConditions(prev => {
+      if (prev.includes(condition)) {
+        return prev.filter(c => c !== condition);
+      } else {
+        return [...prev, condition];
+      }
+    });
+  };
+
   const handleDocumentUploaded = async () => {
     setShowUploadModal(false);
     console.log('📄 Document uploaded, refreshing list...');
@@ -495,9 +538,127 @@ From ${user?.name || 'your medical practice'}`
             <label>Allergies:</label>
             <span>{patient.allergies || 'None reported'}</span>
           </div>
-          <div className="info-item">
-            <label>Chronic Conditions:</label>
-            <span>{patient.chronicConditions || 'None reported'}</span>
+          <div className="info-item" style={{ gridColumn: '1 / -1' }}>
+            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Chronic Conditions:</span>
+              {!editingChronicConditions && (
+                <button
+                  onClick={() => setEditingChronicConditions(true)}
+                  style={{
+                    background: '#4ecdc4',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    padding: '0.4rem 0.8rem',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem',
+                    fontWeight: '500'
+                  }}
+                >
+                  ✏️ Edit
+                </button>
+              )}
+            </label>
+            {editingChronicConditions ? (
+              <div style={{ marginTop: '10px' }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                  gap: '10px',
+                  marginBottom: '15px'
+                }}>
+                  {[
+                    'Diabetes Type 1',
+                    'Diabetes Type 2',
+                    'Hypertension',
+                    'Asthma',
+                    'COPD',
+                    'Heart Disease',
+                    'Chronic Kidney Disease',
+                    'Arthritis',
+                    'Epilepsy',
+                    'HIV/AIDS',
+                    'Cancer',
+                    'Depression',
+                    'Anxiety Disorder',
+                    'Bipolar Disorder',
+                    'Schizophrenia',
+                    'Thyroid Disorder',
+                    'Obesity',
+                    'High Cholesterol'
+                  ].map((condition) => (
+                    <label
+                      key={condition}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '8px 12px',
+                        background: chronicConditions.includes(condition) ? 'rgba(78, 205, 196, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                        border: chronicConditions.includes(condition) ? '2px solid #4ecdc4' : '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={chronicConditions.includes(condition)}
+                        onChange={() => toggleCondition(condition)}
+                        style={{ marginRight: '8px', cursor: 'pointer' }}
+                      />
+                      <span style={{ fontSize: '0.9rem' }}>{condition}</span>
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    onClick={saveChronicConditions}
+                    disabled={savingConditions}
+                    style={{
+                      background: '#4ecdc4',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '0.6rem 1.2rem',
+                      cursor: savingConditions ? 'not-allowed' : 'pointer',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      opacity: savingConditions ? 0.6 : 1
+                    }}
+                  >
+                    {savingConditions ? '💾 Saving...' : '💾 Save to Database'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setEditingChronicConditions(false);
+                      // Reset to original values
+                      if (patient.chronicConditions) {
+                        const conditions = patient.chronicConditions.split(',').map(c => c.trim()).filter(Boolean);
+                        setChronicConditions(conditions);
+                      } else {
+                        setChronicConditions([]);
+                      }
+                    }}
+                    disabled={savingConditions}
+                    style={{
+                      background: '#e74c3c',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      padding: '0.6rem 1.2rem',
+                      cursor: savingConditions ? 'not-allowed' : 'pointer',
+                      fontSize: '0.95rem',
+                      fontWeight: '600',
+                      opacity: savingConditions ? 0.6 : 1
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <span>{chronicConditions.length > 0 ? chronicConditions.join(', ') : 'None reported'}</span>
+            )}
           </div>
         </div>
       </div>
