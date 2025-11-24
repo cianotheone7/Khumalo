@@ -94,60 +94,71 @@ export function BodyMatrix({ user }: BodyMatrixProps) {
       const text = result.data.text;
       console.log('OCR Result:', text);
 
-      // Extract metrics using regex patterns
+      // Extract metrics using improved regex patterns
       const extracted: Partial<BodyMetrics> = {};
       
-      // Weight (e.g., "64.95kg")
-      const weightMatch = text.match(/(\d+\.?\d*)\s*kg/i);
-      if (weightMatch) extracted.weight = weightMatch[1] + 'kg';
+      // More flexible patterns to match various formats
+      // Weight - match patterns like "64.95kg", "Weight 64.95", "64.95 kg"
+      const weightMatch = text.match(/(\d+\.?\d*)\s*kg|Weight[:\s]*(\d+\.?\d*)/i);
+      if (weightMatch) extracted.weight = (weightMatch[1] || weightMatch[2]) + 'kg';
 
-      // Body Fat (e.g., "24.8%")
-      const bodyFatMatch = text.match(/Body\s*Fat[:\s]*(\d+\.?\d*)\s*%/i);
-      if (bodyFatMatch) extracted.bodyFat = bodyFatMatch[1] + '%';
+      // Body Fat - match "24.8%", "Body Fat 24.8", "Fat 24.8%"
+      const bodyFatMatch = text.match(/(?:Body\s*)?Fat[:\s]*(\d+\.?\d*)\s*%?|(\d+\.?\d*)\s*%/i);
+      if (bodyFatMatch) extracted.bodyFat = (bodyFatMatch[1] || bodyFatMatch[2]) + '%';
 
-      // BMI (e.g., "24.1")
+      // BMI - match "BMI 24.1", "24.1" near BMI keyword
       const bmiMatch = text.match(/BMI[:\s]*(\d+\.?\d*)/i);
       if (bmiMatch) extracted.bmi = bmiMatch[1];
 
-      // Skeletal Muscle (e.g., "48.5%")
-      const skeletalMatch = text.match(/Skeletal\s*Muscle[:\s]*(\d+\.?\d*)\s*%/i);
+      // Skeletal Muscle - match various formats
+      const skeletalMatch = text.match(/(?:Skeletal\s*)?Muscle[:\s]*(\d+\.?\d*)\s*%?/i) || 
+                           text.match(/SKM[:\s]*(\d+\.?\d*)\s*%?/i);
       if (skeletalMatch) extracted.skeletalMuscle = skeletalMatch[1] + '%';
 
-      // Muscle Mass (e.g., "46.4kg")
-      const muscleMatch = text.match(/Muscle\s*Mass[:\s]*(\d+\.?\d*)\s*kg/i);
+      // Muscle Mass
+      const muscleMatch = text.match(/(?:Muscle\s*)?Mass[:\s]*(\d+\.?\d*)\s*kg/i) ||
+                         text.match(/MM[:\s]*(\d+\.?\d*)\s*kg/i);
       if (muscleMatch) extracted.muscleMass = muscleMatch[1] + 'kg';
 
-      // Protein (e.g., "17.2%")
-      const proteinMatch = text.match(/Protein[:\s]*(\d+\.?\d*)\s*%/i);
+      // Protein
+      const proteinMatch = text.match(/Protein[:\s]*(\d+\.?\d*)\s*%?/i);
       if (proteinMatch) extracted.protein = proteinMatch[1] + '%';
 
-      // BMR (e.g., "1424kcal")
-      const bmrMatch = text.match(/(\d+)\s*kcal/i);
+      // BMR - match "1424kcal", "BMR 1424", "1424 kcal"
+      const bmrMatch = text.match(/BMR[:\s]*(\d+)|(?:\d+)\s*kcal/i);
       if (bmrMatch) extracted.bmr = bmrMatch[1] + 'kcal';
 
-      // Fat-free Body Weight (e.g., "48.8kg")
-      const fatFreeMatch = text.match(/Fat-free\s*Body\s*Weight[:\s]*(\d+\.?\d*)\s*kg/i);
+      // Fat-free Body Weight
+      const fatFreeMatch = text.match(/(?:Fat[\s-]*free|FFM)[:\s]*(\d+\.?\d*)\s*kg/i);
       if (fatFreeMatch) extracted.fatFreeBodyWeight = fatFreeMatch[1] + 'kg';
 
-      // Subcutaneous Fat (e.g., "22.3%")
-      const subcutMatch = text.match(/Subcutaneous\s*Fat[:\s]*(\d+\.?\d*)\s*%/i);
+      // Subcutaneous Fat
+      const subcutMatch = text.match(/(?:Subcutaneous|SubQ|SFat)[:\s]*(\d+\.?\d*)\s*%?/i);
       if (subcutMatch) extracted.subcutaneousFat = subcutMatch[1] + '%';
 
-      // Visceral Fat (e.g., "7")
-      const visceralMatch = text.match(/Visceral\s*Fat[:\s]*(\d+)/i);
+      // Visceral Fat - often just a number
+      const visceralMatch = text.match(/(?:Visceral|VFat)[:\s]*(\d+)/i);
       if (visceralMatch) extracted.visceralFat = visceralMatch[1];
 
-      // Body Water (e.g., "54.2%")
-      const waterMatch = text.match(/Body\s*Water[:\s]*(\d+\.?\d*)\s*%/i);
+      // Body Water
+      const waterMatch = text.match(/(?:Body\s*)?Water[:\s]*(\d+\.?\d*)\s*%?/i) ||
+                        text.match(/TBW[:\s]*(\d+\.?\d*)\s*%?/i);
       if (waterMatch) extracted.bodyWater = waterMatch[1] + '%';
 
-      // Bone Mass (e.g., "2.44kg")
-      const boneMatch = text.match(/Bone\s*Mass[:\s]*(\d+\.?\d*)\s*kg/i);
+      // Bone Mass
+      const boneMatch = text.match(/Bone[:\s]*(\d+\.?\d*)\s*kg/i);
       if (boneMatch) extracted.boneMass = boneMatch[1] + 'kg';
 
-      // Metabolic Age (e.g., "46")
-      const metabolicMatch = text.match(/Metabolic\s*Age[:\s]*(\d+)/i);
+      // Metabolic Age
+      const metabolicMatch = text.match(/(?:Metabolic\s*)?Age[:\s]*(\d+)/i);
       if (metabolicMatch) extracted.metabolicAge = metabolicMatch[1];
+
+      // If still missing critical values, try to extract numbers in sequence
+      if (Object.keys(extracted).length < 3) {
+        console.log('Attempting fallback extraction from raw numbers...');
+        const numbers = text.match(/(\d+\.?\d*)/g);
+        console.log('Found numbers:', numbers);
+      }
 
       setExtractedData(extracted);
       setShowUploadModal(true);
