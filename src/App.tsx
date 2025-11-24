@@ -1068,7 +1068,7 @@ We're here to support you on your health journey. Please don't hesitate to conta
 
 Warm regards,
 
-Dr Hlosukwazi Khumalo
+Lifelane Healthcare
 Dr Hlosukwazi Khumalo's Practice`
                   },
                   {
