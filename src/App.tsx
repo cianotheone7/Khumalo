@@ -2883,27 +2883,27 @@ From ${user?.name || 'your medical practice'}`
                         borderRadius: '8px',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff'
+                        color: '#000'
                       }}
                     >
-                      <option value="Diabetes Type 1">Diabetes Type 1</option>
-                      <option value="Diabetes Type 2">Diabetes Type 2</option>
-                      <option value="Hypertension">Hypertension</option>
-                      <option value="Asthma">Asthma</option>
-                      <option value="COPD">COPD</option>
-                      <option value="Heart Disease">Heart Disease</option>
-                      <option value="Chronic Kidney Disease">Chronic Kidney Disease</option>
-                      <option value="Arthritis">Arthritis</option>
-                      <option value="Epilepsy">Epilepsy</option>
-                      <option value="HIV/AIDS">HIV/AIDS</option>
-                      <option value="Cancer">Cancer</option>
-                      <option value="Depression">Depression</option>
-                      <option value="Anxiety Disorder">Anxiety Disorder</option>
-                      <option value="Bipolar Disorder">Bipolar Disorder</option>
-                      <option value="Schizophrenia">Schizophrenia</option>
-                      <option value="Thyroid Disorder">Thyroid Disorder</option>
-                      <option value="Obesity">Obesity</option>
-                      <option value="High Cholesterol">High Cholesterol</option>
+                      <option value="Diabetes Type 1" style={{ color: '#000' }}>Diabetes Type 1</option>
+                      <option value="Diabetes Type 2" style={{ color: '#000' }}>Diabetes Type 2</option>
+                      <option value="Hypertension" style={{ color: '#000' }}>Hypertension</option>
+                      <option value="Asthma" style={{ color: '#000' }}>Asthma</option>
+                      <option value="COPD" style={{ color: '#000' }}>COPD</option>
+                      <option value="Heart Disease" style={{ color: '#000' }}>Heart Disease</option>
+                      <option value="Chronic Kidney Disease" style={{ color: '#000' }}>Chronic Kidney Disease</option>
+                      <option value="Arthritis" style={{ color: '#000' }}>Arthritis</option>
+                      <option value="Epilepsy" style={{ color: '#000' }}>Epilepsy</option>
+                      <option value="HIV/AIDS" style={{ color: '#000' }}>HIV/AIDS</option>
+                      <option value="Cancer" style={{ color: '#000' }}>Cancer</option>
+                      <option value="Depression" style={{ color: '#000' }}>Depression</option>
+                      <option value="Anxiety Disorder" style={{ color: '#000' }}>Anxiety Disorder</option>
+                      <option value="Bipolar Disorder" style={{ color: '#000' }}>Bipolar Disorder</option>
+                      <option value="Schizophrenia" style={{ color: '#000' }}>Schizophrenia</option>
+                      <option value="Thyroid Disorder" style={{ color: '#000' }}>Thyroid Disorder</option>
+                      <option value="Obesity" style={{ color: '#000' }}>Obesity</option>
+                      <option value="High Cholesterol" style={{ color: '#000' }}>High Cholesterol</option>
                     </select>
                     <small style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginTop: '5px', display: 'block' }}>Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
                   </div>
@@ -3263,27 +3263,27 @@ From ${user?.name || 'your medical practice'}`
                         borderRadius: '8px',
                         border: '1px solid rgba(255, 255, 255, 0.2)',
                         background: 'rgba(255, 255, 255, 0.05)',
-                        color: '#fff'
+                        color: '#000'
                       }}
                     >
-                      <option value="Diabetes Type 1">Diabetes Type 1</option>
-                      <option value="Diabetes Type 2">Diabetes Type 2</option>
-                      <option value="Hypertension">Hypertension</option>
-                      <option value="Asthma">Asthma</option>
-                      <option value="COPD">COPD</option>
-                      <option value="Heart Disease">Heart Disease</option>
-                      <option value="Chronic Kidney Disease">Chronic Kidney Disease</option>
-                      <option value="Arthritis">Arthritis</option>
-                      <option value="Epilepsy">Epilepsy</option>
-                      <option value="HIV/AIDS">HIV/AIDS</option>
-                      <option value="Cancer">Cancer</option>
-                      <option value="Depression">Depression</option>
-                      <option value="Anxiety Disorder">Anxiety Disorder</option>
-                      <option value="Bipolar Disorder">Bipolar Disorder</option>
-                      <option value="Schizophrenia">Schizophrenia</option>
-                      <option value="Thyroid Disorder">Thyroid Disorder</option>
-                      <option value="Obesity">Obesity</option>
-                      <option value="High Cholesterol">High Cholesterol</option>
+                      <option value="Diabetes Type 1" style={{ color: '#000' }}>Diabetes Type 1</option>
+                      <option value="Diabetes Type 2" style={{ color: '#000' }}>Diabetes Type 2</option>
+                      <option value="Hypertension" style={{ color: '#000' }}>Hypertension</option>
+                      <option value="Asthma" style={{ color: '#000' }}>Asthma</option>
+                      <option value="COPD" style={{ color: '#000' }}>COPD</option>
+                      <option value="Heart Disease" style={{ color: '#000' }}>Heart Disease</option>
+                      <option value="Chronic Kidney Disease" style={{ color: '#000' }}>Chronic Kidney Disease</option>
+                      <option value="Arthritis" style={{ color: '#000' }}>Arthritis</option>
+                      <option value="Epilepsy" style={{ color: '#000' }}>Epilepsy</option>
+                      <option value="HIV/AIDS" style={{ color: '#000' }}>HIV/AIDS</option>
+                      <option value="Cancer" style={{ color: '#000' }}>Cancer</option>
+                      <option value="Depression" style={{ color: '#000' }}>Depression</option>
+                      <option value="Anxiety Disorder" style={{ color: '#000' }}>Anxiety Disorder</option>
+                      <option value="Bipolar Disorder" style={{ color: '#000' }}>Bipolar Disorder</option>
+                      <option value="Schizophrenia" style={{ color: '#000' }}>Schizophrenia</option>
+                      <option value="Thyroid Disorder" style={{ color: '#000' }}>Thyroid Disorder</option>
+                      <option value="Obesity" style={{ color: '#000' }}>Obesity</option>
+                      <option value="High Cholesterol" style={{ color: '#000' }}>High Cholesterol</option>
                     </select>
                     <small style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginTop: '5px', display: 'block' }}>Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
                   </div>
