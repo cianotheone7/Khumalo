@@ -53,6 +53,10 @@ export function PatientDetails({ patient }: PatientDetailsProps) {
   const [editingChronicConditions, setEditingChronicConditions] = useState(false);
   const [chronicConditions, setChronicConditions] = useState<string[]>([]);
   const [savingConditions, setSavingConditions] = useState(false);
+  const [showRecentDocs, setShowRecentDocs] = useState(true);
+  const [showArchivedDocs, setShowArchivedDocs] = useState(false);
+  const [showRecentSummaries, setShowRecentSummaries] = useState(true);
+  const [showArchivedSummaries, setShowArchivedSummaries] = useState(false);
 
   const loadDocuments = async (silent: boolean = false) => {
     if (!silent) {
@@ -187,6 +191,23 @@ export function PatientDetails({ patient }: PatientDetailsProps) {
       return 'Invalid date';
     }
   };
+
+  // Helper to check if date is within last 30 days
+  const isWithinLast30Days = (dateString: string): boolean => {
+    if (!dateString) return false;
+    const date = new Date(dateString);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return date >= thirtyDaysAgo;
+  };
+
+  // Split documents into recent and archived
+  const recentDocuments = documents.filter(doc => isWithinLast30Days(doc.uploadedAt));
+  const archivedDocuments = documents.filter(doc => !isWithinLast30Days(doc.uploadedAt));
+
+  // Split summaries into recent and archived
+  const recentSummaries = summaries.filter(summary => isWithinLast30Days(summary.createdAt));
+  const archivedSummaries = summaries.filter(summary => !isWithinLast30Days(summary.createdAt));
 
   const formatFileSize = (bytes: number) => {
     if (!bytes || isNaN(bytes)) return '0 B';
@@ -688,41 +709,106 @@ From ${user?.name || 'your medical practice'}`
             {generatingSummary ? 'Generating...' : '✨ Generate Summary'}
           </button>
         </div>
-        <div className="summaries-list">
-          {summaries.length === 0 ? (
-            <div className="empty-section">
-              No summaries generated yet. Click "Generate Summary" to create an AI-powered summary of this patient's records.
+
+        {/* Recent Summaries (Past 30 Days) */}
+        {recentSummaries.length > 0 && (
+          <div style={{ marginBottom: '1rem' }}>
+            <div 
+              onClick={() => setShowRecentSummaries(!showRecentSummaries)}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.75rem 1rem',
+                background: 'rgba(139, 92, 246, 0.1)',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                marginBottom: '0.5rem'
+              }}
+            >
+              <strong style={{ color: '#8b5cf6' }}>📅 Past 30 Days ({recentSummaries.length})</strong>
+              <span style={{ color: '#8b5cf6', fontSize: '1.2rem' }}>{showRecentSummaries ? '▼' : '▶'}</span>
             </div>
-          ) : (
-            summaries.map((summary) => {
-              // Remove ALL markdown formatting for clean professional display
-              let cleanText = summary.summaryText
-                // Remove headers (##, ###, ####)
-                .replace(/^#{1,6}\s+(.+)$/gm, '$1')
-                // Remove bold+italic (*** or ___)
-                .replace(/[*_]{3}([^*_]+)[*_]{3}/g, '$1')
-                // Remove bold (** or __)
-                .replace(/[*_]{2}([^*_]+)[*_]{2}/g, '$1')
-                // Remove italic (* or _)
-                .replace(/[*_]([^*_]+)[*_]/g, '$1')
-                // Remove code markers (`)
-                .replace(/`([^`]+)`/g, '$1')
-                // Convert bullet points to clean bullets
-                .replace(/^[*+-]\s+/gm, '• ')
-                // Remove excessive newlines (max 2)
-                .replace(/\n{3,}/g, '\n\n');
-              
-              return (
-                <div key={summary.rowKey} className="summary-card">
-                  <div className="summary-header">
-                    <span className="summary-date">{formatDateTime(summary.createdAt)}</span>
-                  </div>
-                  <pre className="summary-text">{cleanText}</pre>
-                </div>
-              );
-            })
-          )}
-        </div>
+            {showRecentSummaries && (
+              <div className="summaries-list">
+                {recentSummaries.map((summary) => {
+                  let cleanText = summary.summaryText
+                    .replace(/^#{1,6}\s+(.+)$/gm, '$1')
+                    .replace(/[*_]{3}([^*_]+)[*_]{3}/g, '$1')
+                    .replace(/[*_]{2}([^*_]+)[*_]{2}/g, '$1')
+                    .replace(/[*_]([^*_]+)[*_]/g, '$1')
+                    .replace(/`([^`]+)`/g, '$1')
+                    .replace(/^[*+-]\s+/gm, '• ')
+                    .replace(/\n{3,}/g, '\n\n');
+
+                  return (
+                    <div key={summary.rowKey} className="summary-card">
+                      <div className="summary-header">
+                        <span className="summary-date">{formatDateTime(summary.createdAt)}</span>
+                      </div>
+                      <pre className="summary-text">{cleanText}</pre>
+                    </div>
+                  );
+                })
+                }
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Archived Summaries */}
+        {archivedSummaries.length > 0 && (
+          <div style={{ marginBottom: '1rem' }}>
+            <div 
+              onClick={() => setShowArchivedSummaries(!showArchivedSummaries)}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.75rem 1rem',
+                background: 'rgba(108, 117, 125, 0.1)',
+                border: '1px solid rgba(108, 117, 125, 0.3)',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                marginBottom: '0.5rem'
+              }}
+            >
+              <strong style={{ color: '#6c757d' }}>📦 Archived ({archivedSummaries.length})</strong>
+              <span style={{ color: '#6c757d', fontSize: '1.2rem' }}>{showArchivedSummaries ? '▼' : '▶'}</span>
+            </div>
+            {showArchivedSummaries && (
+              <div className="summaries-list">
+                {archivedSummaries.map((summary) => {
+                  let cleanText = summary.summaryText
+                    .replace(/^#{1,6}\s+(.+)$/gm, '$1')
+                    .replace(/[*_]{3}([^*_]+)[*_]{3}/g, '$1')
+                    .replace(/[*_]{2}([^*_]+)[*_]{2}/g, '$1')
+                    .replace(/[*_]([^*_]+)[*_]/g, '$1')
+                    .replace(/`([^`]+)`/g, '$1')
+                    .replace(/^[*+-]\s+/gm, '• ')
+                    .replace(/\n{3,}/g, '\n\n');
+
+                  return (
+                    <div key={summary.rowKey} className="summary-card" style={{ opacity: 0.8 }}>
+                      <div className="summary-header">
+                        <span className="summary-date">{formatDateTime(summary.createdAt)}</span>
+                      </div>
+                      <pre className="summary-text">{cleanText}</pre>
+                    </div>
+                  );
+                })
+                }
+              </div>
+            )}
+          </div>
+        )}
+
+        {summaries.length === 0 && (
+          <div className="empty-section">
+            No summaries generated yet. Click "Generate Summary" to create an AI-powered summary of this patient's records.
+          </div>
+        )}
       </div>
 
       <div style={{ 
@@ -747,81 +833,193 @@ From ${user?.name || 'your medical practice'}`
             }}
             className="btn-primary btn-sm"
           >
-            📎 Upload Document {/* v2.1 */}
+            📎 Upload Document
           </button>
         </div>
-        <div className="documents-list">
-          {loadingDocs ? (
-            <div className="loading-section">Loading documents...</div>
-          ) : documents.length === 0 ? (
-            <div className="empty-section">
-              No documents uploaded yet. Click "Upload Document" to add patient files.
-            </div>
-          ) : (
-            <table className="documents-table">
-              <thead>
-                <tr>
-                  <th>File Name</th>
-                  <th>Type</th>
-                  <th>Size</th>
-                  <th>Description</th>
-                  <th>Uploaded</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {documents.map((doc) => (
-                  <tr key={doc.rowKey}>
-                    <td className="doc-filename">
-                      📄 {doc.fileName}
-                    </td>
-                    <td>{doc.documentType}</td>
-                    <td>{formatFileSize(doc.fileSize)}</td>
-                    <td>{doc.description || '-'}</td>
-                    <td>{formatDateTime(doc.uploadedAt)}</td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                        <button
-                          onClick={() => handleDocumentClick(doc)}
-                          className="document-view-btn"
-                          title="View document in new tab"
-                        >
-                          👁️
-                        </button>
-                        <button
-                          onClick={() => handleWhatsAppClick(doc)}
-                          className="document-whatsapp-btn"
-                          title="Send via WhatsApp"
-                          style={{
-                            background: '#25D366',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '0.5rem 0.75rem',
-                            cursor: 'pointer',
-                            fontSize: '1.1rem',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#128C7E'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = '#25D366'}
-                        >
-                          📱
-                        </button>
-                        <button
-                          onClick={() => handleDeleteDocument(doc)}
-                          className="document-delete-btn"
-                          title="Delete document"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+
+        {loadingDocs ? (
+          <div className="loading-section">Loading documents...</div>
+        ) : documents.length === 0 ? (
+          <div className="empty-section">
+            No documents uploaded yet. Click "Upload Document" to add patient files.
+          </div>
+        ) : (
+          <>
+            {/* Recent Documents (Past 30 Days) */}
+            {recentDocuments.length > 0 && (
+              <div style={{ marginBottom: '1rem' }}>
+                <div 
+                  onClick={() => setShowRecentDocs(!showRecentDocs)}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(78, 205, 196, 0.1)',
+                    border: '1px solid rgba(78, 205, 196, 0.3)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    marginBottom: '0.5rem'
+                  }}
+                >
+                  <strong style={{ color: '#4ecdc4' }}>📅 Past 30 Days ({recentDocuments.length})</strong>
+                  <span style={{ color: '#4ecdc4', fontSize: '1.2rem' }}>{showRecentDocs ? '▼' : '▶'}</span>
+                </div>
+                {showRecentDocs && (
+                  <table className="documents-table">
+                    <thead>
+                      <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Size</th>
+                        <th>Description</th>
+                        <th>Uploaded</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recentDocuments.map((doc) => (
+                        <tr key={doc.rowKey}>
+                          <td className="doc-filename">
+                            📄 {doc.fileName}
+                          </td>
+                          <td>{doc.documentType}</td>
+                          <td>{formatFileSize(doc.fileSize)}</td>
+                          <td>{doc.description || '-'}</td>
+                          <td>{formatDateTime(doc.uploadedAt)}</td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                              <button
+                                onClick={() => handleDocumentClick(doc)}
+                                className="document-view-btn"
+                                title="View document in new tab"
+                              >
+                                👁️
+                              </button>
+                              <button
+                                onClick={() => handleWhatsAppClick(doc)}
+                                className="document-whatsapp-btn"
+                                title="Send via WhatsApp"
+                                style={{
+                                  background: '#25D366',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  padding: '0.5rem 0.75rem',
+                                  cursor: 'pointer',
+                                  fontSize: '1.1rem',
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#128C7E'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#25D366'}
+                              >
+                                📱
+                              </button>
+                              <button
+                                onClick={() => handleDeleteDocument(doc)}
+                                className="document-delete-btn"
+                                title="Delete document"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+
+            {/* Archived Documents */}
+            {archivedDocuments.length > 0 && (
+              <div style={{ marginBottom: '1rem' }}>
+                <div 
+                  onClick={() => setShowArchivedDocs(!showArchivedDocs)}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.75rem 1rem',
+                    background: 'rgba(108, 117, 125, 0.1)',
+                    border: '1px solid rgba(108, 117, 125, 0.3)',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    marginBottom: '0.5rem'
+                  }}
+                >
+                  <strong style={{ color: '#6c757d' }}>📦 Archived ({archivedDocuments.length})</strong>
+                  <span style={{ color: '#6c757d', fontSize: '1.2rem' }}>{showArchivedDocs ? '▼' : '▶'}</span>
+                </div>
+                {showArchivedDocs && (
+                  <table className="documents-table" style={{ opacity: 0.8 }}>
+                    <thead>
+                      <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Size</th>
+                        <th>Description</th>
+                        <th>Uploaded</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {archivedDocuments.map((doc) => (
+                        <tr key={doc.rowKey}>
+                          <td className="doc-filename">
+                            📄 {doc.fileName}
+                          </td>
+                          <td>{doc.documentType}</td>
+                          <td>{formatFileSize(doc.fileSize)}</td>
+                          <td>{doc.description || '-'}</td>
+                          <td>{formatDateTime(doc.uploadedAt)}</td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                              <button
+                                onClick={() => handleDocumentClick(doc)}
+                                className="document-view-btn"
+                                title="View document in new tab"
+                              >
+                                👁️
+                              </button>
+                              <button
+                                onClick={() => handleWhatsAppClick(doc)}
+                                className="document-whatsapp-btn"
+                                title="Send via WhatsApp"
+                                style={{
+                                  background: '#25D366',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  padding: '0.5rem 0.75rem',
+                                  cursor: 'pointer',
+                                  fontSize: '1.1rem',
+                                  transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#128C7E'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = '#25D366'}
+                              >
+                                📱
+                              </button>
+                              <button
+                                onClick={() => handleDeleteDocument(doc)}
+                                className="document-delete-btn"
+                                title="Delete document"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {/* Deleted Documents Section */}
