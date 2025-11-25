@@ -383,6 +383,10 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
     if (patientData.race !== undefined) {
       updateBody.race = patientData.race;
       updateBody.Race = null; // Remove old PascalCase field
+      console.log('🟢 RACE UPDATE:', {
+        value: patientData.race,
+        type: typeof patientData.race
+      });
     }
     if (patientData.dateOfBirth !== undefined) updateBody.dateOfBirth = patientData.dateOfBirth;
     if (patientData.medicalRecordNumber !== undefined) updateBody.medicalRecordNumber = patientData.medicalRecordNumber;
@@ -394,6 +398,11 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
     if (patientData.currentMedications !== undefined) {
       updateBody.currentMedications = patientData.currentMedications;
       updateBody.CurrentMedications = null; // Remove old PascalCase field
+      console.log('🟢 MEDICATIONS UPDATE:', {
+        value: patientData.currentMedications,
+        type: typeof patientData.currentMedications,
+        length: patientData.currentMedications?.length
+      });
     }
     if (patientData.chronicConditions !== undefined) {
       updateBody.chronicConditions = patientData.chronicConditions;
@@ -471,6 +480,7 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
           whatsappPhone: patient.whatsappPhone || patient.WhatsappPhone || '',
           passportId: patient.passportId || patient.PassportId || '',
           gender: patient.gender || patient.Gender || '',
+          race: patient.race || patient.Race || '',
           dateOfBirth: patient.dateOfBirth || patient.DateOfBirth || '',
           medicalRecordNumber: patient.medicalRecordNumber || patient.MedicalRecordNumber || '',
           emergencyContact: patient.emergencyContact || patient.EmergencyContact || '',
@@ -478,6 +488,7 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
           medicalAidNumber: patient.medicalAidNumber || patient.MedicalAidNumber || '',
           dependentCode: patient.dependentCode || patient.DependentCode || '',
           allergies: patient.allergies || patient.Allergies || '',
+          currentMedications: patient.currentMedications || patient.CurrentMedications || '',
           chronicConditions: patient.chronicConditions || patient.ChronicConditions || '',
           status: patient.status || patient.Status || 'Unknown',
           deceasedDate: patient.deceasedDate || patient.DeceasedDate || '',
