@@ -235,7 +235,7 @@ interface Document {
   fileSize: number;
   uploadedAt: string;
   description: string;
-  documentType: 'Lab Results' | 'Imaging' | 'Pathology' | 'Consultation' | 'Prescription' | 'Invoice' | 'Body Composition' | 'Other';
+  documentType: 'Lab Results' | 'Imaging' | 'Pathology' | 'Consultation' | 'Prescription' | 'Referral Letter' | 'Invoice' | 'Body Composition' | 'Other';
 }
 
 interface AISummary {
@@ -2817,6 +2817,7 @@ From ${user?.name || 'your medical practice'}`
                                            document.documentType === 'Pathology' ? '🔬' :
                                            document.documentType === 'Consultation' ? '📝' :
                                            document.documentType === 'Prescription' ? '💊' :
+                                           document.documentType === 'Referral Letter' ? '✉️' :
                                            document.documentType === 'Invoice' ? '📋' : '📄'}
                                         </div>
                                         <div className="document-details">
@@ -2920,6 +2921,7 @@ From ${user?.name || 'your medical practice'}`
                                            document.documentType === 'Pathology' ? '🔬' :
                                            document.documentType === 'Consultation' ? '📝' :
                                            document.documentType === 'Prescription' ? '💊' :
+                                           document.documentType === 'Referral Letter' ? '✉️' :
                                            document.documentType === 'Invoice' ? '📋' : '📄'}
                                         </div>
                                         <div className="document-details">
@@ -4428,6 +4430,7 @@ From ${user?.name || 'your medical practice'}`
                       <option value="Pathology">🔬 Pathology Report</option>
                       <option value="Consultation">📝 Consultation Notes</option>
                       <option value="Prescription">💊 Prescription</option>
+                      <option value="Referral Letter">✉️ Referral Letter</option>
                       <option value="Invoice">📋 Invoice</option>
                       <option value="Body Composition">🏋️‍♀️ Body Composition</option>
                       <option value="Other">📄 Other</option>
