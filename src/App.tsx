@@ -769,7 +769,17 @@ function Dashboard() {
           patientId: editingPatient.id,
           originalData: editingPatient,
           newData: newPatient,
-          updateData: updatedPatientData
+          updateData: updatedPatientData,
+          chronicConditions: {
+            original: editingPatient.chronicConditions,
+            new: newPatient.chronicConditions,
+            update: updatedPatientData.chronicConditions
+          },
+          status: {
+            original: editingPatient.status,
+            new: newPatient.status,
+            update: updatedPatientData.status
+          }
         });
 
         // Update patient using Azure REST API service

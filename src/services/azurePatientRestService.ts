@@ -387,8 +387,21 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
     if (patientData.medicalAidNumber !== undefined) updateBody.medicalAidNumber = patientData.medicalAidNumber;
     if (patientData.dependentCode !== undefined) updateBody.dependentCode = patientData.dependentCode;
     if (patientData.allergies !== undefined) updateBody.allergies = patientData.allergies;
-    if (patientData.chronicConditions !== undefined) updateBody.chronicConditions = patientData.chronicConditions;
-    if (patientData.status !== undefined) updateBody.status = patientData.status;
+    if (patientData.chronicConditions !== undefined) {
+      updateBody.chronicConditions = patientData.chronicConditions;
+      console.log('🟢 CHRONIC CONDITIONS UPDATE:', {
+        value: patientData.chronicConditions,
+        type: typeof patientData.chronicConditions,
+        length: patientData.chronicConditions?.length
+      });
+    }
+    if (patientData.status !== undefined) {
+      updateBody.status = patientData.status;
+      console.log('🟢 STATUS UPDATE:', {
+        value: patientData.status,
+        type: typeof patientData.status
+      });
+    }
     if (patientData.deceasedDate !== undefined) updateBody.deceasedDate = patientData.deceasedDate;
     // Address fields
     if (patientData.homeNumber !== undefined) updateBody.homeNumber = patientData.homeNumber;
@@ -474,8 +487,19 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
         console.log('✅ Normalized patient data:', {
           id: updatedPatient.id,
           name: updatedPatient.name,
+          chronicConditions: updatedPatient.chronicConditions,
           status: updatedPatient.status,
           deceasedDate: updatedPatient.deceasedDate
+        });
+        console.log('🟢 RAW chronicConditions from DB:', {
+          lowercase: patient.chronicConditions,
+          PascalCase: patient.ChronicConditions,
+          final: updatedPatient.chronicConditions
+        });
+        console.log('🟢 RAW status from DB:', {
+          lowercase: patient.status,
+          PascalCase: patient.Status,
+          final: updatedPatient.status
         });
         return updatedPatient;
       } else {
