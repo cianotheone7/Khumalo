@@ -2739,86 +2739,223 @@ From ${user?.name || 'your medical practice'}`
                         </button>
                       </div>
                       
-                      <div className="documents-grid">
-                        {documentsList
-                          .filter(doc => doc.patientId === selectedPatient.medicalRecordNumber)
-                          .map(document => (
-                            <div key={document.rowKey} className="document-item">
-                              <div className="document-icon">
-                                {document.documentType === 'Lab Results' ? '🧪' :
-                                 document.documentType === 'Imaging' ? '📷' :
-                                 document.documentType === 'Pathology' ? '🔬' :
-                                 document.documentType === 'Consultation' ? '📝' :
-                                 document.documentType === 'Prescription' ? '💊' :
-                                 document.documentType === 'Invoice' ? '📋' : '📄'}
-                              </div>
-                              <div className="document-details">
-                                <h4>{document.fileName}</h4>
-                                <p>{document.description}</p>
-                                <span className="document-type">{document.documentType}</span>
-                                <span className="document-date">{new Date(document.uploadedAt).toLocaleDateString('en-ZA')}</span>
-                              </div>
-                              <div className="document-actions">
-                                <button 
-                                  className="document-view-btn"
-                                  onClick={() => {
-                                    console.log('📄 Viewing document:', document.fileName);
-                                    console.log('🔗 Blob URL:', document.blobUrl);
-                                    
-                                    if (document.blobUrl) {
-                                      console.log('🚀 Opening document...');
-                                      const newWindow = window.open(document.blobUrl, '_blank', 'noopener,noreferrer');
-                                      
-                                      if (!newWindow) {
-                                        alert('Pop-up blocked! Please allow pop-ups for this site.');
-                                      } else {
-                                        console.log('✅ Document opened successfully');
-                                      }
-                                    } else {
-                                      alert('Document URL not available');
-                                    }
-                                  }}
-                                  title="View Document"
-                                >
-                                  👁️
-                                </button>
-                                <button 
-                                  className="document-whatsapp-btn"
-                                  onClick={() => handleWhatsAppClick(document)}
-                                  title="Send via WhatsApp"
+                      {(() => {
+                        const patientDocs = documentsList.filter(doc => doc.patientId === selectedPatient.medicalRecordNumber);
+                        const thirtyDaysAgo = new Date();
+                        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                        
+                        const recentDocs = patientDocs.filter(doc => new Date(doc.uploadedAt) >= thirtyDaysAgo);
+                        const archivedDocs = patientDocs.filter(doc => new Date(doc.uploadedAt) < thirtyDaysAgo);
+                        
+                        const [showRecentDocs, setShowRecentDocs] = React.useState(true);
+                        const [showArchivedDocs, setShowArchivedDocs] = React.useState(false);
+                        
+                        return (
+                          <>
+                            {/* Recent Documents (Past 30 Days) */}
+                            {recentDocs.length > 0 && (
+                              <div style={{ marginBottom: '1rem' }}>
+                                <div 
+                                  onClick={() => setShowRecentDocs(!showRecentDocs)}
                                   style={{
-                                    background: '#25D366',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    width: '36px',
-                                    height: '36px',
                                     display: 'flex',
+                                    justifyContent: 'space-between',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
+                                    padding: '0.75rem 1rem',
+                                    background: 'rgba(78, 205, 196, 0.1)',
+                                    border: '1px solid rgba(78, 205, 196, 0.3)',
+                                    borderRadius: '8px',
                                     cursor: 'pointer',
-                                    fontSize: '1.1rem',
-                                    transition: 'all 0.2s ease',
-                                    padding: '6px'
+                                    marginBottom: '0.5rem'
                                   }}
-                                  onMouseEnter={(e) => e.currentTarget.style.background = '#128C7E'}
-                                  onMouseLeave={(e) => e.currentTarget.style.background = '#25D366'}
                                 >
-                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="white"/>
-                                  </svg>
-                                </button>
-                                <button 
-                                  className="document-delete-btn"
-                                  onClick={() => deleteDocument(document.rowKey)}
-                                  title="Delete Document"
-                                >
-                                  ✕
-                                </button>
+                                  <strong style={{ color: '#4ecdc4' }}>📅 Past 30 Days ({recentDocs.length})</strong>
+                                  <span style={{ color: '#4ecdc4', fontSize: '1.2rem' }}>{showRecentDocs ? '▼' : '▶'}</span>
+                                </div>
+                                {showRecentDocs && (
+                                  <div className="documents-grid">
+                                    {recentDocs.map(document => (
+                                      <div key={document.rowKey} className="document-item">
+                                        <div className="document-icon">
+                                          {document.documentType === 'Lab Results' ? '🧪' :
+                                           document.documentType === 'Imaging' ? '📷' :
+                                           document.documentType === 'Pathology' ? '🔬' :
+                                           document.documentType === 'Consultation' ? '📝' :
+                                           document.documentType === 'Prescription' ? '💊' :
+                                           document.documentType === 'Invoice' ? '📋' : '📄'}
+                                        </div>
+                                        <div className="document-details">
+                                          <h4>{document.fileName}</h4>
+                                          <p>{document.description}</p>
+                                          <span className="document-type">{document.documentType}</span>
+                                          <span className="document-date">{new Date(document.uploadedAt).toLocaleDateString('en-ZA')}</span>
+                                        </div>
+                                        <div className="document-actions">
+                                          <button 
+                                            className="document-view-btn"
+                                            onClick={() => {
+                                              console.log('📄 Viewing document:', document.fileName);
+                                              console.log('🔗 Blob URL:', document.blobUrl);
+                                              
+                                              if (document.blobUrl) {
+                                                console.log('🚀 Opening document...');
+                                                const newWindow = window.open(document.blobUrl, '_blank', 'noopener,noreferrer');
+                                                
+                                                if (!newWindow) {
+                                                  alert('Pop-up blocked! Please allow pop-ups for this site.');
+                                                } else {
+                                                  console.log('✅ Document opened successfully');
+                                                }
+                                              } else {
+                                                alert('Document URL not available');
+                                              }
+                                            }}
+                                            title="View Document"
+                                          >
+                                            👁️
+                                          </button>
+                                          <button 
+                                            className="document-whatsapp-btn"
+                                            onClick={() => handleWhatsAppClick(document)}
+                                            title="Send via WhatsApp"
+                                            style={{
+                                              background: '#25D366',
+                                              color: 'white',
+                                              border: 'none',
+                                              borderRadius: '6px',
+                                              width: '36px',
+                                              height: '36px',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              cursor: 'pointer',
+                                              fontSize: '1.1rem',
+                                              transition: 'all 0.2s ease',
+                                              padding: '6px'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = '#128C7E'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = '#25D366'}
+                                          >
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="white"/>
+                                            </svg>
+                                          </button>
+                                          <button 
+                                            className="document-delete-btn"
+                                            onClick={() => deleteDocument(document.rowKey)}
+                                            title="Delete Document"
+                                          >
+                                            ✕
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
-                            </div>
-                          ))}
-                      </div>
+                            )}
+                            
+                            {/* Archived Documents */}
+                            {archivedDocs.length > 0 && (
+                              <div style={{ marginBottom: '1rem' }}>
+                                <div 
+                                  onClick={() => setShowArchivedDocs(!showArchivedDocs)}
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '0.75rem 1rem',
+                                    background: 'rgba(108, 117, 125, 0.1)',
+                                    border: '1px solid rgba(108, 117, 125, 0.3)',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    marginBottom: '0.5rem'
+                                  }}
+                                >
+                                  <strong style={{ color: '#6c757d' }}>📦 Archived ({archivedDocs.length})</strong>
+                                  <span style={{ color: '#6c757d', fontSize: '1.2rem' }}>{showArchivedDocs ? '▼' : '▶'}</span>
+                                </div>
+                                {showArchivedDocs && (
+                                  <div className="documents-grid" style={{ opacity: 0.8 }}>
+                                    {archivedDocs.map(document => (
+                                      <div key={document.rowKey} className="document-item">
+                                        <div className="document-icon">
+                                          {document.documentType === 'Lab Results' ? '🧪' :
+                                           document.documentType === 'Imaging' ? '📷' :
+                                           document.documentType === 'Pathology' ? '🔬' :
+                                           document.documentType === 'Consultation' ? '📝' :
+                                           document.documentType === 'Prescription' ? '💊' :
+                                           document.documentType === 'Invoice' ? '📋' : '📄'}
+                                        </div>
+                                        <div className="document-details">
+                                          <h4>{document.fileName}</h4>
+                                          <p>{document.description}</p>
+                                          <span className="document-type">{document.documentType}</span>
+                                          <span className="document-date">{new Date(document.uploadedAt).toLocaleDateString('en-ZA')}</span>
+                                        </div>
+                                        <div className="document-actions">
+                                          <button 
+                                            className="document-view-btn"
+                                            onClick={() => {
+                                              if (document.blobUrl) {
+                                                window.open(document.blobUrl, '_blank', 'noopener,noreferrer');
+                                              } else {
+                                                alert('Document URL not available');
+                                              }
+                                            }}
+                                            title="View Document"
+                                          >
+                                            👁️
+                                          </button>
+                                          <button 
+                                            className="document-whatsapp-btn"
+                                            onClick={() => handleWhatsAppClick(document)}
+                                            title="Send via WhatsApp"
+                                            style={{
+                                              background: '#25D366',
+                                              color: 'white',
+                                              border: 'none',
+                                              borderRadius: '6px',
+                                              width: '36px',
+                                              height: '36px',
+                                              display: 'flex',
+                                              alignItems: 'center',
+                                              justifyContent: 'center',
+                                              cursor: 'pointer',
+                                              fontSize: '1.1rem',
+                                              transition: 'all 0.2s ease',
+                                              padding: '6px'
+                                            }}
+                                            onMouseEnter={(e) => e.currentTarget.style.background = '#128C7E'}
+                                            onMouseLeave={(e) => e.currentTarget.style.background = '#25D366'}
+                                          >
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" fill="white"/>
+                                            </svg>
+                                          </button>
+                                          <button 
+                                            className="document-delete-btn"
+                                            onClick={() => deleteDocument(document.rowKey)}
+                                            title="Delete Document"
+                                          >
+                                            ✕
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            {patientDocs.length === 0 && (
+                              <div className="empty-section" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                No documents uploaded yet.
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
 
                     <div className="patient-summaries-section">
@@ -2832,55 +2969,157 @@ From ${user?.name || 'your medical practice'}`
                         </button>
                       </div>
                       
-                      <div className="summaries-grid">
-                        {summariesList
-                          .filter(summary => summary.patientId === selectedPatient.medicalRecordNumber)
-                          .map(summary => {
-                            // Debug: Log each summary being displayed
-                            console.log('🔍 Displaying Summary:', {
-                              rowKey: summary.rowKey,
-                              patientId: summary.patientId,
-                              hasSummaryText: !!summary.summaryText,
-                              summaryTextLength: summary.summaryText?.length || 0,
-                              summaryTextPreview: summary.summaryText?.substring(0, 100) + '...' || 'No text',
-                              hasSummary: !!summary.summary,
-                              summaryLength: summary.summary?.length || 0
-                            });
+                      {(() => {
+                        const patientSummaries = summariesList.filter(summary => summary.patientId === selectedPatient.medicalRecordNumber);
+                        const thirtyDaysAgo = new Date();
+                        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                        
+                        const recentSummaries = patientSummaries.filter(summary => new Date(summary.createdAt) >= thirtyDaysAgo);
+                        const archivedSummaries = patientSummaries.filter(summary => new Date(summary.createdAt) < thirtyDaysAgo);
+                        
+                        const [showRecentSummaries, setShowRecentSummaries] = React.useState(true);
+                        const [showArchivedSummaries, setShowArchivedSummaries] = React.useState(false);
+                        
+                        return (
+                          <>
+                            {/* Recent Summaries (Past 30 Days) */}
+                            {recentSummaries.length > 0 && (
+                              <div style={{ marginBottom: '1rem' }}>
+                                <div 
+                                  onClick={() => setShowRecentSummaries(!showRecentSummaries)}
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '0.75rem 1rem',
+                                    background: 'rgba(139, 92, 246, 0.1)',
+                                    border: '1px solid rgba(139, 92, 246, 0.3)',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    marginBottom: '0.5rem'
+                                  }}
+                                >
+                                  <strong style={{ color: '#8b5cf6' }}>📅 Past 30 Days ({recentSummaries.length})</strong>
+                                  <span style={{ color: '#8b5cf6', fontSize: '1.2rem' }}>{showRecentSummaries ? '▼' : '▶'}</span>
+                                </div>
+                                {showRecentSummaries && (
+                                  <div className="summaries-grid">
+                                    {recentSummaries.map(summary => {
+                                      console.log('🔍 Displaying Summary:', {
+                                        rowKey: summary.rowKey,
+                                        patientId: summary.patientId,
+                                        hasSummaryText: !!summary.summaryText,
+                                        summaryTextLength: summary.summaryText?.length || 0,
+                                        summaryTextPreview: summary.summaryText?.substring(0, 100) + '...' || 'No text',
+                                        hasSummary: !!summary.summary,
+                                        summaryLength: summary.summary?.length || 0
+                                      });
+                                      
+                                      return (
+                                        <div key={summary.rowKey} className="summary-item">
+                                          <div className="summary-header">
+                                            <h4>AI Summary - {summary.createdAt ? new Date(summary.createdAt).toLocaleDateString('en-ZA') : 'Unknown Date'}</h4>
+                                            <div className="summary-header-actions">
+                                              <button 
+                                                className="btn btn-success btn-sm"
+                                                onClick={() => {
+                                                  setWhatsappPhone(selectedPatient.whatsappPhone || selectedPatient.mobilePhone || selectedPatient.phone || '');
+                                                  setWhatsappMessage(summary.summaryText || summary.summary);
+                                                  setIsCustomWhatsAppNumber(false);
+                                                  setShowWhatsAppModal(true);
+                                                }}
+                                                style={{ background: '#25D366', color: 'white', marginRight: '8px' }}
+                                                title="Send via WhatsApp"
+                                              >
+                                                📱
+                                              </button>
+                                              <button 
+                                                className="summary-delete-btn"
+                                                onClick={() => deleteSummary(summary.rowKey)}
+                                                title="Delete Summary"
+                                              >
+                                                ×
+                                              </button>
+                                            </div>
+                                          </div>
+                                          <div className="summary-content">
+                                            <pre>{summary.summaryText || summary.summary || 'No summary available'}</pre>
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            )}
                             
-                            return (
-                            <div key={summary.rowKey} className="summary-item">
-                              <div className="summary-header">
-                                <h4>AI Summary - {summary.createdAt ? new Date(summary.createdAt).toLocaleDateString('en-ZA') : 'Unknown Date'}</h4>
-                                <div className="summary-header-actions">
-                                  <button 
-                                    className="btn btn-success btn-sm"
-                                    onClick={() => {
-                                      setWhatsappPhone(selectedPatient.whatsappPhone || selectedPatient.mobilePhone || selectedPatient.phone || '');
-                                      setWhatsappMessage(summary.summaryText || summary.summary);
-                                      setIsCustomWhatsAppNumber(false);
-                                      setShowWhatsAppModal(true);
-                                    }}
-                                    style={{ background: '#25D366', color: 'white', marginRight: '8px' }}
-                                    title="Send via WhatsApp"
-                                  >
-                                    📱
-                                  </button>
-                                  <button 
-                                      className="summary-delete-btn"
-                                    onClick={() => deleteSummary(summary.rowKey)}
-                                    title="Delete Summary"
-                                  >
-                                      ×
-                                  </button>
+                            {/* Archived Summaries */}
+                            {archivedSummaries.length > 0 && (
+                              <div style={{ marginBottom: '1rem' }}>
+                                <div 
+                                  onClick={() => setShowArchivedSummaries(!showArchivedSummaries)}
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '0.75rem 1rem',
+                                    background: 'rgba(108, 117, 125, 0.1)',
+                                    border: '1px solid rgba(108, 117, 125, 0.3)',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    marginBottom: '0.5rem'
+                                  }}
+                                >
+                                  <strong style={{ color: '#6c757d' }}>📦 Archived ({archivedSummaries.length})</strong>
+                                  <span style={{ color: '#6c757d', fontSize: '1.2rem' }}>{showArchivedSummaries ? '▼' : '▶'}</span>
                                 </div>
+                                {showArchivedSummaries && (
+                                  <div className="summaries-grid" style={{ opacity: 0.8 }}>
+                                    {archivedSummaries.map(summary => (
+                                      <div key={summary.rowKey} className="summary-item">
+                                        <div className="summary-header">
+                                          <h4>AI Summary - {summary.createdAt ? new Date(summary.createdAt).toLocaleDateString('en-ZA') : 'Unknown Date'}</h4>
+                                          <div className="summary-header-actions">
+                                            <button 
+                                              className="btn btn-success btn-sm"
+                                              onClick={() => {
+                                                setWhatsappPhone(selectedPatient.whatsappPhone || selectedPatient.mobilePhone || selectedPatient.phone || '');
+                                                setWhatsappMessage(summary.summaryText || summary.summary);
+                                                setIsCustomWhatsAppNumber(false);
+                                                setShowWhatsAppModal(true);
+                                              }}
+                                              style={{ background: '#25D366', color: 'white', marginRight: '8px' }}
+                                              title="Send via WhatsApp"
+                                            >
+                                              📱
+                                            </button>
+                                            <button 
+                                              className="summary-delete-btn"
+                                              onClick={() => deleteSummary(summary.rowKey)}
+                                              title="Delete Summary"
+                                            >
+                                              ×
+                                            </button>
+                                          </div>
+                                        </div>
+                                        <div className="summary-content">
+                                          <pre>{summary.summaryText || summary.summary || 'No summary available'}</pre>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
-                              <div className="summary-content">
-                                <pre>{summary.summaryText || summary.summary || 'No summary available'}</pre>
-                                </div>
+                            )}
+                            
+                            {patientSummaries.length === 0 && (
+                              <div className="empty-section" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                No AI summaries generated yet.
                               </div>
-                            );
-                          })}
-                      </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
