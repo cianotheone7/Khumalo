@@ -366,6 +366,12 @@ function Dashboard() {
   const [whatsappMessage, setWhatsappMessage] = useState('');
   const [isCustomWhatsAppNumber, setIsCustomWhatsAppNumber] = useState(false);
 
+  // Dropdown states for documents and summaries
+  const [showRecentDocs, setShowRecentDocs] = useState(true);
+  const [showArchivedDocs, setShowArchivedDocs] = useState(false);
+  const [showRecentSummaries, setShowRecentSummaries] = useState(true);
+  const [showArchivedSummaries, setShowArchivedSummaries] = useState(false);
+
   // KPI data for last 30 days
   const [kpiData, setKpiData] = useState({
     documentsLast30Days: 0,
@@ -2747,9 +2753,6 @@ From ${user?.name || 'your medical practice'}`
                         const recentDocs = patientDocs.filter(doc => new Date(doc.uploadedAt) >= thirtyDaysAgo);
                         const archivedDocs = patientDocs.filter(doc => new Date(doc.uploadedAt) < thirtyDaysAgo);
                         
-                        const [showRecentDocs, setShowRecentDocs] = React.useState(true);
-                        const [showArchivedDocs, setShowArchivedDocs] = React.useState(false);
-                        
                         return (
                           <>
                             {/* Recent Documents (Past 30 Days) */}
@@ -2976,9 +2979,6 @@ From ${user?.name || 'your medical practice'}`
                         
                         const recentSummaries = patientSummaries.filter(summary => new Date(summary.createdAt) >= thirtyDaysAgo);
                         const archivedSummaries = patientSummaries.filter(summary => new Date(summary.createdAt) < thirtyDaysAgo);
-                        
-                        const [showRecentSummaries, setShowRecentSummaries] = React.useState(true);
-                        const [showArchivedSummaries, setShowArchivedSummaries] = React.useState(false);
                         
                         return (
                           <>
