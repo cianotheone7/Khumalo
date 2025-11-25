@@ -371,6 +371,10 @@ function Dashboard() {
   const [showArchivedDocs, setShowArchivedDocs] = useState(false);
   const [showRecentSummaries, setShowRecentSummaries] = useState(false);
   const [showArchivedSummaries, setShowArchivedSummaries] = useState(false);
+  
+  // Dropdown states for patient details sections
+  const [showBasicInfo, setShowBasicInfo] = useState(true);
+  const [showAddressInfo, setShowAddressInfo] = useState(true);
 
   // KPI data for last 30 days
   const [kpiData, setKpiData] = useState({
@@ -2635,7 +2639,24 @@ From ${user?.name || 'your medical practice'}`
 
                   <div className="patient-details-content">
                     <div className="patient-basic-info">
-                      <h3>Basic Information</h3>
+                      <div 
+                        onClick={() => setShowBasicInfo(!showBasicInfo)}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '0.75rem 1rem',
+                          background: 'rgba(78, 205, 196, 0.1)',
+                          border: '1px solid rgba(78, 205, 196, 0.3)',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          marginBottom: '0.5rem'
+                        }}
+                      >
+                        <h3 style={{ margin: 0, color: '#4ecdc4' }}>Basic Information</h3>
+                        <span style={{ color: '#4ecdc4', fontSize: '1.2rem' }}>{showBasicInfo ? '▼' : '▶'}</span>
+                      </div>
+                      {showBasicInfo && (
                       <div className="info-grid">
                         <div className="info-item">
                           <label>Full Name:</label>
@@ -2729,11 +2750,29 @@ From ${user?.name || 'your medical practice'}`
                           </div>
                         )}
                       </div>
+                      )}
                     </div>
 
                     {/* Address Information Section */}
                     <div className="patient-basic-info">
-                      <h3>Address Information</h3>
+                      <div 
+                        onClick={() => setShowAddressInfo(!showAddressInfo)}
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '0.75rem 1rem',
+                          background: 'rgba(78, 205, 196, 0.1)',
+                          border: '1px solid rgba(78, 205, 196, 0.3)',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          marginBottom: '0.5rem'
+                        }}
+                      >
+                        <h3 style={{ margin: 0, color: '#4ecdc4' }}>Address Information</h3>
+                        <span style={{ color: '#4ecdc4', fontSize: '1.2rem' }}>{showAddressInfo ? '▼' : '▶'}</span>
+                      </div>
+                      {showAddressInfo && (
                       <div className="info-grid">
                         <div className="info-item" style={{ gridColumn: '1 / -1' }}>
                           <label>Home/Unit Number or Estate:</label>
@@ -2764,6 +2803,7 @@ From ${user?.name || 'your medical practice'}`
                           <span>{selectedPatient.country || 'Not specified'}</span>
                         </div>
                       </div>
+                      )}
                     </div>
 
                     <div className="patient-documents-section">
