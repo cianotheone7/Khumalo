@@ -714,7 +714,7 @@ function Dashboard() {
       allergies: patient.allergies,
       currentMedications: patient.currentMedications || '',
       chronicConditions: patient.chronicConditions,
-      status: patient.status || 'Unknown',
+      status: (patient.status as any) === 'Active' ? 'Living' : (patient.status || 'Unknown'),
       deceasedDate: patient.deceasedDate || '',
       // Address fields
       homeNumber: patient.homeNumber || '',
