@@ -389,6 +389,7 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
     if (patientData.allergies !== undefined) updateBody.allergies = patientData.allergies;
     if (patientData.chronicConditions !== undefined) {
       updateBody.chronicConditions = patientData.chronicConditions;
+      updateBody.ChronicConditions = null; // Remove old PascalCase field
       console.log('🟢 CHRONIC CONDITIONS UPDATE:', {
         value: patientData.chronicConditions,
         type: typeof patientData.chronicConditions,
@@ -397,6 +398,7 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
     }
     if (patientData.status !== undefined) {
       updateBody.status = patientData.status;
+      updateBody.Status = null; // Remove old PascalCase field
       console.log('🟢 STATUS UPDATE:', {
         value: patientData.status,
         type: typeof patientData.status
