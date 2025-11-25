@@ -772,6 +772,16 @@ function Dashboard() {
           originalData: editingPatient,
           newData: newPatient,
           updateData: updatedPatientData,
+          race: {
+            original: editingPatient.race,
+            new: newPatient.race,
+            update: updatedPatientData.race
+          },
+          currentMedications: {
+            original: editingPatient.currentMedications,
+            new: newPatient.currentMedications,
+            update: updatedPatientData.currentMedications
+          },
           chronicConditions: {
             original: editingPatient.chronicConditions,
             new: newPatient.chronicConditions,
