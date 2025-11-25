@@ -512,6 +512,10 @@ From ${user?.name || 'your medical practice'}`
             <span>{patient.gender || 'Not specified'}</span>
           </div>
           <div className="info-item">
+            <label>Race/Ethnicity:</label>
+            <span>{patient.race || 'Not specified'}</span>
+          </div>
+          <div className="info-item">
             <label>Date of Birth:</label>
             <span>{patient.dateOfBirth ? formatDate(patient.dateOfBirth) : 'Not specified'}</span>
           </div>
@@ -548,6 +552,10 @@ From ${user?.name || 'your medical practice'}`
           <div className="info-item">
             <label>Allergies:</label>
             <span>{patient.allergies || 'None reported'}</span>
+          </div>
+          <div className="info-item" style={{ gridColumn: '1 / -1' }}>
+            <label>Current Medications:</label>
+            <span style={{ whiteSpace: 'pre-wrap' }}>{patient.currentMedications || 'None reported'}</span>
           </div>
           <div className="info-item" style={{ gridColumn: '1 / -1' }}>
             <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
