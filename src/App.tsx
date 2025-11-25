@@ -2670,6 +2670,10 @@ From ${user?.name || 'your medical practice'}`
                           <span>{selectedPatient.gender || 'Not specified'}</span>
                         </div>
                         <div className="info-item">
+                          <label>Race/Ethnicity:</label>
+                          <span>{selectedPatient.race || 'Not specified'}</span>
+                        </div>
+                        <div className="info-item">
                           <label>Date of Birth:</label>
                           <span>{new Date(selectedPatient.dateOfBirth).toLocaleDateString('en-ZA')}</span>
                         </div>
@@ -2710,6 +2714,12 @@ From ${user?.name || 'your medical practice'}`
                           <div className="info-item">
                             <label>Allergies:</label>
                             <span>{selectedPatient.allergies}</span>
+                          </div>
+                        )}
+                        {selectedPatient.currentMedications && (
+                          <div className="info-item" style={{ gridColumn: '1 / -1' }}>
+                            <label>Current Medications:</label>
+                            <span style={{ whiteSpace: 'pre-wrap' }}>{selectedPatient.currentMedications}</span>
                           </div>
                         )}
                         {selectedPatient.chronicConditions && (
