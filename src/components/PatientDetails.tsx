@@ -522,10 +522,10 @@ From ${user?.name || 'your medical practice'}`
           <div className="info-item">
             <label>Status:</label>
             <span style={{ 
-              color: patient.status === 'Deceased' ? '#dc3545' : patient.status === 'Living' ? '#28a745' : '#6c757d',
+              color: patient.status === 'Deceased' ? '#dc3545' : (patient.status === 'Living' || (patient.status as any) === 'Active') ? '#28a745' : '#6c757d',
               fontWeight: '500'
             }}>
-              {patient.status || 'Unknown'}
+              {(patient.status as any) === 'Active' ? 'Living' : (patient.status || 'Unknown')}
               {patient.status === 'Deceased' && patient.deceasedDate && ` (${formatDate(patient.deceasedDate)})`}
             </span>
           </div>
