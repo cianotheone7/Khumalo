@@ -71,6 +71,7 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
   // Form state
   const [selectedPatientId, setSelectedPatientId] = useState('');
   const [selectedPatientName, setSelectedPatientName] = useState('');
+  const [prescriptionType, setPrescriptionType] = useState<'normal' | 'chronic'>('normal');
   const [diagnosis, setDiagnosis] = useState('');
   const [notes, setNotes] = useState('');
   const [medications, setMedications] = useState<PrescriptionMedication[]>([]);
@@ -208,6 +209,7 @@ const PrescriptionManagement: React.FC<PrescriptionManagementProps> = ({ user: p
     setPatientSearchTerm('');
     setPatientSearchResults([]);
     setShowPatientDropdown(false);
+    setPrescriptionType('normal');
     setDiagnosis('');
     setNotes('');
     setMedications([]);
@@ -971,6 +973,63 @@ ${prescription.doctorName}`);
                 )}
               </div>
 
+              {/* Prescription Type */}
+              <div className="form-group">
+                <label>Prescription Type *</label>
+                <select
+                  value={prescriptionType}
+                  onChange={(e) => {
+                    const type = e.target.value as 'normal' | 'chronic';
+                    setPrescriptionType(type);
+                    
+                    // If chronic is selected and patient is selected, load their current medications
+                    if (type === 'chronic' && selectedPatientId) {
+                      const patient = patientsCacheRef.current.find(p => p.rowKey === selectedPatientId) || 
+                                      patientsCache.find(p => p.rowKey === selectedPatientId);
+                      
+                      if (patient?.currentMedications) {
+                        // Parse current medications into prescription format
+                        const medLines = patient.currentMedications.split('\n').filter(m => m.trim());
+                        const parsedMeds: PrescriptionMedication[] = medLines.map((medLine, idx) => ({
+                          medicationId: `chronic-${idx}`,
+                          medicationName: medLine,
+                          genericName: '',
+                          dosage: '',
+                          frequency: '',
+                          duration: 'Chronic (ongoing)',
+                          instructions: medLine,
+                          quantity: 30,
+                          refills: 5,
+                          form: '',
+                          schedule: '',
+                          route: 'Oral'
+                        }));
+                        setMedications(parsedMeds);
+                      } else {
+                        alert('⚠️ This patient has no chronic medications on file. Please add medications to their patient record first, or use Normal prescription type.');
+                      }
+                    } else if (type === 'normal') {
+                      setMedications([]);
+                    }
+                  }}
+                  className="form-input"
+                  style={{
+                    padding: '0.75rem',
+                    fontSize: '1rem',
+                    borderRadius: '8px',
+                    border: '2px solid #e9ecef'
+                  }}
+                >
+                  <option value="normal">Normal Script</option>
+                  <option value="chronic">Chronic Script</option>
+                </select>
+                {prescriptionType === 'chronic' && (
+                  <small style={{ color: '#666', marginTop: '0.5rem', display: 'block' }}>
+                    💊 Chronic medications will be loaded from the patient's medical record
+                  </small>
+                )}
+              </div>
+
               {/* Diagnosis */}
               <div className="form-group">
                 <label>Diagnosis / Indication</label>
@@ -987,16 +1046,23 @@ ${prescription.doctorName}`);
               <div className="medications-section">
                 <div className="section-header">
                   <h4>Medications</h4>
-                  <button
-                    onClick={() => setShowMedSearch(!showMedSearch)}
-                    className="btn-primary"
-                  >
-                    {showMedSearch ? '✕ Cancel' : '➕ Add Medication'}
-                  </button>
+                  {prescriptionType === 'normal' && (
+                    <button
+                      onClick={() => setShowMedSearch(!showMedSearch)}
+                      className="btn-primary"
+                    >
+                      {showMedSearch ? '✕ Cancel' : '➕ Add Medication'}
+                    </button>
+                  )}
+                  {prescriptionType === 'chronic' && (
+                    <span style={{ color: '#666', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                      Chronic medications from patient record
+                    </span>
+                  )}
                 </div>
 
                 {/* Medication Search */}
-                {showMedSearch && (
+                {showMedSearch && prescriptionType === 'normal' && (
                   <div className="med-search-panel">
                     <div className="search-controls">
                       <input
@@ -1051,18 +1117,43 @@ ${prescription.doctorName}`);
                 {/* Added Medications List */}
                 <div className="medications-list">
                   {medications.length === 0 ? (
-                    <p className="empty-medications">No medications added yet</p>
+                    <p className="empty-medications">
+                      {prescriptionType === 'chronic' 
+                        ? 'No chronic medications found for this patient. Please add medications to their patient record first.'
+                        : 'No medications added yet'}
+                    </p>
                   ) : (
                     medications.map((med, index) => (
-                      <div key={index} className="medication-card">
+                      <div 
+                        key={index} 
+                        className="medication-card"
+                        style={{
+                          opacity: prescriptionType === 'chronic' ? 0.7 : 1,
+                          background: prescriptionType === 'chronic' ? '#f8f9fa' : 'white'
+                        }}
+                      >
                         <div className="med-card-header">
                           <h5>{med.medicationName}</h5>
-                          <button
-                            onClick={() => handleRemoveMedication(index)}
-                            className="btn-sm btn-danger"
-                          >
-                            ✕
-                          </button>
+                          {prescriptionType === 'normal' && (
+                            <button
+                              onClick={() => handleRemoveMedication(index)}
+                              className="btn-sm btn-danger"
+                            >
+                              ✕
+                            </button>
+                          )}
+                          {prescriptionType === 'chronic' && (
+                            <span style={{ 
+                              fontSize: '0.85rem', 
+                              color: '#6c757d',
+                              background: '#e9ecef',
+                              padding: '0.25rem 0.5rem',
+                              borderRadius: '4px',
+                              fontWeight: 500
+                            }}>
+                              Chronic
+                            </span>
+                          )}
                         </div>
                         
                         {med.genericName && (
@@ -1078,6 +1169,11 @@ ${prescription.doctorName}`);
                               onChange={(e) => handleUpdateMedication(index, 'dosage', e.target.value)}
                               placeholder="e.g., 500mg"
                               className="form-input"
+                              disabled={prescriptionType === 'chronic'}
+                              style={{
+                                cursor: prescriptionType === 'chronic' ? 'not-allowed' : 'text',
+                                background: prescriptionType === 'chronic' ? '#e9ecef' : 'white'
+                              }}
                             />
                           </div>
 
@@ -1089,6 +1185,11 @@ ${prescription.doctorName}`);
                               onChange={(e) => handleUpdateMedication(index, 'frequency', e.target.value)}
                               placeholder="e.g., Twice daily"
                               className="form-input"
+                              disabled={prescriptionType === 'chronic'}
+                              style={{
+                                cursor: prescriptionType === 'chronic' ? 'not-allowed' : 'text',
+                                background: prescriptionType === 'chronic' ? '#e9ecef' : 'white'
+                              }}
                             />
                           </div>
 
@@ -1100,6 +1201,11 @@ ${prescription.doctorName}`);
                               onChange={(e) => handleUpdateMedication(index, 'duration', e.target.value)}
                               placeholder="e.g., 7 days"
                               className="form-input"
+                              disabled={prescriptionType === 'chronic'}
+                              style={{
+                                cursor: prescriptionType === 'chronic' ? 'not-allowed' : 'text',
+                                background: prescriptionType === 'chronic' ? '#e9ecef' : 'white'
+                              }}
                             />
                           </div>
 
@@ -1111,6 +1217,11 @@ ${prescription.doctorName}`);
                               onChange={(e) => handleUpdateMedication(index, 'quantity', parseInt(e.target.value) || 0)}
                               min="1"
                               className="form-input"
+                              disabled={prescriptionType === 'chronic'}
+                              style={{
+                                cursor: prescriptionType === 'chronic' ? 'not-allowed' : 'text',
+                                background: prescriptionType === 'chronic' ? '#e9ecef' : 'white'
+                              }}
                             />
                           </div>
 
@@ -1122,6 +1233,11 @@ ${prescription.doctorName}`);
                               onChange={(e) => handleUpdateMedication(index, 'refills', parseInt(e.target.value) || 0)}
                               min="0"
                               className="form-input"
+                              disabled={prescriptionType === 'chronic'}
+                              style={{
+                                cursor: prescriptionType === 'chronic' ? 'not-allowed' : 'text',
+                                background: prescriptionType === 'chronic' ? '#e9ecef' : 'white'
+                              }}
                             />
                           </div>
                         </div>
@@ -1134,6 +1250,11 @@ ${prescription.doctorName}`);
                             placeholder="Special instructions..."
                             rows={2}
                             className="form-textarea"
+                            disabled={prescriptionType === 'chronic'}
+                            style={{
+                              cursor: prescriptionType === 'chronic' ? 'not-allowed' : 'text',
+                              background: prescriptionType === 'chronic' ? '#e9ecef' : 'white'
+                            }}
                           />
                         </div>
                       </div>

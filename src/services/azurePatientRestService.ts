@@ -41,6 +41,7 @@ export interface Patient {
   whatsappPhone?: string;
   passportId?: string;
   gender?: string;
+  race?: string;
   dateOfBirth: string;
   medicalRecordNumber: string;
   emergencyContact: string;
@@ -48,6 +49,7 @@ export interface Patient {
   medicalAidNumber?: string;
   dependentCode?: string;
   allergies?: string;
+  currentMedications?: string;
   chronicConditions?: string;
   status?: 'Living' | 'Deceased' | 'Unknown';
   deceasedDate?: string;
@@ -162,6 +164,7 @@ export const createPatient = async (patientData: Omit<Patient, 'id' | 'createdAt
       "whatsappPhone": patient.whatsappPhone || '',
       "passportId": patient.passportId || '',
       "gender": patient.gender || '',
+      "race": patient.race || '',
       "dateOfBirth": patient.dateOfBirth,
       "medicalRecordNumber": patient.medicalRecordNumber,
       "emergencyContact": patient.emergencyContact,
@@ -169,6 +172,7 @@ export const createPatient = async (patientData: Omit<Patient, 'id' | 'createdAt
       "medicalAidNumber": patient.medicalAidNumber || '',
       "dependentCode": patient.dependentCode || '',
       "allergies": patient.allergies || '',
+      "currentMedications": patient.currentMedications || '',
       "chronicConditions": patient.chronicConditions || '',
       "status": patient.status || 'Unknown',
       "deceasedDate": patient.deceasedDate || '',
@@ -278,6 +282,7 @@ export const getPatients = async (): Promise<Patient[]> => {
             whatsappPhone: patient.WhatsappPhone || patient.whatsappPhone || '',
             passportId: patient.PassportId || patient.passportId || '',
             gender: patient.Gender || patient.gender || '',
+            race: patient.Race || patient.race || '',
             dateOfBirth: patient.DateOfBirth || patient.dateOfBirth || '',
             medicalRecordNumber: patient.MedicalRecordNumber || patient.medicalRecordNumber || '',
             emergencyContact: patient.EmergencyContact || patient.emergencyContact || '',
@@ -285,6 +290,7 @@ export const getPatients = async (): Promise<Patient[]> => {
             medicalAidNumber: patient.MedicalAidNumber || patient.medicalAidNumber || '',
             dependentCode: patient.DependentCode || patient.dependentCode || '',
             allergies: patient.Allergies || patient.allergies || '',
+            currentMedications: patient.CurrentMedications || patient.currentMedications || '',
             chronicConditions: patient.ChronicConditions || patient.chronicConditions || '',
             status: patient.Status || patient.status || 'Unknown',
             deceasedDate: patient.DeceasedDate || patient.deceasedDate || '',
