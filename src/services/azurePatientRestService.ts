@@ -282,7 +282,7 @@ export const getPatients = async (): Promise<Patient[]> => {
             whatsappPhone: patient.WhatsappPhone || patient.whatsappPhone || '',
             passportId: patient.PassportId || patient.passportId || '',
             gender: patient.Gender || patient.gender || '',
-            race: patient.Race || patient.race || '',
+            race: patient.race || patient.Race || '',
             dateOfBirth: patient.DateOfBirth || patient.dateOfBirth || '',
             medicalRecordNumber: patient.MedicalRecordNumber || patient.medicalRecordNumber || '',
             emergencyContact: patient.EmergencyContact || patient.emergencyContact || '',
