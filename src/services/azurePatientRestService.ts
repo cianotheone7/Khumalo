@@ -380,6 +380,10 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
     if (patientData.whatsappPhone !== undefined) updateBody.whatsappPhone = patientData.whatsappPhone;
     if (patientData.passportId !== undefined) updateBody.passportId = patientData.passportId;
     if (patientData.gender !== undefined) updateBody.gender = patientData.gender;
+    if (patientData.race !== undefined) {
+      updateBody.race = patientData.race;
+      updateBody.Race = null; // Remove old PascalCase field
+    }
     if (patientData.dateOfBirth !== undefined) updateBody.dateOfBirth = patientData.dateOfBirth;
     if (patientData.medicalRecordNumber !== undefined) updateBody.medicalRecordNumber = patientData.medicalRecordNumber;
     if (patientData.emergencyContact !== undefined) updateBody.emergencyContact = patientData.emergencyContact;
@@ -387,6 +391,10 @@ export const updatePatient = async (patientId: string, patientData: Partial<Pati
     if (patientData.medicalAidNumber !== undefined) updateBody.medicalAidNumber = patientData.medicalAidNumber;
     if (patientData.dependentCode !== undefined) updateBody.dependentCode = patientData.dependentCode;
     if (patientData.allergies !== undefined) updateBody.allergies = patientData.allergies;
+    if (patientData.currentMedications !== undefined) {
+      updateBody.currentMedications = patientData.currentMedications;
+      updateBody.CurrentMedications = null; // Remove old PascalCase field
+    }
     if (patientData.chronicConditions !== undefined) {
       updateBody.chronicConditions = patientData.chronicConditions;
       updateBody.ChronicConditions = null; // Remove old PascalCase field
