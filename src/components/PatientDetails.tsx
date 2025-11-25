@@ -53,9 +53,9 @@ export function PatientDetails({ patient }: PatientDetailsProps) {
   const [editingChronicConditions, setEditingChronicConditions] = useState(false);
   const [chronicConditions, setChronicConditions] = useState<string[]>([]);
   const [savingConditions, setSavingConditions] = useState(false);
-  const [showRecentDocs, setShowRecentDocs] = useState(true);
+  const [showRecentDocs, setShowRecentDocs] = useState(false);
   const [showArchivedDocs, setShowArchivedDocs] = useState(false);
-  const [showRecentSummaries, setShowRecentSummaries] = useState(true);
+  const [showRecentSummaries, setShowRecentSummaries] = useState(false);
   const [showArchivedSummaries, setShowArchivedSummaries] = useState(false);
 
   const loadDocuments = async (silent: boolean = false) => {

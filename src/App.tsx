@@ -367,9 +367,9 @@ function Dashboard() {
   const [isCustomWhatsAppNumber, setIsCustomWhatsAppNumber] = useState(false);
 
   // Dropdown states for documents and summaries
-  const [showRecentDocs, setShowRecentDocs] = useState(true);
+  const [showRecentDocs, setShowRecentDocs] = useState(false);
   const [showArchivedDocs, setShowArchivedDocs] = useState(false);
-  const [showRecentSummaries, setShowRecentSummaries] = useState(true);
+  const [showRecentSummaries, setShowRecentSummaries] = useState(false);
   const [showArchivedSummaries, setShowArchivedSummaries] = useState(false);
 
   // KPI data for last 30 days
