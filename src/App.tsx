@@ -373,8 +373,8 @@ function Dashboard() {
   const [showArchivedSummaries, setShowArchivedSummaries] = useState(false);
   
   // Dropdown states for patient details sections
-  const [showBasicInfo, setShowBasicInfo] = useState(true);
-  const [showAddressInfo, setShowAddressInfo] = useState(true);
+  const [showBasicInfo, setShowBasicInfo] = useState(false);
+  const [showAddressInfo, setShowAddressInfo] = useState(false);
 
   // KPI data for last 30 days
   const [kpiData, setKpiData] = useState({
@@ -2645,16 +2645,17 @@ From ${user?.name || 'your medical practice'}`
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          padding: '0.75rem 1rem',
-                          background: 'rgba(78, 205, 196, 0.1)',
-                          border: '1px solid rgba(78, 205, 196, 0.3)',
+                          padding: '1rem',
+                          background: 'rgba(78, 205, 196, 0.05)',
+                          border: '1px solid rgba(78, 205, 196, 0.2)',
                           borderRadius: '8px',
                           cursor: 'pointer',
-                          marginBottom: '0.5rem'
+                          marginBottom: '1rem',
+                          transition: 'all 0.2s ease'
                         }}
                       >
-                        <h3 style={{ margin: 0, color: '#4ecdc4' }}>Basic Information</h3>
-                        <span style={{ color: '#4ecdc4', fontSize: '1.2rem' }}>{showBasicInfo ? '▼' : '▶'}</span>
+                        <h3 style={{ margin: 0, color: '#4ecdc4', fontSize: '1.1rem', fontWeight: '500' }}>Basic Information</h3>
+                        <span style={{ color: '#4ecdc4', fontSize: '0.9rem' }}>{showBasicInfo ? '▼' : '▶'}</span>
                       </div>
                       {showBasicInfo && (
                       <div className="info-grid">
@@ -2761,16 +2762,17 @@ From ${user?.name || 'your medical practice'}`
                           display: 'flex',
                           justifyContent: 'space-between',
                           alignItems: 'center',
-                          padding: '0.75rem 1rem',
-                          background: 'rgba(78, 205, 196, 0.1)',
-                          border: '1px solid rgba(78, 205, 196, 0.3)',
+                          padding: '1rem',
+                          background: 'rgba(78, 205, 196, 0.05)',
+                          border: '1px solid rgba(78, 205, 196, 0.2)',
                           borderRadius: '8px',
                           cursor: 'pointer',
-                          marginBottom: '0.5rem'
+                          marginBottom: '1rem',
+                          transition: 'all 0.2s ease'
                         }}
                       >
-                        <h3 style={{ margin: 0, color: '#4ecdc4' }}>Address Information</h3>
-                        <span style={{ color: '#4ecdc4', fontSize: '1.2rem' }}>{showAddressInfo ? '▼' : '▶'}</span>
+                        <h3 style={{ margin: 0, color: '#4ecdc4', fontSize: '1.1rem', fontWeight: '500' }}>Address Information</h3>
+                        <span style={{ color: '#4ecdc4', fontSize: '0.9rem' }}>{showAddressInfo ? '▼' : '▶'}</span>
                       </div>
                       {showAddressInfo && (
                       <div className="info-grid">
