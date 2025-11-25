@@ -2667,8 +2667,8 @@ From ${user?.name || 'your medical practice'}`
                         </div>
                         <div className="info-item">
                           <label>Status:</label>
-                          <span className={selectedPatient.status === 'Deceased' ? 'deceased-badge' : selectedPatient.status === 'Living' ? 'living-badge' : 'unknown-badge'}>
-                            {selectedPatient.status || 'Unknown'}
+                          <span className={selectedPatient.status === 'Deceased' ? 'deceased-badge' : (selectedPatient.status === 'Living' || (selectedPatient.status as any) === 'Active') ? 'living-badge' : 'unknown-badge'}>
+                            {(selectedPatient.status as any) === 'Active' ? 'Living' : (selectedPatient.status || 'Unknown')}
                             {selectedPatient.status === 'Deceased' && selectedPatient.deceasedDate && (
                               <span className="deceased-date"> ({new Date(selectedPatient.deceasedDate).toLocaleDateString('en-ZA')})</span>
                             )}
